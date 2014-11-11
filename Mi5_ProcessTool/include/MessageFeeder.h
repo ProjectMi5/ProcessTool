@@ -12,7 +12,6 @@ public:
     ~MessageFeeder();
 
 public:
-    MessageFeeder* getPointer();
     void write(UaString string, messageFeedLevel level);
 
 private:
@@ -20,6 +19,13 @@ private:
     int m_feedCounter;
     OpcuaGateway* m_pGateway;
     int m_moduleNumber;
+
+private:
+    static const int LISTSIZE = 100;
+
+private:
+    void writeToOpcua(UaString message, messageFeedLevel level, UaString timestamp);
+    void resetList();
 };
 
 #endif //MESSAGEFEEDER_H

@@ -156,7 +156,7 @@ bool ProductionModule::checkSkillReadyState(int& skillId)
 {
     bool tmpBool = false;
 
-    if ((skillId >= 0) && (skillId < SKILLCOUNT))
+    if ((skillId >= 0))
     {
         for (int i = 0; i < SKILLCOUNT; i++)
         {

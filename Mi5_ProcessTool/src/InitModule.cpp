@@ -53,6 +53,7 @@ int InitModule::positionCalibration(int moduleNumber)
 
             if (moduleState == SKILLMODULEREADY)
             {
+                std::cout << "Calibrating module " << moduleNumber << "with transport module " << *it << std::endl;
                 positionCalibrationExecution(moduleNumber, *it);
 
                 // Wait til its done.

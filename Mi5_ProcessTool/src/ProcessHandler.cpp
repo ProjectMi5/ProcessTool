@@ -65,10 +65,11 @@ UaStatus ProcessHandler::build()
     // 1. Stelle ÄNDERN
     m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.175.210:4840"));
     m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.175.210:4840"));
+    m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.175.210:4840"));
 
     m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.175.224:4840"));
     m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.175.225:4840"));
-    //m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.175.226:4840"));
+    m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.175.226:4840"));
     // ENDE ÄNDERN
     m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.175.230:4840"));
     m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(
@@ -102,12 +103,15 @@ UaStatus ProcessHandler::build()
             MODULENUMBERXTS1, m_pMessageFeeder);
     m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
             MODULENUMBERXTS2, m_pMessageFeeder);
+    m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
+            MODULENUMBERXTS3, m_pMessageFeeder);
+
     m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
             MODULEX, m_pMessageFeeder);
     m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
             MODULEY, m_pMessageFeeder);
-    //m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
-    //        MODULEZ, m_pMessageFeeder);
+    m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
+            MODULEZ, m_pMessageFeeder);
     //ENDE ÄNDERN
 
     //m_xts = new Xts(m_pOpcuaGateway, MODULENUMBERXTS);
@@ -138,45 +142,20 @@ void ProcessHandler::run()
 
     // Nur eine kosmetische Ausgabe.
     buildSkillList();
-    getchar();
-    initialInit();
-    //m_taskModule->startup();
+    /* initialInit();
+     getchar();*/
+    m_taskModule->startup();
 
-    ////// Testing
-    //while (1)
-    //{
-    //    getchar();
-    //    //execute this skill on the correspondent module
-    //    ParameterInputArray tmpParamArray;
-    //    int skillPos = 1;
-
-    //    for (int i = 0; i < PARAMETERCOUNT; i++)
-    //    {
-    //        tmpParamArray.paramInput[i].value = i;
-    //        tmpParamArray.paramInput[i].string = UaString::number(1000 + i);
-    //    }
-
-    //    m_productionModuleList[MODULENUMBERXTS1]->executeSkill(skillPos, tmpParamArray);
-    //}
-
-    //m_xts->writeSkillNumber5();
-    //m_xts->writeModuleInput();
 }
 
 void ProcessHandler::buildSkillList() //obsolete here.
 {
-    //m_xts->buildSkillList(); // TODO: Only use active skills! --> Init.
-
-    //m_cremeModule->buildSkillList();
     for (std::map<int, IProductionModule*>::iterator it = m_productionModuleList.begin();
          it != m_productionModuleList.end(); ++it)
     {
         m_moduleSkillList.insert(std::pair<int, std::map<int, int>>(it->first, it->second->getSkills()));
     }
 
-    //m_moduleSkillList.insert(std::pair<int, std::map<int, int>>(MODULENUMBERXTS, m_xts->getSkills()));
-    //m_moduleSkillList.insert(std::pair<int, std::map<int, int>>(MODULENUMBERCREME,
-    //m_cremeModule->getSkills()));
     std::cout << "\nAvailable skills:" << std::endl;
 
     for (std::multimap<int, std::map<int, int>>::iterator it = m_moduleSkillList.begin();
@@ -200,7 +179,16 @@ void ProcessHandler::buildSkillList() //obsolete here.
 
 void ProcessHandler::initialInit()
 {
+    //for (std::map<int, IProductionModule*>::iterator it = m_productionModuleList.begin();
+    //     it != m_productionModuleList.end(); ++it)
+    //{
+    //    m_initModule->positionCalibration(it->first);
+    //}
+    //Dont init the XTS modules!
     m_initModule->positionCalibration(MODULEX);
     m_initModule->positionCalibration(MODULEY);
-    //m_initModule->positionCalibration(MODULEZ);
+    m_initModule->positionCalibration(MODULEZ);
+
+
+    m_pMessageFeeder->write("Initialization of the production modules done.", msgSuccess);
 }

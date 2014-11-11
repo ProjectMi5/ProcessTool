@@ -2,24 +2,24 @@
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <qdatetime.h>
 
-MessageFeeder::MessageFeeder(OpcuaGateway* pGateway, int moduleNumber)
+MessageFeeder::MessageFeeder(OpcuaGateway* pGateway, int moduleNumber) : m_feedId(1),
+    m_feedCounter(0), m_pGateway(pGateway), m_moduleNumber(moduleNumber)
 {
-    m_feedId = 1;
-    m_feedCounter = 0;
-    m_pGateway = pGateway;
-    m_moduleNumber = moduleNumber;
+    resetList();
 }
 
 MessageFeeder::~MessageFeeder()
 {
 }
 
-MessageFeeder* MessageFeeder::getPointer()
+void MessageFeeder::write(UaString string, messageFeedLevel level)
 {
-    return this;
+    UaString timestamp = UaString(
+                             QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz").toUtf8().constData());
+    writeToOpcua(string, level, timestamp);
 }
 
-void MessageFeeder::write(UaString string, messageFeedLevel level)
+void MessageFeeder::writeToOpcua(UaString string, messageFeedLevel level, UaString timestamp)
 {
     UaWriteValues nodesToWrite;
     nodesToWrite.create(4);
@@ -57,10 +57,6 @@ void MessageFeeder::write(UaString string, messageFeedLevel level)
     writeCounter++;
     tmpValue.clear();
 
-    UaString timestamp = UaString(
-                             QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz").toUtf8().constData());
-
-
     tmpNodeId = baseNodeIdToWrite;
     tmpNodeId += "Timestamp";
     tmpValue.setString(timestamp);
@@ -75,5 +71,18 @@ void MessageFeeder::write(UaString string, messageFeedLevel level)
 
     m_feedId++;
     m_feedCounter++;
-    m_feedCounter = m_feedCounter % 100;
+    m_feedCounter = m_feedCounter % LISTSIZE;
+}
+
+void MessageFeeder::resetList()
+{
+    UaString string = "";
+
+    for (int i = 0; i < LISTSIZE; i++)
+    {
+        writeToOpcua(string, msgClear, string);
+    }
+
+    m_feedId = 1;
+    m_feedCounter = 0;
 }

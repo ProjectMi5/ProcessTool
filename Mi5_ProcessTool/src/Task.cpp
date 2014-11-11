@@ -108,14 +108,17 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
         {
             if (m_foundTransport)
             {
-                //// We already found a transport, lets use this.
+                //// We already found a transport, lets use this.5
+                for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
+                     it != matchedSkillsVector.end(); it++)
+                {
+                    if (it->moduleNumber == m_transportModuleNumber)
+                    {
+                        chosenModule = it;
+                    }
+                }
 
-                matchedSkill tmpMatchedSkill;
-                tmpMatchedSkill.moduleNumber = m_transportModuleNumber;
-                tmpMatchedSkill.taskSkillState = nextItem.skillState;
-                tmpMatchedSkill.skillId = nextItem.skillId;
-                tmpMatchedSkill.skillPosition = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(
-                                                    tmpMatchedSkill.skillId);
+
             }
             else
             {
@@ -124,15 +127,13 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                     for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
                          it != matchedSkillsVector.end(); it++)
                     {
-                        int skillPos = m_moduleList[it->moduleNumber]->translateSkillIdToSkillPos(
-                                           it->skillId);
-
-                        if (m_moduleList[it->moduleNumber]->checkSkillReadyState(skillPos) ==
+                        if (m_moduleList[it->moduleNumber]->checkSkillReadyState(it->skillId) ==
                             true) // take the first transport module to become ready.
                         {
                             // Lets use this!
                             m_foundTransport = true;
                             m_transportModuleNumber = it->moduleNumber;
+                            chosenModule = it;
                             break;
                         }
                     }
