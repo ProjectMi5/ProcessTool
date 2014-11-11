@@ -12,6 +12,9 @@ InitModule::InitModule(std::map<int, OpcuaGateway*> pGatewayList,
 
     m_pGatewayList = pGatewayList;
     m_pModuleList = pModuleList;
+
+    moveToThread(&m_thread);
+    m_thread.start();
 }
 
 InitModule::~InitModule()
@@ -51,7 +54,12 @@ int InitModule::positionCalibration(int moduleNumber)
             if (moduleState == SKILLMODULEREADY)
             {
                 positionCalibrationExecution(moduleNumber, *it);
+
+                // Wait til its done.
+                m_mutex.lock();
+                m_waitCondition.wait(&m_mutex);
                 returnval = 1;
+                m_mutex.unlock();
                 break;
             }
             else
@@ -175,4 +183,5 @@ void InitModule::resetData()
     int skillPos = m_pModuleList[m_usedXtsModuleNumber]->translateSkillIdToSkillPos(POSCALSKILLID);
     m_pModuleList[m_usedXtsModuleNumber]->deregisterTaskForSkill(skillPos);
     m_usedXtsModuleNumber = -1;
+    m_waitCondition.wakeAll();
 }

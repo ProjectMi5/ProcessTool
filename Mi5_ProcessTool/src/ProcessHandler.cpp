@@ -68,7 +68,7 @@ UaStatus ProcessHandler::build()
 
     m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.175.224:4840"));
     m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.175.225:4840"));
-    m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.175.226:4840"));
+    //m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.175.226:4840"));
     // ENDE ÄNDERN
     m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.175.230:4840"));
     m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(
@@ -99,15 +99,15 @@ UaStatus ProcessHandler::build()
                                          MODULENUMBERMESSAGEFEEDER);
     // 2. Stelle ÄNDERN
     m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
-            MODULENUMBERXTS2, m_pMessageFeeder);
+            MODULENUMBERXTS1, m_pMessageFeeder);
     m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
             MODULENUMBERXTS2, m_pMessageFeeder);
     m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
             MODULEX, m_pMessageFeeder);
     m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
             MODULEY, m_pMessageFeeder);
-    m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
-            MODULEZ, m_pMessageFeeder);
+    //m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
+    //        MODULEZ, m_pMessageFeeder);
     //ENDE ÄNDERN
 
     //m_xts = new Xts(m_pOpcuaGateway, MODULENUMBERXTS);
@@ -139,14 +139,8 @@ void ProcessHandler::run()
     // Nur eine kosmetische Ausgabe.
     buildSkillList();
     getchar();
-    m_initModule->positionCalibration(MODULEX);
-    getchar();
-
-    m_initModule->positionCalibration(MODULEY);
-    getchar();
-    m_initModule->positionCalibration(MODULEZ);
-    getchar();
-    m_taskModule->startup();
+    initialInit();
+    //m_taskModule->startup();
 
     ////// Testing
     //while (1)
@@ -202,4 +196,11 @@ void ProcessHandler::buildSkillList() //obsolete here.
 
     std::cout << "=======End of Skill list=========" << std::endl;
 
+}
+
+void ProcessHandler::initialInit()
+{
+    m_initModule->positionCalibration(MODULEX);
+    m_initModule->positionCalibration(MODULEY);
+    //m_initModule->positionCalibration(MODULEZ);
 }

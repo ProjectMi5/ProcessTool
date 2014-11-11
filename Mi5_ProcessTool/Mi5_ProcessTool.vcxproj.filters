@@ -94,6 +94,12 @@
     <ClCompile Include="GeneratedFiles\Release\moc_Task.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_InitModule.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_InitModule.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CookieSeparator.h">
@@ -135,9 +141,6 @@
     <ClInclude Include="include\ProductionModules\XTS.h">
       <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
-    <ClInclude Include="include\InitModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ISkillRegistration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -162,6 +165,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="include\Task.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\InitModule.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

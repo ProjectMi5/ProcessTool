@@ -37,6 +37,7 @@ private:
     UaStatus loadConfig();
     void run();
     void buildSkillList();
+    void initialInit();
 
 };
 
