@@ -104,7 +104,7 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
     if (matchedSkillsVector.size() > 1)
     {
         // Place for some algorithms.
-        if (isTransportModule(matchedSkillsVector[0].moduleNumber)) // This is sufficient.
+        if (isTransportModule(matchedSkillsVector[0].moduleNumber)) // The first one is sufficient.
         {
             if (m_foundTransport)
             {
@@ -119,22 +119,24 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
             }
             else
             {
-                for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
-                     it != matchedSkillsVector.end(); it++)
+                while (!m_foundTransport)
                 {
-                    int skillPos = m_moduleList[it->moduleNumber]->translateSkillIdToSkillPos(
-                                       it->skillId);
-
-                    if (m_moduleList[it->moduleNumber]->checkSkillReadyState(skillPos) == true)
+                    for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
+                         it != matchedSkillsVector.end(); it++)
                     {
-                        // Lets use this!
-                        m_foundTransport = true;
-                        m_transportModuleNumber = it->moduleNumber;
-                        break;
+                        int skillPos = m_moduleList[it->moduleNumber]->translateSkillIdToSkillPos(
+                                           it->skillId);
+
+                        if (m_moduleList[it->moduleNumber]->checkSkillReadyState(skillPos) ==
+                            true) // take the first transport module to become ready.
+                        {
+                            // Lets use this!
+                            m_foundTransport = true;
+                            m_transportModuleNumber = it->moduleNumber;
+                            break;
+                        }
                     }
                 }
-
-
             }
         }
     }
