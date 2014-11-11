@@ -8,6 +8,8 @@ ProcessHandler::ProcessHandler()
 
     m_moduleSkillList.clear();
     m_gatewayList.clear();
+    m_gatewayList.clear();
+    m_productionModuleList.clear();
 
     start();
 }
@@ -70,6 +72,8 @@ UaStatus ProcessHandler::build()
     m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.175.224:4840"));
     m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.175.225:4840"));
     m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.175.226:4840"));
+
+    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString("opc.tcp://192.168.175.230:4840"));
     // ENDE ÄNDERN
     m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.175.230:4840"));
     m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(
@@ -112,12 +116,17 @@ UaStatus ProcessHandler::build()
             MODULEY, m_pMessageFeeder);
     m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
             MODULEZ, m_pMessageFeeder);
+
+    // Manual Module
+    m_manualModule = new ManualModule(m_gatewayList[MANUALMODULE1],
+                                      MANUALMODULE1, m_pMessageFeeder);
+
     //ENDE ÄNDERN
 
     //m_xts = new Xts(m_pOpcuaGateway, MODULENUMBERXTS);
     //m_cremeModule = new CremeModule(m_pOpcuaGateway, MODULENUMBERCREME);
     m_taskModule = new TaskModule(m_gatewayList[MODULENUMBERTASK], MODULENUMBERTASK,
-                                  m_productionModuleList, m_pMessageFeeder);
+                                  m_productionModuleList, m_pMessageFeeder, m_manualModule);
 
 
     m_initModule = new InitModule(m_gatewayList, m_productionModuleList);
@@ -135,6 +144,7 @@ void ProcessHandler::run()
         it->second->startup(); //Startup all production modules.
     }
 
+    m_manualModule->startup();
     m_initModule->startup();
     std::cout << "Startup finished." << std::endl;
     m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
@@ -142,8 +152,9 @@ void ProcessHandler::run()
 
     // Nur eine kosmetische Ausgabe.
     buildSkillList();
-    /* initialInit();
-     getchar();*/
+    //initialInit();
+    //getchar();
+
     m_taskModule->startup();
 
 }

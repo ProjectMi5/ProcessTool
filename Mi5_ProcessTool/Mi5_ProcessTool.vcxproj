@@ -101,6 +101,7 @@
     <ClCompile Include="src\ProcessHandler.cpp" />
     <ClCompile Include="src\ProductionModule.cpp" />
     <ClCompile Include="src\ProductionModules\CremeModule.cpp" />
+    <ClCompile Include="src\ProductionModules\ManualModule.cpp" />
     <ClCompile Include="src\ProductionModules\XTS.cpp" />
     <ClCompile Include="src\Task.cpp" />
     <ClCompile Include="src\TaskModule.cpp" />
@@ -157,6 +158,7 @@
     </CustomBuild>
     <ClInclude Include="include\ProductionModule.h" />
     <ClInclude Include="include\ProductionModules\CremeModule.h" />
+    <ClInclude Include="include\ProductionModules\ManualModule.h" />
     <ClInclude Include="include\ProductionModules\XTS.h" />
     <CustomBuild Include="include\Task.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

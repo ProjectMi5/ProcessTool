@@ -170,4 +170,32 @@ struct matchedSkill
     int skillPosition;
 };
 
+struct ManualModuleParameter
+{
+    OpcUa_Int32 id;
+    UaString name;
+    UaString stringValue;
+    UaString unit;
+    OpcUa_Double value;
+    ManualModuleParameter(): id(0), value(0) {};
+};
+
+struct ManualModuleData
+{
+    OpcUa_Boolean iExecute;
+    OpcUa_Boolean oBusy;
+    OpcUa_Boolean oDone;
+    OpcUa_Boolean oError;
+    OpcUa_Boolean oReady;
+    OpcUa_Int32 oErrorId;
+    UaString iSkilldescription;
+    OpcUa_Int32 iSkillId;
+    OpcUa_Int32 iTaskId;
+    ManualModuleParameter iParameter[PARAMETERCOUNT];
+
+    ManualModuleData() : iExecute(false), oBusy(false), oDone(false), oError(false), oErrorId(0),
+        iSkillId(0),
+        iTaskId(0) {  };
+};
+
 #endif // DATASTRUCTURES_H

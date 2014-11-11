@@ -3,7 +3,8 @@
 #include <qcoreapplication.h>
 
 TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
-                       std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder)
+                       std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder,
+                       ManualModule* pManual) : m_pManual(pManual)
 {
     m_taskCounter = 0;
     m_moduleSkillList.clear();
@@ -147,7 +148,7 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
                     std::cout << "Received new task (#" << taskNumber << "): " << m_tasklist[taskNumber].name.toUtf8()
                               << std::endl;
                     m_taskObjects[m_tasklist[taskNumber].taskId] = new Task(m_tasklist[taskNumber], m_moduleList, this,
-                            m_pMsgFeed);
+                            m_pMsgFeed, m_pManual);
                     m_taskObjects[m_tasklist[taskNumber].taskId]->start();
                 }
 

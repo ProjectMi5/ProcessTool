@@ -13,6 +13,7 @@
 #include <Mi5_ProcessTool/include/TaskModule.h>
 #include <Mi5_ProcessTool/include/InitModule.h>
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
+#include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
 
 class ProcessHandler
 {
@@ -29,6 +30,7 @@ private:
     std::multimap<int, std::map<int, int>> m_moduleSkillList;
     std::map<int, OpcuaGateway*> m_gatewayList;
     std::map<int, IProductionModule*> m_productionModuleList;
+    ManualModule* m_manualModule;
     QThread m_thread;
     MessageFeeder* m_pMessageFeeder;
 

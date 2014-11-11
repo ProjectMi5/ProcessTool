@@ -100,6 +100,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_InitModule.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProductionModules\ManualModule.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CookieSeparator.h">
@@ -152,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="include\MessageFeeder.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProductionModules\ManualModule.h">
+      <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,6 @@
 #include <Mi5_ProcessTool/include/ConnectionTestTimer.h>
 #include <Mi5_ProcessTool/include/ISkillRegistration.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
-#include <Mi5_ProcessTool/include/MessageFeeder.h>
 
 class OpcuaGateway; // Using forward declaration.
 

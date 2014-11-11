@@ -754,6 +754,7 @@ void ProductionModule::writeModuleInput()
     // Write!
     m_pOpcuaGateway->write(nodesToWrite);
 }
+
 void ProductionModule::writeSkillInput(int skillPos)
 {
     UaWriteValues nodesToWrite;
@@ -796,7 +797,7 @@ void ProductionModule::writeSkillInput(int skillPos)
         writeCounter++;
         tmpValue.clear();
 
-        tmpNodeId = baseParamNodeId; // TODO!
+        tmpNodeId = baseParamNodeId;
         tmpNodeId += "StringValue";
         tmpValue.setString(input.skillInput[skillPos].parameterInput[j].string);
         UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);

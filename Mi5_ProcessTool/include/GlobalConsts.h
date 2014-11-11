@@ -5,9 +5,15 @@
 static const int MODULENUMBERXTS1 = 2001; //2001
 static const int MODULENUMBERXTS2 = 2002;
 static const int MODULENUMBERXTS3 = 2003;
+
+// Manual modules
+static const int MANUALMODULE1 = 2401;
+
+// Simu modules
 static const int MODULEX = 1202;
 static const int MODULEY = 1203;
 static const int MODULEZ = 1204;
+
 static const int MODULENUMBERCOOKIE = 2101;
 static const int MODULENUMBERCREME = 2;
 static const int MODULENUMBERTASK = 11;

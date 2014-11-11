@@ -7,6 +7,7 @@
 #include <Mi5_ProcessTool/include/Task.h>
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
+#include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
 
 class OpcuaGateway; // Using forward declaration.
 
@@ -15,7 +16,7 @@ class TaskModule : public IModule
 
 public:
     TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
-               std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder);
+               std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder, ManualModule* pManual);
     ~TaskModule();
     void subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
                                 const UaDataNotifications& dataNotifications,
@@ -40,6 +41,7 @@ private:
     std::map<int, IProductionModule*> m_moduleList;
     std::vector<skillModuleList> m_moduleSkillList;
     MessageFeeder* m_pMsgFeed;
+    ManualModule* m_pManual;
 
 private:
     void createMonitoredItems();

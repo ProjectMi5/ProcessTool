@@ -3,13 +3,18 @@
 #include <QStringList>
 
 Task::Task(ProductionTask productionTask, std::map<int, IProductionModule*>moduleList,
-           TaskModule* taskModule, MessageFeeder* pMessageFeeder) : mutex(QMutex::Recursive),
-    m_foundTransport(false), m_state(m_task.taskState), m_transportModuleNumber(-1)
+           TaskModule* taskModule, MessageFeeder* pMessageFeeder,
+           ManualModule* pManual) : mutex(QMutex::Recursive),
+    m_foundTransport(false), m_state(m_task.taskState), m_transportModuleNumber(-1), m_pManual(pManual)
 {
     m_task = productionTask;
     m_moduleList = moduleList;
     m_pTaskModule = taskModule;
     m_pMsgFeed = pMessageFeeder;
+
+    UaString message = "Received new Task #";
+    message += UaString::number(productionTask.taskId);
+    m_pMsgFeed->write(message, msgInfo);
 
     moveToThread(&m_thread);
     m_thread.start();
@@ -334,6 +339,9 @@ void Task::processNextOpenSkill()
     {
         // finished or error.. go on
         std::cout << "Finished task #" << m_task.taskId << std::endl;
+        UaString message = "Finished Task #";
+        message += UaString::number(m_task.taskId);
+        m_pMsgFeed->write(message, msgInfo);
 
         //triggerTaskObjectDeletion();
         m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure);
