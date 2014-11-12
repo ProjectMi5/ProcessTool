@@ -1,5 +1,6 @@
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <Mi5_ProcessTool/include/ProductionModule.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 OpcuaGateway::OpcuaGateway(UaString serverUrl)
 {
@@ -39,17 +40,17 @@ UaStatus OpcuaGateway::loadConfig()
 {
     UaString sConfigFile(getAppPath());
     sConfigFile += "\\OPCUAconfig.ini"; // Windows style
-    std::cout << "Loading configuration file.." << std::endl;
+    QLOG_DEBUG() << "Loading configuration file.." ;
     UaStatus status = m_pConfiguration->loadConfiguration(sConfigFile);
 
     if (status.isGood())
     {
-        std::cout << "Configuration file loaded successfully." << std::endl;
+        QLOG_DEBUG() << "Configuration file loaded successfully." ;
 
     }
     else
     {
-        std::cout << "Error loading configuration file." << std::endl;
+        QLOG_DEBUG() << "Error loading configuration file." ;
     }
 
     return status;
@@ -300,15 +301,15 @@ UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite)
                 if (OpcUa_IsGood(results[i]))
                 {
                     //UaVariant tmpValue = nodesToWrite[i].Value.Value;
-                    //std::cout << "Write suceeded for item[" << i << "]: " <<
+                    //QLOG_DEBUG() << "Write suceeded for item[" << i << "]: " <<
                     //          nodesToWrite[i].NodeId.Identifier.String.strContent << " - Value: " << tmpValue.toString().toUtf8()
-                    //          << std::endl;
+                    //          ;
                     tryCounter = 2;
                 }
                 else
                 {
                     printf("Write failed for item[%d] with status %s\n", i, UaStatus(results[i]).toString().toUtf8());
-                    std::cout << "Tries left: " << (1 - tryCounter) << std::endl;
+                    QLOG_DEBUG() << "Tries left: " << (1 - tryCounter) ;
                     tryCounter++;
                 }
             }
@@ -466,7 +467,7 @@ void OpcuaGateway::registerModule(int moduleNumber, IModule* pModule)
 {
     if (m_moduleList.count(moduleNumber) > 0)
     {
-        std::cout << "Error, module number " << moduleNumber << " is already registered.";
+        QLOG_DEBUG() << "Error, module number " << moduleNumber << " is already registered.";
     }
     else
     {
@@ -486,7 +487,7 @@ void OpcuaGateway::subscriptionDataChange(OpcUa_UInt32               clientSubsc
     }
     else
     {
-        std::cout << "Subscription for module number " << clientSubscriptionHandle <<
-                  " received, but module is not present." << std::endl;
+        QLOG_DEBUG() << "Subscription for module number " << clientSubscriptionHandle <<
+                     " received, but module is not present." ;
     }
 }

@@ -3,6 +3,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <QTDIR>C:\Qt\5.3\msvc2010_opengl</QTDIR>
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b$(PATH)</LocalDebuggerEnvironment>
+    <RemoteDebuggerCommand>C:\Users\ow\ProcessToolDebug\Mi5_ProcessTool.exe</RemoteDebuggerCommand>
+    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <RemoteDebuggerServerName>ow@192.168.175.222</RemoteDebuggerServerName>
+    <RemoteDebuggerDebuggerType>Auto</RemoteDebuggerDebuggerType>
+    <RemoteDebuggerConnection>RemoteWithAuthentication</RemoteDebuggerConnection>
+    <RemoteDebuggerWorkingDirectory>C:\Users\ow\ProcessToolDebug\</RemoteDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <QTDIR>C:\Qt\5.3\msvc2010_opengl</QTDIR>

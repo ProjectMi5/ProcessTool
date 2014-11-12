@@ -1,5 +1,6 @@
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                                    MessageFeeder* pMessageFeeder)
@@ -33,8 +34,7 @@ void ProductionModule::setupOpcua()
 
     if (!status.isGood())
     {
-        std::cout << "Creation of subscription for module number " << m_moduleNumber << " failed." <<
-                  std::endl;
+        QLOG_DEBUG() << "Creation of subscription for module number " << m_moduleNumber << " failed.";
         return;
     }
 
@@ -85,8 +85,7 @@ void ProductionModule::executeSkill(int& skillPos, ParameterInputArray& paramInp
     }
 
     input.skillInput[skillPos].execute = true;
-    std::cout << "Executing skill position #" << skillPos << " at module number " << m_moduleNumber <<
-              std::endl;
+    QLOG_DEBUG() << "Executing skill position #" << skillPos << " at module number " << m_moduleNumber;
     writeSkillInput(skillPos);
 }
 
@@ -109,8 +108,8 @@ void ProductionModule::deregisterTaskForSkill(int& skillPos)
 
     else
     {
-        std::cout << "Module number " << m_moduleNumber <<
-                  ": Received deregistration request for unknown skillpos " << skillPos << std::cout;
+        QLOG_DEBUG() << "Module number " << m_moduleNumber <<
+                     ": Received deregistration request for unknown skillpos " << skillPos;
     }
 }
 
@@ -282,8 +281,8 @@ int ProductionModule::registerTaskForSkill(ISkillRegistration* pTask, int skillP
 
     if (m_skillRegistrationList.count(skillPos) > 0)
     {
-        std::cout << "Skill at position " << skillPos << " is already registered with task id " <<
-                  m_skillRegistrationList[skillPos]->getTaskId() << std::endl;
+        QLOG_DEBUG() << "Skill at position " << skillPos << " is already registered with task id " <<
+                     m_skillRegistrationList[skillPos]->getTaskId() ;
     }
     else
     {
@@ -834,7 +833,7 @@ void ProductionModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHan
 
         for (i = 0; i < dataNotifications.length(); i++)
         {
-            // std::cout << dataNotifications[i].ClientHandle << std::endl;
+            // QLOG_DEBUG() << dataNotifications[i].ClientHandle ;
 
             if (OpcUa_IsGood(dataNotifications[i].Value.StatusCode))
             {
@@ -855,8 +854,8 @@ void ProductionModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHan
     }
     else
     {
-        std::cout << "Module number " << m_moduleNumber << " received subscription for " <<
-                  clientSubscriptionHandle << "." << std::endl;
+        QLOG_DEBUG() << "Module number " << m_moduleNumber << " received subscription for " <<
+                     clientSubscriptionHandle << "." ;
     }
 }
 

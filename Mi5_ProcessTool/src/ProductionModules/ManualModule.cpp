@@ -1,5 +1,6 @@
 #include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 ManualModule::ManualModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                            MessageFeeder* pMessageFeeder) : m_moduleNumber(moduleNumber), m_pGateway(pOpcuaGateway)
@@ -30,8 +31,7 @@ void ManualModule::setupOpcua()
 
     if (!status.isGood())
     {
-        std::cout << "Creation of subscription for module number " << m_moduleNumber << " failed." <<
-                  std::endl;
+        QLOG_DEBUG() << "Creation of subscription for module number " << m_moduleNumber << " failed.";
         return;
     }
 
@@ -48,7 +48,7 @@ void ManualModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
 
         for (i = 0; i < dataNotifications.length(); i++)
         {
-            // std::cout << dataNotifications[i].ClientHandle << std::endl;
+            // QLOG_DEBUG() << dataNotifications[i].ClientHandle ;
 
             if (OpcUa_IsGood(dataNotifications[i].Value.StatusCode))
             {
@@ -69,8 +69,8 @@ void ManualModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
     }
     else
     {
-        std::cout << "Module number " << m_moduleNumber << " received subscription for " <<
-                  clientSubscriptionHandle << "." << std::endl;
+        QLOG_DEBUG() << "Module number " << m_moduleNumber << " received subscription for " <<
+                     clientSubscriptionHandle << "." ;
     }
 }
 

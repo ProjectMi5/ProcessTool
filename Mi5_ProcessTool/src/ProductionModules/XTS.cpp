@@ -1,10 +1,11 @@
 #include <Mi5_ProcessTool/include/ProductionModules/XTS.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 Xts::Xts(OpcuaGateway* pOpcuaGateway,
          int moduleNumber, MessageFeeder* pMessageFeeder) : ProductionModule(pOpcuaGateway, moduleNumber,
                      pMessageFeeder)
 {
-    std::cout << "Created module XTS with module number " << moduleNumber << std::endl;
+    QLOG_DEBUG() << "Created module XTS with module number " << moduleNumber ;
 }
 
 Xts::~Xts()

@@ -35,6 +35,12 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\QsLog">
+      <UniqueIdentifier>{918bec70-4fc2-42ad-861a-7b19beeeef4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\QsLog">
+      <UniqueIdentifier>{e64fd69f-f1ce-47b2-b0c2-7ad739ca57bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CookieSeparator.cpp">
@@ -103,6 +109,27 @@
     <ClCompile Include="src\ProductionModules\ManualModule.cpp">
       <Filter>Source Files\ProductionModules</Filter>
     </ClCompile>
+    <ClCompile Include="src\QsLog\QsLog.cpp">
+      <Filter>Source Files\QsLog</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QsLog\QsLogDest.cpp">
+      <Filter>Source Files\QsLog</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QsLog\QsLogDestConsole.cpp">
+      <Filter>Source Files\QsLog</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QsLog\QsLogDestFile.cpp">
+      <Filter>Source Files\QsLog</Filter>
+    </ClCompile>
+    <ClCompile Include="src\QsLog\QsLogDestFunctor.cpp">
+      <Filter>Source Files\QsLog</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_QsLogDestFunctor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_QsLogDestFunctor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CookieSeparator.h">
@@ -150,22 +177,34 @@
     <ClInclude Include="include\GlobalConsts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GeneratedFiles\ui_gui_processTool.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\MessageFeeder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ProductionModules\ManualModule.h">
       <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
+    <ClInclude Include="include\QsLog\QsLog.h">
+      <Filter>Header Files\QsLog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QsLog\QsLogDest.h">
+      <Filter>Header Files\QsLog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QsLog\QsLogDestConsole.h">
+      <Filter>Header Files\QsLog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QsLog\QsLogDestFile.h">
+      <Filter>Header Files\QsLog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QsLog\QsLogDisableForThisFile.h">
+      <Filter>Header Files\QsLog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\QsLog\QsLogLevel.h">
+      <Filter>Header Files\QsLog</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="include\ConnectionTestTimer.h">
       <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="gui_processTool.ui">
-      <Filter>Generated Files</Filter>
     </CustomBuild>
     <CustomBuild Include="include\ProcessHandler.h">
       <Filter>Header Files</Filter>
@@ -175,6 +214,9 @@
     </CustomBuild>
     <CustomBuild Include="include\InitModule.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\QsLog\QsLogDestFunctor.h">
+      <Filter>Header Files\QsLog</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

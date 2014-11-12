@@ -1,6 +1,6 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
-#include <Mi5_ProcessTool/include/Gui.h>
-
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLogDest.h>
 #include <QApplication>
 
 
@@ -10,6 +10,13 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
     //Gui gui;
     //gui.show();
+
+    QsLogging::Logger* pLogger = &QsLogging::Logger::instance();
+    pLogger->setLoggingLevel(QsLogging::TraceLevel);
+    QsLogging::DestinationPtr debugDestination(
+        QsLogging::DestinationFactory::MakeDebugOutputDestination());
+    pLogger->addDestination(debugDestination);
+    QLOG_DEBUG() << "Test";
 
     ProcessHandler* processHandler = new ProcessHandler();
 

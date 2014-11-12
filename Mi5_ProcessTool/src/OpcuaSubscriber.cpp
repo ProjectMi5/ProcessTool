@@ -2,6 +2,7 @@
 #include <uasubscription.h>
 #include <uasession.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 OpcuaSubscriber::OpcuaSubscriber()
 {
@@ -69,8 +70,7 @@ UaStatus OpcuaSubscriber::createSubscription(UaSession* pSession,
 
     m_subscriptionList[subscriptionClientHandle] = NULL;
     UaSubscription* tempSubscription;
-    std::cout << "Creating subscription with clienthandle " << subscriptionClientHandle << ".." <<
-              std::endl;
+    QLOG_DEBUG() << "Creating subscription with clienthandle " << subscriptionClientHandle << "..";
     result = pSession->createSubscription(
                  serviceSettings,
                  this,
@@ -82,8 +82,7 @@ UaStatus OpcuaSubscriber::createSubscription(UaSession* pSession,
 
     if (result.isGood())
     {
-        std::cout << "CreateSubscription for clienthandle " << subscriptionClientHandle << " succeeded." <<
-                  std::endl;
+        QLOG_DEBUG() << "CreateSubscription for clienthandle " << subscriptionClientHandle << " succeeded.";
     }
     else
     {
@@ -241,7 +240,7 @@ UaStatus OpcuaSubscriber::createSingleMonitoredItem(OpcUa_UInt32 clientHandle,
 
     if (nodesToSubscribe.length() != 1)
     {
-        std::cout << "Error, Length of nodesToSubscribe not equal to 1." << std::endl;
+        QLOG_DEBUG() << "Error, Length of nodesToSubscribe not equal to 1." ;
         return OpcUa_BadInvalidState;
     }
 
@@ -273,7 +272,7 @@ UaStatus OpcuaSubscriber::createSingleMonitoredItem(OpcUa_UInt32 clientHandle,
         printf("CreateMonitoredItems failed with status %s\n", result.toString().toUtf8());
     }
 
-    // std::cout << "Created subscription with clienthandle " << clientHandle;
+    // QLOG_DEBUG() << "Created subscription with clienthandle " << clientHandle;
     return result;
 }
 

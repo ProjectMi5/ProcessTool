@@ -1,6 +1,7 @@
 #include <Mi5_ProcessTool/include/TaskModule.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <qcoreapplication.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                        std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder,
@@ -16,7 +17,7 @@ TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
     m_pMsgFeed = pMessageFeeder;
 
     m_pOpcuaGateway->registerModule(m_moduleNumber, this);
-    std::cout << "Created TaskModule with module number " << moduleNumber << std::endl;
+    QLOG_DEBUG() << "Created TaskModule with module number " << moduleNumber ;
 }
 
 TaskModule::~TaskModule()
@@ -35,8 +36,7 @@ void TaskModule::setupOpcua()
 
     if (!status.isGood())
     {
-        std::cout << "Creation of subscription for module number " << m_moduleNumber << " failed." <<
-                  std::endl;
+        QLOG_DEBUG() << "Creation of subscription for module number " << m_moduleNumber << " failed.";
         return;
     }
 
@@ -84,7 +84,7 @@ void TaskModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
 
         for (OpcUa_Int32 i = 0; i < dataNotifications.length(); i++)
         {
-            // std::cout << dataNotifications[i].ClientHandle << std::endl;
+            // QLOG_DEBUG() << dataNotifications[i].ClientHandle ;
 
             if (OpcUa_IsGood(dataNotifications[i].Value.StatusCode))
             {
@@ -102,8 +102,8 @@ void TaskModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
     }
     else
     {
-        std::cout << "Module number " << m_moduleNumber << " received subscription for " <<
-                  clientSubscriptionHandle << "." << std::endl;
+        QLOG_DEBUG() << "Module number " << m_moduleNumber << " received subscription for " <<
+                     clientSubscriptionHandle << "." ;
     }
 }
 
@@ -140,13 +140,13 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
 
                     if (!status.isGood())
                     {
-                        std::cout << "Error: Couldn't retrieve task information for task number " << taskNumber <<
-                                  std::endl;
+                        QLOG_DEBUG() << "Error: Couldn't retrieve task information for task number " << taskNumber;
                         return;
                     }
 
-                    std::cout << "Received new task (#" << taskNumber << "): " << m_tasklist[taskNumber].name.toUtf8()
-                              << std::endl;
+                    QLOG_DEBUG() << "Received new task (#" << taskNumber << "): " <<
+                                 m_tasklist[taskNumber].name.toUtf8()
+                                 ;
                     m_taskObjects[m_tasklist[taskNumber].taskId] = new Task(m_tasklist[taskNumber], m_moduleList, this,
                             m_pMsgFeed, m_pManual);
                     m_taskObjects[m_tasklist[taskNumber].taskId]->start();
@@ -155,7 +155,7 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
                 else
                 {
                     //task number already exists
-                    std::cout << "Error, task number " << taskNumber << " already exists in tasklist." << std::endl;
+                    QLOG_DEBUG() << "Error, task number " << taskNumber << " already exists in tasklist." ;
                 }
             }
 

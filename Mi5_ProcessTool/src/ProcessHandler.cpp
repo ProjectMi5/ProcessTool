@@ -1,4 +1,5 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 ProcessHandler::ProcessHandler()
 {
@@ -45,7 +46,7 @@ ProcessHandler::~ProcessHandler()
 void ProcessHandler::start()
 {
     UaStatus status;
-    std::cout << "Starting MI5 Process Tool.." << std::endl;
+    QLOG_DEBUG() << "Starting MI5 Process Tool.." ;
     status = build();
 
     if (status.isGood())
@@ -86,7 +87,7 @@ UaStatus ProcessHandler::build()
 
         if (!status.isGood())
         {
-            std::cout << "Config load failed." << std::endl;
+            QLOG_DEBUG() << "Config load failed." ;
             return status;
         }
 
@@ -94,7 +95,7 @@ UaStatus ProcessHandler::build()
 
         if (!status.isGood())
         {
-            std::cout << "Connection to server failed." << std::endl;
+            QLOG_DEBUG() << "Connection to server failed." ;
             return status;
         }
 
@@ -144,9 +145,10 @@ void ProcessHandler::run()
         it->second->startup(); //Startup all production modules.
     }
 
+    OutputDebugString(L"test");
     m_manualModule->startup();
     m_initModule->startup();
-    std::cout << "Startup finished." << std::endl;
+    QLOG_DEBUG() << "Startup finished." ;
     m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
 
 
@@ -167,24 +169,24 @@ void ProcessHandler::buildSkillList() //obsolete here.
         m_moduleSkillList.insert(std::pair<int, std::map<int, int>>(it->first, it->second->getSkills()));
     }
 
-    std::cout << "\nAvailable skills:" << std::endl;
+    QLOG_DEBUG() << "\nAvailable skills:" ;
 
     for (std::multimap<int, std::map<int, int>>::iterator it = m_moduleSkillList.begin();
          it != m_moduleSkillList.end(); ++it)
     {
-        std::cout << "=============================" << std::endl;
-        std::cout << "Module number: " << it->first << std::endl;
+        QLOG_DEBUG() << "=============================" ;
+        QLOG_DEBUG() << "Module number: " << it->first ;
 
         for (std::map<int, int>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
         {
             std:: cout <<  "Skill ID: " << it2->first <<
                        ", Skill OPC UA identifier (in output interface): SkillOutput"
                        <<
-                       it2->second << std::endl;
+                       it2->second ;
         }
     }
 
-    std::cout << "=======End of Skill list=========" << std::endl;
+    QLOG_DEBUG() << "=======End of Skill list=========" ;
 
 }
 

@@ -1,5 +1,6 @@
 #include <Mi5_ProcessTool/include/Task.h>
 #include <Mi5_ProcessTool/include/TaskModule.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 #include <QStringList>
 
 Task::Task(ProductionTask productionTask, std::map<int, IProductionModule*>moduleList,
@@ -22,7 +23,7 @@ Task::Task(ProductionTask productionTask, std::map<int, IProductionModule*>modul
 
 Task::~Task()
 {
-    std::cout << "Task killed";
+    QLOG_DEBUG() << "Task killed";
     m_thread.quit();
     m_thread.wait();
 }
@@ -159,8 +160,8 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
         tmpMatchedSkill.skillId = -1;
         tmpMatchedSkill.skillPosition = -1;
 
-        std::cout << "Task #" << m_task.taskId << ": Found no suitable module for skill #" <<
-                  nextItem.skillNumberInTask << std::endl;
+        QLOG_DEBUG() << "Task #" << m_task.taskId << ": Found no suitable module for skill #" <<
+                     nextItem.skillNumberInTask ;
 
         return tmpMatchedSkill;
     }
@@ -171,10 +172,9 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
         m_moduleList[chosenModule->moduleNumber]->getModuleName();
     m_task.skill[nextItem.skillNumberInTask].assignedModulePosition =
         m_moduleList[chosenModule->moduleNumber]->getModulePosition();
-    std::cout << "Task #" << m_task.taskId  << ": Writing assignment for skill position " <<
-              chosenModule->skillPosition << " (assignedModule: " << chosenModule->moduleNumber <<
-              "), skillNumberInTask" << nextItem.skillNumberInTask <<
-              std::endl;
+    QLOG_DEBUG() << "Task #" << m_task.taskId  << ": Writing assignment for skill position " <<
+                 chosenModule->skillPosition << " (assignedModule: " << chosenModule->moduleNumber <<
+                 "), skillNumberInTask" << nextItem.skillNumberInTask;
 
     // Write the info to the outside world and return.
     m_pTaskModule->updateTaskStructure(m_task, nextItem.skillNumberInTask);
@@ -241,10 +241,10 @@ void Task::evaluateSkillState(int skillNumberInTask)
 
         case SKILLMODULEDONE:
 
-            //std::cout << "Deregistered task #" << m_task.taskId << " from module " <<
-            //          m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber] << std::endl;
-            std::cout << "Task #" << m_task.taskId << ": Skill #" <<
-                      m_matchedSkills[skillNumberInTask].skillPosition << " done." << std::endl;
+            //QLOG_DEBUG() << "Deregistered task #" << m_task.taskId << " from module " <<
+            //          m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber] ;
+            QLOG_DEBUG() << "Task #" << m_task.taskId << ": Skill #" <<
+                         m_matchedSkills[skillNumberInTask].skillPosition << " done." ;
             m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
             m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
                 m_matchedSkills[skillNumberInTask].skillPosition);
@@ -338,7 +338,7 @@ void Task::processNextOpenSkill()
     if (!nextSkillToProcess)
     {
         // finished or error.. go on
-        std::cout << "Finished task #" << m_task.taskId << std::endl;
+        QLOG_DEBUG() << "Finished task #" << m_task.taskId ;
         UaString message = "Finished Task #";
         message += UaString::number(m_task.taskId);
         m_pMsgFeed->write(message, msgInfo);

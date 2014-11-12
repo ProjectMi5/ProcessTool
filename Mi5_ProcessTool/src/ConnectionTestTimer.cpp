@@ -36,9 +36,9 @@ void ConnectionTestTimer::evaluateConnectionTest()
 
     else
     {
-        /*std::cout << "Module " << m_pModule->getModuleName().toUtf8() << " didnt respond to ConnectionTest"
+        /*QLOG_DEBUG() << "Module " << m_pModule->getModuleName().toUtf8() << " didnt respond to ConnectionTest"
                   <<
-                  std::endl;*/
+                  ;*/
         m_pModule->moduleDisconnected();
     }
 

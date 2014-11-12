@@ -1,5 +1,6 @@
 #include <Mi5_ProcessTool/include/InitModule.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
+#include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 InitModule::InitModule(std::map<int, OpcuaGateway*> pGatewayList,
                        std::map<int, IProductionModule*> pModuleList)
 {
@@ -24,7 +25,7 @@ InitModule::~InitModule()
 void InitModule::startup()
 {
     int xtsModulesCount = evalModuleList();
-    std::cout << "Initmodule found " << xtsModulesCount << " XTS module(s)." << std::endl;
+    QLOG_DEBUG() << "Initmodule found " << xtsModulesCount << " XTS module(s)." ;
 }
 
 void InitModule::serverReconnected()
@@ -53,7 +54,7 @@ int InitModule::positionCalibration(int moduleNumber)
 
             if (moduleState == SKILLMODULEREADY)
             {
-                std::cout << "Calibrating module " << moduleNumber << " with transport module " << *it << std::endl;
+                QLOG_DEBUG() << "Calibrating module " << moduleNumber << " with transport module " << *it ;
                 positionCalibrationExecution(moduleNumber, *it);
 
                 // Wait til its done.
@@ -66,14 +67,15 @@ int InitModule::positionCalibration(int moduleNumber)
             else
             {
                 //TODO: wait for a skill to become ready
-                std::cout << "Found no ready XTS module for position calibration of module number " << moduleNumber
-                          << std::endl;
+                QLOG_DEBUG() << "Found no ready XTS module for position calibration of module number " <<
+                             moduleNumber
+                             ;
             }
         }
     }
     else
     {
-        std::cout << "InitModule received unknown module number " << moduleNumber << std::endl;
+        QLOG_DEBUG() << "InitModule received unknown module number " << moduleNumber ;
     }
 
     return returnval;
@@ -153,7 +155,7 @@ void InitModule::skillStateChanged(int moduleNumber, int skillPos, int state)
         (skillPos == m_pModuleList[moduleNumber]->translateSkillIdToSkillPos(POSCALSKILLID)) &&
         (moduleNumber == m_usedXtsModuleNumber))
     {
-        std::cout << "Statechange: " << state << std::endl;
+        QLOG_DEBUG() << "Statechange: " << state ;
 
         switch (state)
         {
@@ -162,12 +164,12 @@ void InitModule::skillStateChanged(int moduleNumber, int skillPos, int state)
             break;
 
         case SKILLMODULEDONE:
-            std::cout << "Calibration done." << std::endl;
+            QLOG_DEBUG() << "Calibration done." ;
             resetData();
             break;
 
         case SKILLMODULEBUSY:
-            std::cout << "Calibration in progress." << std::endl;
+            QLOG_DEBUG() << "Calibration in progress." ;
             break;
 
         default:
