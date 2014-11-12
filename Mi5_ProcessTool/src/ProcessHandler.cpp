@@ -119,15 +119,17 @@ UaStatus ProcessHandler::build()
             MODULEZ, m_pMessageFeeder);
 
     // Manual Module
-    m_manualModule = new ManualModule(m_gatewayList[MANUALMODULE1],
-                                      MANUALMODULE1, m_pMessageFeeder);
+
+    m_productionModuleList[MANUALMODULE1] = new ManualModule(m_gatewayList[MANUALMODULE1],
+            MANUALMODULE1, m_pMessageFeeder);
+
 
     //ENDE ÄNDERN
 
     //m_xts = new Xts(m_pOpcuaGateway, MODULENUMBERXTS);
     //m_cremeModule = new CremeModule(m_pOpcuaGateway, MODULENUMBERCREME);
     m_taskModule = new TaskModule(m_gatewayList[MODULENUMBERTASK], MODULENUMBERTASK,
-                                  m_productionModuleList, m_pMessageFeeder, m_manualModule);
+                                  m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);
 
 
     m_initModule = new InitModule(m_gatewayList, m_productionModuleList);
@@ -139,24 +141,33 @@ void ProcessHandler::run()
 {
     UaStatus status;
 
+    /*
+    ** Startup all production modules.
+    */
     for (std::map<int, IProductionModule*>::iterator it = m_productionModuleList.begin();
          it != m_productionModuleList.end(); ++it)
     {
-        it->second->startup(); //Startup all production modules.
+        it->second->startup();
     }
 
-    OutputDebugString(L"test");
-    m_manualModule->startup();
+
+
+    /*
+    ** Startup init module and initialize the positions.
+    */
     m_initModule->startup();
     QLOG_DEBUG() << "Startup finished." ;
     m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
-
+    //initialInit();
 
     // Nur eine kosmetische Ausgabe.
     buildSkillList();
-    //initialInit();
+
     //getchar();
 
+    /*
+    ** Start the task module.
+    */
     m_taskModule->startup();
 
 }
@@ -179,10 +190,10 @@ void ProcessHandler::buildSkillList() //obsolete here.
 
         for (std::map<int, int>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2)
         {
-            std:: cout <<  "Skill ID: " << it2->first <<
-                       ", Skill OPC UA identifier (in output interface): SkillOutput"
-                       <<
-                       it2->second ;
+            QLOG_DEBUG() <<  "Skill ID: " << it2->first <<
+                         ", Skill OPC UA identifier (in output interface): SkillOutput"
+                         <<
+                         it2->second ;
         }
     }
 

@@ -1,8 +1,10 @@
+#include "uaclientsdk.h"
 #include <Mi5_ProcessTool/include/ConnectionTestTimer.h>
-#include <Mi5_ProcessTool/include/ProductionModule.h>
+#include <Mi5_ProcessTool/include/DataStructures.h>
+#include <Mi5_ProcessTool/include/IProductionModule.h>
 #include <iostream>
 
-ConnectionTestTimer::ConnectionTestTimer(ProductionModule* pModule)
+ConnectionTestTimer::ConnectionTestTimer(IProductionModule* pModule)
 {
     m_pModule = pModule;
     m_timer1 = new QTimer(this);

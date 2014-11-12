@@ -5,7 +5,7 @@
 
 Task::Task(ProductionTask productionTask, std::map<int, IProductionModule*>moduleList,
            TaskModule* taskModule, MessageFeeder* pMessageFeeder,
-           ManualModule* pManual) : mutex(QMutex::Recursive),
+           IProductionModule* pManual) : mutex(QMutex::Recursive),
     m_foundTransport(false), m_state(m_task.taskState), m_transportModuleNumber(-1), m_pManual(pManual)
 {
     m_task = productionTask;
@@ -81,14 +81,13 @@ void Task::assignSkillsToModules()
          it++)
     {
         m_matchedSkills[it->skillNumberInTask] = assignSingleSkillToModule(*it);
-
     }
 }
 
 matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
 {
     std::vector<matchedSkill> matchedSkillsVector;
-    std::vector<matchedSkill>::iterator chosenModule;
+    matchedSkill chosenModule;
 
     for (std::vector<skillModuleList>::iterator it2 = m_skillListInSystem.begin();
          it2 != m_skillListInSystem.end(); it2++)
@@ -114,13 +113,15 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
         {
             if (m_foundTransport)
             {
-                //// We already found a transport, lets use this.5
+                //// We already found a transport, lets use this.
                 for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
                      it != matchedSkillsVector.end(); it++)
                 {
                     if (it->moduleNumber == m_transportModuleNumber)
                     {
-                        chosenModule = it;
+                        chosenModule = *it;
+                        chosenModule.blocked = true;
+                        break;
                     }
                 }
 
@@ -139,9 +140,35 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                             // Lets use this!
                             m_foundTransport = true;
                             m_transportModuleNumber = it->moduleNumber;
-                            chosenModule = it;
+                            chosenModule = *it;
+                            chosenModule.blocked = true;
                             break;
                         }
+                    }
+                }
+            }
+        }
+        else if (m_matchedSkills[nextItem.skillNumberInTask].blocked)  // Place for other skills
+        {
+            // Return the already assigned one.
+            chosenModule = m_matchedSkills[nextItem.skillNumberInTask];
+        }
+        else
+        {
+            bool searching = true;
+
+            while (searching)
+            {
+                for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
+                     it != matchedSkillsVector.end(); it++)
+                {
+                    if (m_moduleList[it->moduleNumber]->checkSkillReadyState(it->skillId) ==
+                        true) // take the first module to become ready.
+                    {
+                        // Lets use this!
+                        chosenModule = *it;
+                        searching = false;
+                        break;
                     }
                 }
             }
@@ -149,36 +176,37 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
     }
     else if (matchedSkillsVector.size() == 1)
     {
-        chosenModule = matchedSkillsVector.begin();
+        chosenModule = *matchedSkillsVector.begin();
     }
     else
     {
         // no offered skill found. --> Handmodul
         matchedSkill tmpMatchedSkill;
-        tmpMatchedSkill.moduleNumber = -1;
+        tmpMatchedSkill.moduleNumber = MANUALMODULE1;
         tmpMatchedSkill.taskSkillState = SKILLTASKOPEN;
-        tmpMatchedSkill.skillId = -1;
-        tmpMatchedSkill.skillPosition = -1;
+        tmpMatchedSkill.skillId = MANUALUNIVERSALSKILL;
+        tmpMatchedSkill.skillPosition = 0;
 
         QLOG_DEBUG() << "Task #" << m_task.taskId << ": Found no suitable module for skill #" <<
                      nextItem.skillNumberInTask ;
 
-        return tmpMatchedSkill;
+        chosenModule = tmpMatchedSkill;
     }
 
     // Write the info to our internal data structure.
-    m_task.skill[nextItem.skillNumberInTask].assignedModuleId = chosenModule->moduleNumber;
+    m_task.skill[nextItem.skillNumberInTask].assignedModuleId = chosenModule.moduleNumber;
     m_task.skill[nextItem.skillNumberInTask].assignedModuleName =
-        m_moduleList[chosenModule->moduleNumber]->getModuleName();
+        m_moduleList[chosenModule.moduleNumber]->getModuleName();
     m_task.skill[nextItem.skillNumberInTask].assignedModulePosition =
-        m_moduleList[chosenModule->moduleNumber]->getModulePosition();
+        m_moduleList[chosenModule.moduleNumber]->getModulePosition();
     QLOG_DEBUG() << "Task #" << m_task.taskId  << ": Writing assignment for skill position " <<
-                 chosenModule->skillPosition << " (assignedModule: " << chosenModule->moduleNumber <<
+                 chosenModule.skillPosition << " (assignedModule: " << chosenModule.moduleNumber <<
                  "), skillNumberInTask" << nextItem.skillNumberInTask;
 
+    m_task.taskState = TaskAssigned;
     // Write the info to the outside world and return.
     m_pTaskModule->updateTaskStructure(m_task, nextItem.skillNumberInTask);
-    return *chosenModule;
+    return chosenModule;
 }
 
 
@@ -244,7 +272,7 @@ void Task::evaluateSkillState(int skillNumberInTask)
             //QLOG_DEBUG() << "Deregistered task #" << m_task.taskId << " from module " <<
             //          m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber] ;
             QLOG_DEBUG() << "Task #" << m_task.taskId << ": Skill #" <<
-                         m_matchedSkills[skillNumberInTask].skillPosition << " done." ;
+                         skillNumberInTask << " done." ;
             m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
             m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
                 m_matchedSkills[skillNumberInTask].skillPosition);
@@ -273,9 +301,8 @@ void Task::processNextOpenSkill()
     {
         if (it->second.taskSkillState == SKILLTASKOPEN)
         {
-            if (isTransportModule(it->second.moduleNumber))
+            if (!(it->second.blocked)) // Only recheck, if no blocked module is targeted.
             {
-                // Only recheck, if no transport module is targeted.
                 it->second = assignSingleSkillToModule(m_skillQueue[it->first]);
             }
 
@@ -295,15 +322,26 @@ void Task::processNextOpenSkill()
                         int RelSkillPosOfDependantModule = dynamicParam[2].toInt();
                         QString paramIdentifier = dynamicParam[3];
 
-                        if (paramIdentifier == "XPosition" && ((it->first +
-                                                                RelSkillPosOfDependantModule) >= 0)) // sanity check
+                        // Check assignment and block the dependent module
+                        int skillPosInTaskOfDependantModule = it->first + RelSkillPosOfDependantModule;
+                        int moduleNumberOfDependantModule = m_matchedSkills[skillPosInTaskOfDependantModule].moduleNumber;
+
+                        if (RelSkillPosOfDependantModule >=
+                            0) // Only reassign, if the dependent module has not been processed yet.
                         {
-                            int moduleNumberOfDependantModule = m_matchedSkills[it->first +
-                                                                RelSkillPosOfDependantModule].moduleNumber;
+                            m_matchedSkills[it->first +
+                                            RelSkillPosOfDependantModule] = assignSingleSkillToModule(
+                                                        m_skillQueue[skillPosInTaskOfDependantModule]);
+                            m_matchedSkills[skillPosInTaskOfDependantModule].blocked = true;
+                        }
+
+                        if (paramIdentifier == "XPosition" && ((skillPosInTaskOfDependantModule) >= 0)) // sanity check
+                        {
                             tmpParamArray.paramInput[i].value =
                                 m_moduleList[moduleNumberOfDependantModule]->getModulePosition();
                             tmpParamArray.paramInput[i].string = "Fischer ftw.";
                         }
+
                     }
                     else
                     {
@@ -344,6 +382,7 @@ void Task::processNextOpenSkill()
         m_pMsgFeed->write(message, msgInfo);
 
         //triggerTaskObjectDeletion();
+        m_task.taskState = TaskDone;
         m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure);
 
     }
@@ -365,4 +404,23 @@ void Task::triggerTaskObjectDeletion()
     //m_deletionTimer = new QTimer(this);
     //connect(m_deletionTimer, SIGNAL(timeout()), this, SLOT(deleteTaskObject()));
     //m_deletionTimer->start(3000);
+}
+
+void Task::abortTask()
+{
+    for (std::map<int, matchedSkill>::iterator it = m_matchedSkills.begin();
+         it != m_matchedSkills.end(); it++)
+    {
+        if (it->second.taskSkillState == SKILLTASKINPROCESS)
+        {
+            m_moduleList[it->second.moduleNumber]->deregisterTaskForSkill(
+                m_matchedSkills[it->second.moduleNumber].skillPosition);
+        }
+
+        it->second.taskSkillState = SKILLTASKERROR;
+    }
+
+    m_matchedSkills.clear();
+    m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure);
+    QLOG_DEBUG() << "Aborted Task #" << m_task.taskId;
 }

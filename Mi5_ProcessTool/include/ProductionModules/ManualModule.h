@@ -3,25 +3,42 @@
 
 #include "uaclientsdk.h"
 
-#include <Mi5_ProcessTool/include/IModule.h>
 #include <Mi5_ProcessTool/include/DataStructures.h>
+#include <Mi5_ProcessTool/include/IProductionModule.h>
+#include <Mi5_ProcessTool/include/ISkillRegistration.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 
 class OpcuaGateway;
 
-class ManualModule : public IModule
+class ManualModule : public IProductionModule
 {
 public:
     ManualModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                  MessageFeeder* pMessageFeeder);
     ~ManualModule();
 
-public:
+public: //IModule methods
     virtual void subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
                                         const UaDataNotifications& dataNotifications,
                                         const UaDiagnosticInfos&   diagnosticInfos);
     virtual void startup();
     virtual void serverReconnected();
+
+public: //IProductionModule Methods
+    std::map<int, int> getSkills();
+    int checkSkillState(int& skillId);
+    bool checkSkillReadyState(int& skillId);
+    int translateSkillIdToSkillPos(int skillId);
+    void assignSkill(int& taskId, Skill skill, int& skillPos);
+    void executeSkill(int& skillPos, ParameterInputArray& paramInput);
+    void deregisterTaskForSkill(int& skillPos);
+    UaString getSkillName(int& skillPos);
+    UaString getModuleName();
+    int getModulePosition();
+    int registerTaskForSkill(ISkillRegistration* pTask, int skillPos);
+    void writeConnectionTestInput(bool input);
+    bool checkConnectionTestOutput();
+    void moduleDisconnected();
 
 private:
     void createMonitoredItems();
@@ -36,6 +53,7 @@ private:
     int m_moduleNumber;
     UaNodeIdArray nodeToSubscribe;
     UaString nodeIdToSubscribe;
+    std::map<int, ISkillRegistration*> m_skillRegistrationList; /*skillPos, pTask*/
 
 };
 

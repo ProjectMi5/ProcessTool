@@ -16,7 +16,6 @@ int main(int argc, char* argv[])
     QsLogging::DestinationPtr debugDestination(
         QsLogging::DestinationFactory::MakeDebugOutputDestination());
     pLogger->addDestination(debugDestination);
-    QLOG_DEBUG() << "Test";
 
     ProcessHandler* processHandler = new ProcessHandler();
 

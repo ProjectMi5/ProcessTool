@@ -21,6 +21,7 @@ public:
     virtual int registerTaskForSkill(ISkillRegistration* pTask, int skillPos) = 0;
     virtual void writeConnectionTestInput(bool input) = 0;
     virtual bool checkConnectionTestOutput() = 0;
+    virtual void moduleDisconnected() = 0;
 };
 
 enum moduleSkillState

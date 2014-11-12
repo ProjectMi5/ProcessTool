@@ -6,7 +6,6 @@
 #include <Mi5_ProcessTool/include/IProductionModule.h>
 #include <Mi5_ProcessTool/include/ISkillRegistration.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
-#include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
 #include <QMutex>
 #include <qobject.h>
 #include <qtimer.h>
@@ -19,13 +18,14 @@ class Task : public QObject, public ISkillRegistration
     Q_OBJECT
 public:
     Task(ProductionTask productionTask, std::map<int, IProductionModule*>moduleList,
-         TaskModule* taskModule, MessageFeeder* pMessageFeeder, ManualModule* pManual);
+         TaskModule* taskModule, MessageFeeder* pMessageFeeder, IProductionModule* pManual);
     ~Task();
 
 public:
     int getTaskId();
     void skillStateChanged(int moduleNumber, int skillPos, int state);
     void start();
+    void abortTask();
 
 public slots:
     void triggerTaskObjectDeletion();
@@ -57,7 +57,7 @@ private:
     QThread m_thread;
     bool m_foundTransport;
     int m_transportModuleNumber;
-    ManualModule* m_pManual;
+    IProductionModule* m_pManual;
 
 private slots:
     void deleteTaskObject();

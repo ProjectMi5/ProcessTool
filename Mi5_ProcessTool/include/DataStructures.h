@@ -127,7 +127,7 @@ enum TaskState
 {
     TaskUnassigned = 0,
     TaskAssigned = 1,
-    TaskWaitingForSkillRead = 2,
+    TaskWaitingForSkillReady = 2,
     TaskInProgress = 3,
     TaskDone = 4,
     TaskAborted = 5,
@@ -168,6 +168,9 @@ struct matchedSkill
     int skillId;
     int taskSkillState;
     int skillPosition;
+    bool blocked;
+    matchedSkill() : moduleNumber(0), moduleSkillState(-1), moduleSkillReady(false),
+        skillId(-1), taskSkillState(-1), skillPosition(0), blocked(false) {};
 };
 
 struct ManualModuleParameter
@@ -188,6 +191,7 @@ struct ManualModuleData
     OpcUa_Boolean oError;
     OpcUa_Boolean oReady;
     OpcUa_Int32 oErrorId;
+    OpcUa_Double oPosition;
     UaString iSkilldescription;
     OpcUa_Int32 iSkillId;
     OpcUa_Int32 iTaskId;

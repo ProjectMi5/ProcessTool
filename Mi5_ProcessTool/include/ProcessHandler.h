@@ -30,7 +30,6 @@ private:
     std::multimap<int, std::map<int, int>> m_moduleSkillList;
     std::map<int, OpcuaGateway*> m_gatewayList;
     std::map<int, IProductionModule*> m_productionModuleList;
-    ManualModule* m_manualModule;
     QThread m_thread;
     MessageFeeder* m_pMessageFeeder;
 

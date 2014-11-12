@@ -81,7 +81,6 @@ void MessageFeeder::resetList()
     for (int i = 0; i < LISTSIZE; i++)
     {
         m_feedId = 0;
-        m_feedCounter = 0;
         writeToOpcua(string, msgClear, string);
     }
 

@@ -112,6 +112,12 @@ void ManualModule::createMonitoredItems()
     createNodeStructure();
     status = m_pGateway->createSingleMonitoredItem(104, m_moduleNumber,
              nodeToSubscribe);
+
+    nodeIdToSubscribe = baseNodeId;
+    nodeIdToSubscribe += "Position";
+    createNodeStructure();
+    status = m_pGateway->createSingleMonitoredItem(105, m_moduleNumber,
+             nodeToSubscribe);
 }
 
 void ManualModule::write()
@@ -249,6 +255,10 @@ void ManualModule::moduleDataChange(const UaDataNotifications& dataNotifications
             {
                 tempValue.toBool(data.oReady);
             }
+            else if (dataNotifications[i].ClientHandle == 105)
+            {
+                tempValue.toDouble(data.oPosition);
+            }
         }
     }
 }
@@ -258,4 +268,163 @@ void ManualModule::createNodeStructure()
     nodeToSubscribe.clear();
     nodeToSubscribe.resize(1);
     UaNodeId::fromXmlString(nodeIdToSubscribe).copyTo(&nodeToSubscribe[0]);
+}
+
+
+std::map<int, int> ManualModule::getSkills()
+{
+    std::map<int, int> tmpMap;
+    tmpMap[MANUALUNIVERSALSKILL] = 0;
+
+    return tmpMap;
+}
+
+int ManualModule::checkSkillState(int& skillId)
+{
+    int returnVal = -1;
+
+    if (skillId != MANUALUNIVERSALSKILL)
+    {
+        // error
+    }
+    else
+    {
+        if (data.oReady)
+        {
+            returnVal = SKILLMODULEREADY;
+        }
+        else if (data.oBusy)
+        {
+            returnVal =  SKILLMODULEBUSY;
+        }
+        else if (data.oDone)
+        {
+            returnVal = SKILLMODULEDONE;
+        }
+        else if (data.oError)
+        {
+            returnVal = SKILLMODULEERROR;
+        }
+    }
+
+    return returnVal;
+}
+
+bool ManualModule::checkSkillReadyState(int& skillId)
+{
+    bool tmpBool = false;
+
+    if (skillId == MANUALUNIVERSALSKILL)
+    {
+        tmpBool = data.oReady;
+    }
+
+    return tmpBool;
+}
+
+int ManualModule::translateSkillIdToSkillPos(int skillId)
+{
+    if (skillId == MANUALUNIVERSALSKILL)
+    {
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+void ManualModule::assignSkill(int& taskId, Skill skill, int& skillPos)
+{
+    //used?!
+}
+
+void ManualModule::executeSkill(int& skillPos, ParameterInputArray& paramInput)
+{
+    for (int i = 0; i < PARAMETERCOUNT; i++)
+    {
+        data.iParameter[i].stringValue = paramInput.paramInput[i].string;
+        data.iParameter[i].value = paramInput.paramInput[i].value;
+    }
+
+    data.iExecute = true;
+    QLOG_DEBUG() << "Executing skill position #" << skillPos << " at module number " << m_moduleNumber
+                 << " (ManualModule)";
+    write();
+}
+
+void ManualModule::deregisterTaskForSkill(int& skillPos)
+{
+    if (m_skillRegistrationList.count(skillPos) > 0)
+    {
+        m_skillRegistrationList.erase(m_skillRegistrationList.find(skillPos));
+
+        data.iExecute = false;
+
+        for (int i = 0; i < PARAMETERCOUNT; i++)
+        {
+            data.iParameter[i].value = 0;
+            data.iParameter[i].stringValue  = UaString("");
+            data.iParameter[i].name = UaString("");
+            data.iParameter[i].unit = UaString("");
+            data.iParameter[i].id = 0;
+        }
+
+        write();
+    }
+
+    else
+    {
+        QLOG_DEBUG() << "Module number " << m_moduleNumber <<
+                     ": Received deregistration request for unknown skillpos " << skillPos;
+    }
+}
+
+UaString ManualModule::getSkillName(int& skillPos)
+{
+    return UaString("ManualModule - UniversalSkill");
+}
+
+UaString ManualModule::getModuleName()
+{
+    return UaString("ManualModule");
+}
+
+int ManualModule::getModulePosition()
+{
+    return data.oPosition;
+}
+
+int ManualModule::registerTaskForSkill(ISkillRegistration* pTask, int skillPos)
+{
+    int returnVal = -1;
+
+    if (m_skillRegistrationList.count(skillPos) > 0)
+    {
+        QLOG_DEBUG() << "Skill at position " << skillPos << " is already registered with task id " <<
+                     m_skillRegistrationList[skillPos]->getTaskId() ;
+    }
+    else
+    {
+        m_skillRegistrationList[skillPos] = pTask;
+        returnVal = 0;
+    }
+
+    return returnVal;
+}
+
+// Methods for connection test: not implemented yet.
+void ManualModule::writeConnectionTestInput(bool input)
+{
+    //
+}
+
+bool ManualModule::checkConnectionTestOutput()
+{
+    return false;
+}
+
+void ManualModule::moduleDisconnected()
+{
+    //
 }

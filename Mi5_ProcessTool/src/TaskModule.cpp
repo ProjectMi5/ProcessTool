@@ -5,7 +5,7 @@
 
 TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                        std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder,
-                       ManualModule* pManual) : m_pManual(pManual)
+                       IProductionModule* pManual) : m_pManual(pManual)
 {
     m_taskCounter = 0;
     m_moduleSkillList.clear();
@@ -177,6 +177,7 @@ void TaskModule::notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber)
 
         if (it != m_taskObjects.end())
         {
+            updateTaskState(taskNumber, TaskDone);
             Task* tmp = it->second;
             m_taskObjects.erase(it);
             //delete tmp; // whoops, we have a memory leak here, as the task objects still receives skillStateUpdates
@@ -191,6 +192,29 @@ void TaskModule::updateTaskStructure(ProductionTask& updatedTask, int skillNumbe
     writeTaskInformation(updatedTask.taskNumberInStructure, skillNumberInTask);
 }
 
+
+void TaskModule::updateTaskState(int taskNumber, TaskState state)
+{
+    UaWriteValues nodesToWrite;
+    nodesToWrite.create(1);
+    int writeCounter = 0;
+    UaVariant tmpValue;
+
+    UaString tmpNodeId = "ns=4;s=MI5.ProductionList[";
+    tmpNodeId += UaString::number(taskNumber);
+    tmpNodeId += "].State";
+    tmpValue.setInt16(m_tasklist[taskNumber].taskState);
+    UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
+    nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
+    OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
+    writeCounter++;
+    tmpValue.clear();
+
+    // Write!
+    m_pOpcuaGateway->write(nodesToWrite);
+}
+
+
 UaStatus TaskModule::writeTaskInformation(OpcUa_Int32 taskNumber, int skillNumberInTask)
 {
     UaStatus status;
@@ -203,16 +227,7 @@ UaStatus TaskModule::writeTaskInformation(OpcUa_Int32 taskNumber, int skillNumbe
     baseNodeIdToWrite += UaString::number(taskNumber);
     baseNodeIdToWrite += "].";
 
-    UaString tmpNodeId = baseNodeIdToWrite;
-    //tmpNodeId += "State"; //TODO!
-    //UaByteString tmpByteString;
-    //UaVariant(m_tasklist[taskNumber].taskState).toByteString(tmpByteString);
-    //tmpValue.setByteString(tmpByteString, OpcUa_False);
-    //UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
-    //nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
-    //OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
-    //writeCounter++;
-    //tmpValue.clear();
+    updateTaskState(taskNumber, m_tasklist[taskNumber].taskState);
 
     /*   for (int i = 0; i < SKILLCOUNT; i++)
        {*/

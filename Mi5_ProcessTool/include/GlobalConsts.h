@@ -22,6 +22,7 @@ static const int MODULENUMBERXTSMAX = 2005; //2005
 static const int MODULENUMBERMESSAGEFEEDER = 10;
 
 // Specific skills
+static const int MANUALUNIVERSALSKILL = 1400;
 static const int POSCALSKILLID = 1321;
 static const int SKILLTRANSPORT = 1320; // Param1: pos x
 
