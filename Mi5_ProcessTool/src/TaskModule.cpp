@@ -107,6 +107,41 @@ void TaskModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
     }
 }
 
+bool TaskModule::isTaskDone(int taskStructNumber)
+{
+    bool val = false;
+
+    UaStatus status;
+    UaDataValues returnValues;
+    OpcUa_NodeId tmpNodeId;
+    UaReadValueIds nodesToRead;
+    int readCounter = 0;
+
+    nodesToRead.create(1);
+    UaString baseNodeId = "ns=4;s=MI5.ProductionList[";
+    baseNodeId += UaString::number(taskStructNumber);
+    baseNodeId += "].";
+
+    UaString nodeIdToRead = baseNodeId;
+    nodeIdToRead += "State";
+    UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+    nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+    readCounter++;
+
+    returnValues = m_pOpcuaGateway->read(nodesToRead);
+
+    OpcUa_Int32 tmpReturnVal;
+    UaVariant(returnValues[0].Value).toInt32(tmpReturnVal);
+
+    if (tmpReturnVal == TaskDone)
+    {
+        val = true;
+    }
+
+    return val;
+
+}
+
 
 // Dont look.
 void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
@@ -128,7 +163,9 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
             tempValue.toBool(dummy);
 
             if ((taskNumber < TASKCOUNT) &&
-                (dummy == false)) // check, wether this is the right subscription and activation of task
+                (dummy == false) &&
+                isTaskDone(
+                    taskNumber)) // check, wether this is the right subscription and activation of task and the task has not been processed yet
             {
 
                 if (m_tasklist.count(taskNumber) == 0)
@@ -193,7 +230,7 @@ void TaskModule::updateTaskStructure(ProductionTask& updatedTask, int skillNumbe
 }
 
 
-void TaskModule::updateTaskState(int taskNumber, TaskState state)
+void TaskModule::updateTaskState(int taskNumber, OpcUa_Int32 state)
 {
     UaWriteValues nodesToWrite;
     nodesToWrite.create(1);
@@ -203,7 +240,7 @@ void TaskModule::updateTaskState(int taskNumber, TaskState state)
     UaString tmpNodeId = "ns=4;s=MI5.ProductionList[";
     tmpNodeId += UaString::number(taskNumber);
     tmpNodeId += "].State";
-    tmpValue.setInt16(m_tasklist[taskNumber].taskState);
+    tmpValue.setInt32(state);
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
     nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
     OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
@@ -236,7 +273,7 @@ UaStatus TaskModule::writeTaskInformation(OpcUa_Int32 taskNumber, int skillNumbe
     baseSkillNodeId += UaString::number(skillNumberInTask);
     baseSkillNodeId += "].";
 
-    tmpNodeId = baseSkillNodeId;
+    UaString tmpNodeId = baseSkillNodeId;
     tmpNodeId += "AssignedModuleID";
     tmpValue.setUInt16(m_tasklist[taskNumber].skill[skillNumberInTask].assignedModuleId);
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
@@ -439,7 +476,7 @@ UaStatus TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
     readCounter++;
     m_tasklist[taskNumber].timestamp = UaVariant(returnValues[readCounter].Value).toString();
     readCounter++;
-    UaVariant(returnValues[readCounter].Value).toUInt32(m_tasklist[taskNumber].taskState);
+    UaVariant(returnValues[readCounter].Value).toInt32(m_tasklist[taskNumber].taskState);
     readCounter++;
 
     for (int i = 0; i < SKILLCOUNT; i++)

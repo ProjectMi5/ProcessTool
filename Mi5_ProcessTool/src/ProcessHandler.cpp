@@ -158,10 +158,13 @@ void ProcessHandler::run()
     m_initModule->startup();
     QLOG_DEBUG() << "Startup finished." ;
     m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
-    //initialInit();
 
     // Nur eine kosmetische Ausgabe.
     buildSkillList();
+
+    //initialInit();
+
+
 
     //getchar();
 

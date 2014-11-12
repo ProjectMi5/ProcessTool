@@ -142,7 +142,7 @@ struct ProductionTask
     OpcUa_Int32 taskId;
     OpcUa_Int32 recipeId;
     UaString timestamp;
-    OpcUa_UInt32 taskState;
+    OpcUa_Int32 taskState;
     Skill skill[51];
 };
 

@@ -329,10 +329,11 @@ void Task::processNextOpenSkill()
                         if (RelSkillPosOfDependantModule >=
                             0) // Only reassign, if the dependent module has not been processed yet.
                         {
-                            m_matchedSkills[it->first +
-                                            RelSkillPosOfDependantModule] = assignSingleSkillToModule(
-                                                        m_skillQueue[skillPosInTaskOfDependantModule]);
+                            m_matchedSkills[skillPosInTaskOfDependantModule] = assignSingleSkillToModule(
+                                        m_skillQueue[skillPosInTaskOfDependantModule]);
                             m_matchedSkills[skillPosInTaskOfDependantModule].blocked = true;
+                            // Update the module number, if changed.
+                            moduleNumberOfDependantModule = m_matchedSkills[skillPosInTaskOfDependantModule].moduleNumber;
                         }
 
                         if (paramIdentifier == "XPosition" && ((skillPosInTaskOfDependantModule) >= 0)) // sanity check
@@ -363,6 +364,7 @@ void Task::processNextOpenSkill()
 
             if (moduleState == SKILLMODULEREADY)
             {
+                QLOG_DEBUG() << "Task number in structure #" << m_task.taskNumberInStructure;
                 m_moduleList[it->second.moduleNumber]->executeSkill(it->second.skillPosition, tmpParamArray);
 
                 m_matchedSkills[it->first].taskSkillState = SKILLTASKINPROCESS;
