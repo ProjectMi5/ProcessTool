@@ -67,7 +67,7 @@ int InitModule::positionCalibration(int moduleNumber)
             else
             {
                 //TODO: wait for a skill to become ready
-                QLOG_DEBUG() << "Found no ready XTS module for position calibration of module number " <<
+                QLOG_ERROR() << "Found no ready XTS module for position calibration of module number " <<
                              moduleNumber
                              ;
             }
@@ -75,7 +75,7 @@ int InitModule::positionCalibration(int moduleNumber)
     }
     else
     {
-        QLOG_DEBUG() << "InitModule received unknown module number " << moduleNumber ;
+        QLOG_ERROR() << "InitModule received unknown module number " << moduleNumber ;
     }
 
     return returnval;

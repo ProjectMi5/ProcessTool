@@ -26,7 +26,7 @@ void OpcuaSubscriber::subscriptionStatusChanged(
     OpcUa_ReferenceParameter(
         clientSubscriptionHandle); // We use the callback only for this subscription
 
-    printf("Subscription not longer valid - failed with status %s\n", status.toString().toUtf8());
+    QLOG_ERROR() << "Subscription not longer valid - failed with status " << status.toString().toUtf8();
 }
 
 void OpcuaSubscriber::dataChange(
@@ -86,7 +86,7 @@ UaStatus OpcuaSubscriber::createSubscription(UaSession* pSession,
     }
     else
     {
-        printf("CreateSubscription failed with status %s\n", result.toString().toUtf8());
+        QLOG_ERROR() << "CreateSubscription failed with status " << result.toString().toUtf8();
     }
 
     return result;
@@ -116,7 +116,7 @@ UaStatus OpcuaSubscriber::deleteSubscription(UaSession* pSession,
     }
     else
     {
-        printf("DeleteSubscription failed with status %s\n", result.toString().toUtf8());
+        QLOG_ERROR() << "DeleteSubscription failed with status " << result.toString().toUtf8();
     }
 
     return result;
@@ -144,7 +144,7 @@ UaStatus OpcuaSubscriber::deleteAllSubscriptions(UaSession* pSession)
 
         if (!result.isGood())
         {
-            printf("DeleteSubscription failed with status %s\n", result.toString().toUtf8());
+            QLOG_ERROR() << "DeleteSubscription failed with status " << result.toString().toUtf8();
         }
     }
 
@@ -234,13 +234,13 @@ UaStatus OpcuaSubscriber::createSingleMonitoredItem(OpcUa_UInt32 clientHandle,
 {
     if (m_subscriptionList.count(subscriptionClientHandle) != 1)
     {
-        printf("\nError: No Subscription created\n");
+        QLOG_ERROR() << "\nError: No Subscription created\n";
         return OpcUa_BadInvalidState;
     }
 
     if (nodesToSubscribe.length() != 1)
     {
-        QLOG_DEBUG() << "Error, Length of nodesToSubscribe not equal to 1." ;
+        QLOG_ERROR() << "Error, Length of nodesToSubscribe not equal to 1." ;
         return OpcUa_BadInvalidState;
     }
 
@@ -269,7 +269,7 @@ UaStatus OpcuaSubscriber::createSingleMonitoredItem(OpcUa_UInt32 clientHandle,
         printf("CreateMonitoredItems failed for item: %s - Status %s\n",
                UaNodeId(itemsToCreate[0].ItemToMonitor.NodeId).toXmlString().toUtf8(),
                UaStatus(createResults[0].StatusCode).toString().toUtf8());
-        printf("CreateMonitoredItems failed with status %s\n", result.toString().toUtf8());
+        QLOG_ERROR() << "CreateMonitoredItems failed with status " << result.toString().toUtf8();
     }
 
     // QLOG_DEBUG() << "Created subscription with clienthandle " << clientHandle;

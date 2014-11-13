@@ -187,8 +187,8 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
         tmpMatchedSkill.skillId = MANUALUNIVERSALSKILL;
         tmpMatchedSkill.skillPosition = 0;
 
-        QLOG_DEBUG() << "Task #" << m_task.taskId << ": Found no suitable module for skill #" <<
-                     nextItem.skillNumberInTask ;
+        QLOG_WARN() << "Task #" << m_task.taskId << ": Found no suitable module for skill #" <<
+                    nextItem.skillNumberInTask ;
 
         chosenModule = tmpMatchedSkill;
     }
@@ -271,8 +271,8 @@ void Task::evaluateSkillState(int skillNumberInTask)
 
             //QLOG_DEBUG() << "Deregistered task #" << m_task.taskId << " from module " <<
             //          m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber] ;
-            QLOG_DEBUG() << "Task #" << m_task.taskId << ": Skill #" <<
-                         skillNumberInTask << " done." ;
+            QLOG_INFO() << "Task #" << m_task.taskId << ": Skill #" <<
+                        skillNumberInTask << " done." ;
             m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
             m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
                 m_matchedSkills[skillNumberInTask].skillPosition);
@@ -350,6 +350,9 @@ void Task::processNextOpenSkill()
                         tmpParamArray.paramInput[i].value = -1;
                         tmpParamArray.paramInput[i].string = "Wrong or unknown dynamic parameter format.";
                         m_pMsgFeed->write("Wrong or unknown dynamic parameter format.", msgError);
+                        QLOG_ERROR() << "Wrong or unknown dynamic parameter format. Parameter[" << i << "] at Skill " <<
+                                     it->first
+                                     ;
                     }
                 }
                 else
@@ -378,7 +381,7 @@ void Task::processNextOpenSkill()
     if (!nextSkillToProcess)
     {
         // finished or error.. go on
-        QLOG_DEBUG() << "Finished task #" << m_task.taskId ;
+        QLOG_INFO() << "Finished task ID #" << m_task.taskId;
         UaString message = "Finished Task #";
         message += UaString::number(m_task.taskId);
         m_pMsgFeed->write(message, msgInfo);
@@ -424,5 +427,5 @@ void Task::abortTask()
 
     m_matchedSkills.clear();
     m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure);
-    QLOG_DEBUG() << "Aborted Task #" << m_task.taskId;
+    QLOG_INFO() << "Aborted Task #" << m_task.taskId;
 }

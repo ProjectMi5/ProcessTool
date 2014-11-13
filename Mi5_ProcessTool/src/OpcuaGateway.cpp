@@ -65,7 +65,7 @@ void OpcuaGateway::connectionStatusChanged(
     switch (serverStatus)
     {
     case UaClient::Disconnected:
-        printf("Connection status changed to Disconnected\n");
+        QLOG_INFO() << "Connection status changed to Disconnected\n";
 
         // Delete subscriptions for the connected module.
         for (std::map<int, IModule*>::iterator it = m_moduleList.begin(); it != m_moduleList.end(); it++)
@@ -76,7 +76,7 @@ void OpcuaGateway::connectionStatusChanged(
         break;
 
     case UaClient::Connected:
-        printf("Connection status changed to Connected\n");
+        QLOG_INFO() << "Connection status changed to Connected\n";
 
         if (m_serverStatus != UaClient::NewSessionCreated)
         {
@@ -94,19 +94,19 @@ void OpcuaGateway::connectionStatusChanged(
         break;
 
     case UaClient::ConnectionWarningWatchdogTimeout:
-        printf("Connection status changed to ConnectionWarningWatchdogTimeout\n");
+        QLOG_INFO() << "Connection status changed to ConnectionWarningWatchdogTimeout\n";
         break;
 
     case UaClient::ConnectionErrorApiReconnect:
-        printf("Connection status changed to ConnectionErrorApiReconnect\n");
+        QLOG_INFO() << "Connection status changed to ConnectionErrorApiReconnect\n";
         break;
 
     case UaClient::ServerShutdown:
-        printf("Connection status changed to ServerShutdown\n");
+        QLOG_INFO() << "Connection status changed to ServerShutdown\n";
         break;
 
     case UaClient::NewSessionCreated:
-        printf("Connection status changed to NewSessionCreated\n");
+        QLOG_INFO() << "Connection status changed to NewSessionCreated\n";
         m_pConfiguration->updateNamespaceIndexes(m_pSession->getNamespaceTable());
         break;
     }
@@ -155,7 +155,7 @@ UaStatus OpcuaGateway::connect()
     }
     else
     {
-        printf("Connect failed with status %s\n", result.toString().toUtf8());
+        QLOG_ERROR() << "Connect failed with status " << result.toString().toUtf8();
     }
 
     return result;
@@ -246,15 +246,15 @@ UaDataValues OpcuaGateway::read(UaReadValueIds& nodesToRead)
             }
             else
             {
-                printf("Read failed for item[%d] with status %s\n", i,
-                       UaStatus(values[i].StatusCode).toString().toUtf8());
+                QLOG_ERROR() << "Read failed for item[%d] with status " <<
+                             UaStatus(values[i].StatusCode).toString().toUtf8();
             }
         }
     }
     else
     {
         // Service call failed
-        printf("Read failed with status %s\n", result.toString().toUtf8());
+        QLOG_ERROR() << "Read failed with status " << result.toString().toUtf8();
     }
 
     return values;
@@ -308,8 +308,9 @@ UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite)
                 }
                 else
                 {
-                    printf("Write failed for item[%d] with status %s\n", i, UaStatus(results[i]).toString().toUtf8());
-                    QLOG_DEBUG() << "Tries left: " << (1 - tryCounter) ;
+                    QLOG_ERROR() << "Write failed for item[%d] with status " << UaStatus(
+                                     results[i]).toString().toUtf8();
+                    QLOG_ERROR() << "Tries left: " << (1 - tryCounter) ;
                     tryCounter++;
                 }
             }
@@ -317,7 +318,7 @@ UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite)
         else
         {
             // Service call failed
-            printf("Write failed with status %s\n", result.toString().toUtf8());
+            QLOG_ERROR() << "Write failed with status " << result.toString().toUtf8();
         }
     }
 

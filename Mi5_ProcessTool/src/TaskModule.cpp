@@ -93,8 +93,8 @@ void TaskModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
             else
             {
                 UaStatus itemError(dataNotifications[i].Value.StatusCode);
-                printf("  Variable %d failed with status %s\n", dataNotifications[i].ClientHandle,
-                       itemError.toString().toUtf8());
+                QLOG_ERROR() << "Variable " << dataNotifications[i].ClientHandle << " failed with status " <<
+                             itemError.toString().toUtf8();
             }
         }
 
@@ -102,7 +102,7 @@ void TaskModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
     }
     else
     {
-        QLOG_DEBUG() << "Module number " << m_moduleNumber << " received subscription for " <<
+        QLOG_ERROR() << "Module number " << m_moduleNumber << " received subscription for " <<
                      clientSubscriptionHandle << "." ;
     }
 }
@@ -164,7 +164,7 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
 
             if ((taskNumber < TASKCOUNT) &&
                 (dummy == false) &&
-                isTaskDone(
+                !isTaskDone(
                     taskNumber)) // check, wether this is the right subscription and activation of task and the task has not been processed yet
             {
 
@@ -177,7 +177,7 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
 
                     if (!status.isGood())
                     {
-                        QLOG_DEBUG() << "Error: Couldn't retrieve task information for task number " << taskNumber;
+                        QLOG_ERROR() << "Error: Couldn't retrieve task information for task number " << taskNumber;
                         return;
                     }
 
@@ -192,7 +192,7 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
                 else
                 {
                     //task number already exists
-                    QLOG_DEBUG() << "Error, task number " << taskNumber << " already exists in tasklist." ;
+                    QLOG_ERROR() << "Error, task number " << taskNumber << " already exists in tasklist." ;
                 }
             }
 
@@ -247,8 +247,28 @@ void TaskModule::updateTaskState(int taskNumber, OpcUa_Int32 state)
     writeCounter++;
     tmpValue.clear();
 
-    // Write!
     m_pOpcuaGateway->write(nodesToWrite);
+
+    if (state == TaskDone)
+    {
+        nodesToWrite.clear();
+        nodesToWrite.create(1);
+        writeCounter = 0;
+
+        tmpNodeId = "ns=4;s=MI5.ProductionList[";
+        tmpNodeId += UaString::number(taskNumber);
+        tmpNodeId += "].Dummy";
+        tmpValue.setBool(true);
+        UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
+        nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
+        OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
+        writeCounter++;
+        tmpValue.clear();
+        m_pOpcuaGateway->write(nodesToWrite);
+    }
+
+    // Write!
+
 }
 
 

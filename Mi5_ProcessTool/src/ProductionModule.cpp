@@ -65,6 +65,7 @@ void ProductionModule::moduleDisconnected()
     message += getModuleName();
     message += " disconnected.";
     m_pMsgFeed->write(message, msgError);
+    QLOG_ERROR() << "Module " << getModuleName() << "disconnected.";
 }
 
 void ProductionModule::assignSkill(int& taskId, Skill skill, int& skillPos)
@@ -108,7 +109,7 @@ void ProductionModule::deregisterTaskForSkill(int& skillPos)
 
     else
     {
-        QLOG_DEBUG() << "Module number " << m_moduleNumber <<
+        QLOG_ERROR() << "Module number " << m_moduleNumber <<
                      ": Received deregistration request for unknown skillpos " << skillPos;
     }
 }
@@ -281,8 +282,8 @@ int ProductionModule::registerTaskForSkill(ISkillRegistration* pTask, int skillP
 
     if (m_skillRegistrationList.count(skillPos) > 0)
     {
-        QLOG_DEBUG() << "Skill at position " << skillPos << " is already registered with task id " <<
-                     m_skillRegistrationList[skillPos]->getTaskId() ;
+        QLOG_WARN() << "Skill at position " << skillPos << " is already registered with task id " <<
+                    m_skillRegistrationList[skillPos]->getTaskId() ;
     }
     else
     {
