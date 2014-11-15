@@ -121,6 +121,7 @@ struct Skill
     OpcUa_UInt32 id;
     UaString name;
     Parameter parameter[11];
+    OpcUa_Int32 state;
 };
 
 enum TaskState
@@ -180,7 +181,7 @@ struct ManualModuleParameter
     UaString stringValue;
     UaString unit;
     OpcUa_Double value;
-    ManualModuleParameter(): id(0), value(0) {};
+    ManualModuleParameter(): id(0), value(0) { UaString voidString = UaString(""); name = voidString; stringValue = voidString; unit = voidString;};
 };
 
 struct ManualModuleData
@@ -190,16 +191,17 @@ struct ManualModuleData
     OpcUa_Boolean oDone;
     OpcUa_Boolean oError;
     OpcUa_Boolean oReady;
-    OpcUa_Int32 oErrorId;
+    OpcUa_UInt16 oErrorId;
     OpcUa_Double oPosition;
     UaString iSkilldescription;
-    OpcUa_Int32 iSkillId;
-    OpcUa_Int32 iTaskId;
+    OpcUa_UInt16 iSkillId;
+    OpcUa_UInt16 iTaskId;
     ManualModuleParameter iParameter[PARAMETERCOUNT];
 
     ManualModuleData() : iExecute(false), oBusy(false), oDone(false), oError(false), oErrorId(0),
+        oPosition(0),
         iSkillId(0),
-        iTaskId(0) {  };
+        iTaskId(0) { iSkilldescription = UaString("0"); };
 };
 
 #endif // DATASTRUCTURES_H

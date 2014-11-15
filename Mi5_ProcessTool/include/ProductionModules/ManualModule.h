@@ -29,6 +29,7 @@ public: //IProductionModule Methods
     int checkSkillState(int& skillId);
     bool checkSkillReadyState(int& skillId);
     int translateSkillIdToSkillPos(int skillId);
+    virtual int translateSkillPosToSkillId(int skillPos);
     void assignSkill(int& taskId, Skill skill, int& skillPos);
     void executeSkill(int& skillPos, ParameterInputArray& paramInput);
     void deregisterTaskForSkill(int& skillPos);
@@ -39,13 +40,15 @@ public: //IProductionModule Methods
     void writeConnectionTestInput(bool input);
     bool checkConnectionTestOutput();
     void moduleDisconnected();
-
+    virtual bool isBlocked();
+    virtual bool isReserved();
 private:
     void createMonitoredItems();
     void write();
     void moduleDataChange(const UaDataNotifications& dataNotifications);
     void createNodeStructure();
     void setupOpcua();
+    void skillStateChanged(int skillPos, int state);
 
 private:
     ManualModuleData data;

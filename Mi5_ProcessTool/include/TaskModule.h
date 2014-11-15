@@ -25,9 +25,10 @@ public:
     void startup();
     void updateTaskStructure(ProductionTask& updatedTask, int skillNumberInTask);
     std::vector<skillModuleList> getSkillList();
-    void notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber);
+    void notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber, OpcUa_Int32 state);
     void serverReconnected();
     void updateTaskState(int taskNumber, OpcUa_Int32 state);
+    void updateSkillState(int taskNumber, int skillNumber, OpcUa_Int32 state);
 
 private:
     OpcuaGateway* m_pOpcuaGateway;
@@ -47,11 +48,12 @@ private:
 private:
     void createMonitoredItems();
     void createNodeStructure();
-    UaStatus getTaskInformation(OpcUa_Int32 taskNumber);
+    int getTaskInformation(OpcUa_Int32 taskNumber);
     UaStatus writeTaskInformation(OpcUa_Int32 taskNumber, int skillNumberInTask);
     void buildSkillList();
     void setupOpcua();
     bool isTaskDone(int taskStructNumber);
+    void abortTheTask(int taskNumber);
 
 private: //const
     static const int TASKCOUNT = 30;

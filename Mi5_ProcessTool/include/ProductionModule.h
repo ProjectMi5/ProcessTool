@@ -44,6 +44,9 @@ public:
     int translateSkillIdToSkillPos(int skillId);
     void serverReconnected();
     void moduleDisconnected();
+    virtual bool isBlocked();
+    virtual bool isReserved();
+    int translateSkillPosToSkillId(int skillPos);
 
 private:
     OpcuaGateway* m_pOpcuaGateway;
@@ -62,12 +65,13 @@ private:
     void writeSkillInput(int skillPos);
     void skillStateChanged(int skillPos, int state);
     void setupOpcua();
+    virtual void checkMoverState(int skillPos);
 
 private: //const
     static const int SKILLCOUNT = 16;
 
 private: // module interface
-    std::map<int, int> m_moduleSkillList;
+    std::map<int, int> m_moduleSkillList; /* skillid, skillpos */
     std::map<int, ISkillRegistration*> m_skillRegistrationList; /*skillPos, pTask*/
 
 };

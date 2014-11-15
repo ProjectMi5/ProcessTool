@@ -26,6 +26,8 @@ public:
     virtual void newEvents(
         OpcUa_UInt32                clientSubscriptionHandle,
         UaEventFieldLists&          eventFieldList);
+    virtual void notificationsMissing(OpcUa_UInt32 clientSubscriptionHandle,
+                                      OpcUa_UInt32 previousSequenceNumber, OpcUa_UInt32 newSequenceNumber);
     // UaSubscriptionCallback implementation ------------------------------------------------------
 
     // Create / delete a subscription on the server

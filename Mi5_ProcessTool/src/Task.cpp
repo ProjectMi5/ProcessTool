@@ -273,6 +273,7 @@ void Task::evaluateSkillState(int skillNumberInTask)
             //          m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber] ;
             QLOG_INFO() << "Task #" << m_task.taskId << ": Skill #" <<
                         skillNumberInTask << " done." ;
+            m_pTaskModule->updateSkillState(m_task.taskId, skillNumberInTask, SKILLTASKFINISHED);
             m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
             m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
                 m_matchedSkills[skillNumberInTask].skillPosition);
@@ -351,8 +352,7 @@ void Task::processNextOpenSkill()
                         tmpParamArray.paramInput[i].string = "Wrong or unknown dynamic parameter format.";
                         m_pMsgFeed->write("Wrong or unknown dynamic parameter format.", msgError);
                         QLOG_ERROR() << "Wrong or unknown dynamic parameter format. Parameter[" << i << "] at Skill " <<
-                                     it->first
-                                     ;
+                                     it->first;
                     }
                 }
                 else
@@ -370,6 +370,7 @@ void Task::processNextOpenSkill()
                 QLOG_DEBUG() << "Task number in structure #" << m_task.taskNumberInStructure;
                 m_moduleList[it->second.moduleNumber]->executeSkill(it->second.skillPosition, tmpParamArray);
 
+                m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, it->first, SKILLTASKINPROCESS);
                 m_matchedSkills[it->first].taskSkillState = SKILLTASKINPROCESS;
             }
 
@@ -381,21 +382,21 @@ void Task::processNextOpenSkill()
     if (!nextSkillToProcess)
     {
         // finished or error.. go on
-        QLOG_INFO() << "Finished task ID #" << m_task.taskId;
-        UaString message = "Finished Task #";
+        UaString message = "Finished Task ID #";
         message += UaString::number(m_task.taskId);
         m_pMsgFeed->write(message, msgInfo);
+        QLOG_INFO() << message.toUtf8();
 
         //triggerTaskObjectDeletion();
         m_task.taskState = TaskDone;
-        m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure);
+        m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, m_task.taskState);
 
     }
 }
 
 void Task::deleteTaskObject()
 {
-    m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure);
+    m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, m_task.taskState);
 }
 
 void Task::triggerTaskObjectDeletion()
@@ -422,10 +423,37 @@ void Task::abortTask()
                 m_matchedSkills[it->second.moduleNumber].skillPosition);
         }
 
+        // Reset XTS
+        if (m_foundTransport)
+        {
+            ParameterInputArray tmpParam;
+
+            for (int i = 0; i < PARAMETERCOUNT; i++)
+            {
+                tmpParam.paramInput[i].string = UaString("");
+                tmpParam.paramInput[i].value = 0;
+            }
+
+            if (m_moduleList[m_transportModuleNumber]->isBlocked())
+            {
+                int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSUNBLOCK);
+                m_moduleList[m_transportModuleNumber]->executeSkill(skillPos, tmpParam);
+                QLOG_DEBUG() << "Unblocked Transport.";
+            }
+
+            if (m_moduleList[m_transportModuleNumber]->isReserved())
+            {
+                int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSRELEASE);
+                m_moduleList[m_transportModuleNumber]->executeSkill(skillPos, tmpParam);
+                QLOG_DEBUG() << "Released Transport.";
+            }
+        }
+
         it->second.taskSkillState = SKILLTASKERROR;
+        m_pTaskModule->updateSkillState(m_task.taskId, it->first, SKILLTASKERROR);
     }
 
     m_matchedSkills.clear();
-    m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure);
+    m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, TaskError);
     QLOG_INFO() << "Aborted Task #" << m_task.taskId;
 }

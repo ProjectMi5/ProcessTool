@@ -12,6 +12,7 @@ public:
     virtual int checkSkillState(int& skillId) = 0;
     virtual bool checkSkillReadyState(int& skillId) = 0;
     virtual int translateSkillIdToSkillPos(int skillId) = 0;
+    virtual int translateSkillPosToSkillId(int skillPos) = 0;
     virtual void assignSkill(int& taskId, Skill skill, int& skillPos) = 0;
     virtual void executeSkill(int& skillPos, ParameterInputArray& paramInput) = 0;
     virtual void deregisterTaskForSkill(int& skillPos) = 0;
@@ -22,6 +23,8 @@ public:
     virtual void writeConnectionTestInput(bool input) = 0;
     virtual bool checkConnectionTestOutput() = 0;
     virtual void moduleDisconnected() = 0;
+    virtual bool isBlocked() = 0;
+    virtual bool isReserved() = 0;
 };
 
 enum moduleSkillState

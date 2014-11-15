@@ -12,6 +12,16 @@ public:
     Xts(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder);
     ~Xts();
 
+public:
+    virtual bool isBlocked();
+    virtual bool isReserved();
+
+private:
+    virtual void checkMoverState(int skillPos);
+
+private:
+    bool m_blocked;
+    bool m_reserved;
 };
 
 #endif // XTS_H

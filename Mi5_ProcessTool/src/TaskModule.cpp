@@ -62,6 +62,15 @@ void TaskModule::createMonitoredItems()
         createNodeStructure();
         status = m_pOpcuaGateway->createSingleMonitoredItem(1000 + i, m_moduleNumber,
                  nodeToSubscribe);
+
+        nodeIdToSubscribe = "ns=4;s=MI5.ProductionList[";
+        nodeIdToSubscribe += UaString::number(i);
+        nodeIdToSubscribe += "].";
+        nodeIdToSubscribe += "AbortTask";
+        createNodeStructure();
+        status = m_pOpcuaGateway->createSingleMonitoredItem(666 + i, m_moduleNumber,
+                 nodeToSubscribe);
+
     }
 
 }
@@ -84,7 +93,7 @@ void TaskModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
 
         for (OpcUa_Int32 i = 0; i < dataNotifications.length(); i++)
         {
-            // QLOG_DEBUG() << dataNotifications[i].ClientHandle ;
+            // QLOG_DEBUG() << dataNotifications[i].ClientHandle;
 
             if (OpcUa_IsGood(dataNotifications[i].Value.StatusCode))
             {
@@ -142,6 +151,21 @@ bool TaskModule::isTaskDone(int taskStructNumber)
 
 }
 
+void TaskModule::abortTheTask(int taskNumber)
+{
+    if (m_tasklist.count(taskNumber) == 0)
+    {
+        return;
+    }
+
+    if (m_taskObjects[m_tasklist[taskNumber].taskId] == 0)
+    {
+        return;
+    }
+
+    m_taskObjects[m_tasklist[taskNumber].taskId]->abortTask();
+}
+
 
 // Dont look.
 void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
@@ -158,53 +182,79 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
                    tempValue.toString().toUtf8());*/
 
             // INPUT
-            OpcUa_Int32 taskNumber = (dataNotifications[i].ClientHandle % 1000) % TASKCOUNT;
-            OpcUa_Boolean dummy;
-            tempValue.toBool(dummy);
+            OpcUa_Int32 taskNumber;// = (dataNotifications[i].ClientHandle % 1000) % TASKCOUNT;
 
-            if ((taskNumber < TASKCOUNT) &&
-                (dummy == false) &&
-                !isTaskDone(
-                    taskNumber)) // check, wether this is the right subscription and activation of task and the task has not been processed yet
+            for (int j = 0; j < SKILLCOUNT; j++)
             {
-
-                if (m_tasklist.count(taskNumber) == 0)
+                if (dataNotifications[i].ClientHandle % (666 + j) == 0)
                 {
-                    m_tasklist[taskNumber].dummy = true;
-                    m_tasklist[taskNumber].taskNumberInStructure = taskNumber;
+                    OpcUa_Boolean abortTask = false;
+                    tempValue.toBool(abortTask);
+                    taskNumber = j;
 
-                    UaStatus status = getTaskInformation(taskNumber);
-
-                    if (!status.isGood())
+                    if (abortTask == OpcUa_True)
                     {
-                        QLOG_ERROR() << "Error: Couldn't retrieve task information for task number " << taskNumber;
-                        return;
+                        abortTheTask(taskNumber);
                     }
 
-                    QLOG_DEBUG() << "Received new task (#" << taskNumber << "): " <<
-                                 m_tasklist[taskNumber].name.toUtf8()
-                                 ;
-                    m_taskObjects[m_tasklist[taskNumber].taskId] = new Task(m_tasklist[taskNumber], m_moduleList, this,
-                            m_pMsgFeed, m_pManual);
-                    m_taskObjects[m_tasklist[taskNumber].taskId]->start();
+                    break;
                 }
-
-                else
+                else if (dataNotifications[i].ClientHandle % (1000 + j) == 0)
                 {
-                    //task number already exists
-                    QLOG_ERROR() << "Error, task number " << taskNumber << " already exists in tasklist." ;
+                    taskNumber = j;
+                    OpcUa_Boolean dummy;
+                    tempValue.toBool(dummy);
+
+                    if ((taskNumber < TASKCOUNT) &&
+                        (dummy == false) &&
+                        !isTaskDone(
+                            taskNumber)) // check, wether this is the right subscription and activation of task and the task has not been processed yet
+                    {
+
+                        if (m_tasklist.count(taskNumber) == 0)
+                        {
+                            m_tasklist[taskNumber].dummy = true;
+                            m_tasklist[taskNumber].taskNumberInStructure = taskNumber;
+
+                            int status = getTaskInformation(taskNumber);
+
+                            if ((-1) == status)
+                            {
+                                QLOG_ERROR() << "Error: Couldn't retrieve task information for task number " << taskNumber;
+                                return;
+                            }
+
+                            QLOG_DEBUG() << "Received new task (#" << taskNumber << ", ID #" << m_tasklist[taskNumber].taskId <<
+                                         "): " <<
+                                         m_tasklist[taskNumber].name.toUtf8()
+                                         ;
+                            m_taskObjects[m_tasklist[taskNumber].taskId] = new Task(m_tasklist[taskNumber], m_moduleList, this,
+                                    m_pMsgFeed, m_pManual);
+                            m_taskObjects[m_tasklist[taskNumber].taskId]->start();
+                            break;
+                        }
+
+                        else
+                        {
+                            //task number already exists
+                            QLOG_ERROR() << "Error, task number " << taskNumber << " already exists in tasklist." ;
+                            break;
+                        }
+                    }
+
+                    else
+                    {
+                        // Subscription for someone else, or dummy changed from false to trues
+                    }
                 }
             }
 
-            else
-            {
-                // Subscription for someone else, or dummy changed from false to trues
-            }
+
         }
     }
 }
 
-void TaskModule::notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber)
+void TaskModule::notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber, OpcUa_Int32 state)
 {
     if (m_taskObjects.count(taskId) > 0)
     {
@@ -214,12 +264,15 @@ void TaskModule::notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber)
 
         if (it != m_taskObjects.end())
         {
-            updateTaskState(taskNumber, TaskDone);
+            updateTaskState(taskNumber, state);
             Task* tmp = it->second;
             m_taskObjects.erase(it);
+            return;
             //delete tmp; // whoops, we have a memory leak here, as the task objects still receives skillStateUpdates
         }
     }
+
+    QLOG_ERROR() << "Found no task with task #" << taskNumber << "(ID #" << taskId << ") to delete.";
 }
 
 void TaskModule::updateTaskStructure(ProductionTask& updatedTask, int skillNumberInTask)
@@ -328,15 +381,15 @@ UaStatus TaskModule::writeTaskInformation(OpcUa_Int32 taskNumber, int skillNumbe
 }
 
 
-UaStatus TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
+int TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
 {
-    UaStatus status;
+    int status = -1;
     UaDataValues returnValues;
     OpcUa_NodeId tmpNodeId;
     UaReadValueIds nodesToRead;
     int readCounter = 0;
 
-    nodesToRead.create(5 + (SKILLCOUNT) * (6 + 10 *
+    nodesToRead.create(5 + (SKILLCOUNT) * (7 + 10 *
                                            (PARAMETERCOUNT))); // Fill in number, should be 4799
     UaString baseNodeId = "ns=4;s=MI5.ProductionList[";
     baseNodeId += UaString::number(taskNumber);
@@ -415,6 +468,12 @@ UaStatus TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
         nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
         readCounter++;
 
+        nodeIdToRead = baseSkillNodeId;
+        nodeIdToRead += "State";
+        UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+        nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+        readCounter++;
+
         for (int j = 0; j < PARAMETERCOUNT; j++)
         {
             UaString baseParamNodeId = baseSkillNodeId;
@@ -486,6 +545,13 @@ UaStatus TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
 
     // Read!
     returnValues = m_pOpcuaGateway->read(nodesToRead);
+
+    if (returnValues.length() != readCounter)
+    {
+        status = -1;
+        return status;
+    }
+
     readCounter = 0;
 
     m_tasklist[taskNumber].name = UaVariant(returnValues[readCounter].Value).toString();
@@ -518,6 +584,9 @@ UaStatus TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
         readCounter++;
         m_tasklist[taskNumber].skill[i].name = UaVariant(
                 returnValues[readCounter].Value).toString();
+        readCounter++;
+        UaVariant(returnValues[readCounter].Value).toInt32(
+            m_tasklist[taskNumber].skill[i].state);
         readCounter++;
 
         for (int j = 0; j < PARAMETERCOUNT; j++)
@@ -555,7 +624,7 @@ UaStatus TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
         }
     }
 
-
+    status = 1;
     return status;
 }
 
@@ -587,4 +656,26 @@ void TaskModule::buildSkillList()
             m_moduleSkillList.push_back(tmpList);
         }
     }
+}
+
+void TaskModule::updateSkillState(int taskNumber, int skillNumber, OpcUa_Int32 state)
+{
+    UaWriteValues nodesToWrite;
+    nodesToWrite.create(1);
+    int writeCounter = 0;
+    UaVariant tmpValue;
+
+    UaString tmpNodeId = "ns=4;s=MI5.ProductionList[";
+    tmpNodeId += UaString::number(taskNumber);
+    tmpNodeId += "].Skill[";
+    tmpNodeId += UaString::number(skillNumber);
+    tmpNodeId += "].State";
+    tmpValue.setInt32(state);
+    UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
+    nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
+    OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
+    writeCounter++;
+    tmpValue.clear();
+
+    m_pOpcuaGateway->write(nodesToWrite);
 }

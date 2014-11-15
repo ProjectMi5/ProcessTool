@@ -135,7 +135,7 @@ UaStatus OpcuaGateway::connect()
     sessionConnectInfo.sApplicationUri = UaString("urn:%1:%2:%3").arg(sNodeName).arg("ITQ").arg(
             "MI5");
     sessionConnectInfo.sProductUri = UaString("urn:%1:%2").arg("ITQ").arg("MI5");
-    sessionConnectInfo.sSessionName = sessionConnectInfo.sApplicationUri;
+    sessionConnectInfo.sSessionName = UaString("MI5Session:%1").arg(UaString::number(rand() % 10000));
     sessionConnectInfo.bAutomaticReconnect = m_pConfiguration->getAutomaticReconnect();
     sessionConnectInfo.bRetryInitialConnect = m_pConfiguration->getRetryInitialConnect();
 

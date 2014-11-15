@@ -19,8 +19,6 @@ int main(int argc, char* argv[])
 
     ProcessHandler* processHandler = new ProcessHandler();
 
-
-
     //delete processHandler;
     //processHandler = NULL;
     int applicationResult = a.exec();

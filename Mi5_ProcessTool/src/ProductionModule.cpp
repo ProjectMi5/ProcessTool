@@ -53,6 +53,25 @@ int ProductionModule::translateSkillIdToSkillPos(int skillId)
     return returnVal;
 }
 
+
+int ProductionModule::translateSkillPosToSkillId(int skillPos)
+{
+    int returnVal = -1;
+
+    for (std::map<int, int>::iterator it = m_moduleSkillList.begin(); it != m_moduleSkillList.end();
+         it++)
+    {
+        if (it->second == skillPos)
+        {
+            returnVal = it->first;
+            break;
+        }
+    }
+
+    return returnVal;
+}
+
+
 std::map<int, int> ProductionModule::getSkills()
 {
     buildSkillList();
@@ -65,7 +84,7 @@ void ProductionModule::moduleDisconnected()
     message += getModuleName();
     message += " disconnected.";
     m_pMsgFeed->write(message, msgError);
-    QLOG_ERROR() << "Module " << getModuleName() << "disconnected.";
+    QLOG_ERROR() << message.toUtf8();
 }
 
 void ProductionModule::assignSkill(int& taskId, Skill skill, int& skillPos)
@@ -80,6 +99,7 @@ void ProductionModule::assignSkill(int& taskId, Skill skill, int& skillPos)
 
 void ProductionModule::executeSkill(int& skillPos, ParameterInputArray& paramInput)
 {
+
     for (int i = 0; i < PARAMETERCOUNT; i++)
     {
         input.skillInput[skillPos].parameterInput[i] = paramInput.paramInput[i];
@@ -88,6 +108,8 @@ void ProductionModule::executeSkill(int& skillPos, ParameterInputArray& paramInp
     input.skillInput[skillPos].execute = true;
     QLOG_DEBUG() << "Executing skill position #" << skillPos << " at module number " << m_moduleNumber;
     writeSkillInput(skillPos);
+
+    checkMoverState(skillPos);
 }
 
 void ProductionModule::deregisterTaskForSkill(int& skillPos)
@@ -268,7 +290,7 @@ void ProductionModule::skillStateChanged(int skillPos, int state)
 
         else if (output.skillOutput[skillPos].ready)
         {
-            pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEERROR);
+            pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEREADY);
         }
     }
     else // no task registered for this skill position
@@ -1073,4 +1095,19 @@ void ProductionModule::moduleDataChange(const UaDataNotifications& dataNotificat
             }
         }
     }
+}
+
+bool ProductionModule::isReserved()
+{
+    return false;
+}
+
+bool ProductionModule::isBlocked()
+{
+    return false;
+}
+
+void ProductionModule::checkMoverState(int skillPos)
+{
+
 }

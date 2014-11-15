@@ -65,8 +65,12 @@ UaStatus OpcuaSubscriber::createSubscription(UaSession* pSession,
 
     ServiceSettings serviceSettings;
     SubscriptionSettings subscriptionSettings;
+    //subscriptionSettings.lifetimeCount = 1200; // Time = lifeTimeCount * publishingInterval
+    //subscriptionSettings.maxKeepAliveCount = 5; // Time = maxKeepAliveCount * publishingInterval
+    //subscriptionSettings.maxNotificationsPerPublish = 0;
+    // subscriptionSettings.priority = 0; // relative priority, if multiple subscriptions are used
+    //subscriptionSettings.publishingInterval = 1000.0; // cyclic rate [ms]
     subscriptionSettings.publishingInterval = 1;
-    int deleteme = m_subscriptionList.size();
 
     m_subscriptionList[subscriptionClientHandle] = NULL;
     UaSubscription* tempSubscription;
@@ -253,7 +257,7 @@ UaStatus OpcuaSubscriber::createSingleMonitoredItem(OpcUa_UInt32 clientHandle,
     itemsToCreate[0].ItemToMonitor.AttributeId = OpcUa_Attributes_Value;
     OpcUa_NodeId_CopyTo(&nodesToSubscribe[0], &itemsToCreate[0].ItemToMonitor.NodeId);
     itemsToCreate[0].RequestedParameters.ClientHandle = clientHandle;
-    itemsToCreate[0].RequestedParameters.SamplingInterval = 1;
+    itemsToCreate[0].RequestedParameters.SamplingInterval = 50; //TODO: VALUE
     itemsToCreate[0].RequestedParameters.QueueSize = 1;
     itemsToCreate[0].RequestedParameters.DiscardOldest = OpcUa_True;
     itemsToCreate[0].MonitoringMode = OpcUa_MonitoringMode_Reporting;
@@ -280,4 +284,10 @@ UaStatus OpcuaSubscriber::createSingleMonitoredItem(OpcUa_UInt32 clientHandle,
 void OpcuaSubscriber::setGateway(OpcuaGateway* gateway)
 {
     m_pOpcuaGateway = gateway;
+}
+
+void OpcuaSubscriber::notificationsMissing(OpcUa_UInt32 clientSubscriptionHandle,
+        OpcUa_UInt32 previousSequenceNumber, OpcUa_UInt32 newSequenceNumber)
+{
+    QLOG_ERROR() << "Notifications missing for clientsubscriptionhandle " << clientSubscriptionHandle;
 }

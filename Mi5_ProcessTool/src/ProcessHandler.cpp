@@ -66,19 +66,19 @@ UaStatus ProcessHandler::build()
 
     // Create instance of OpcuaGateway
     // 1. Stelle ÄNDERN
-    m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.175.210:4840"));
-    m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.175.210:4840"));
-    m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.175.210:4840"));
+    /*_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+    m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+    m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+    */
+    m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
+    m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
+    m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
 
-    m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.175.224:4840"));
-    m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.175.225:4840"));
-    m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.175.226:4840"));
-
-    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString("opc.tcp://192.168.175.230:4840"));
+    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
     // ENDE ÄNDERN
-    m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.175.230:4840"));
+    m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
     m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(
-        UaString("opc.tcp://192.168.175.230:4840"));
+        UaString("opc.tcp://192.168.192.116:4840"));
 
     for (std::map<int, OpcuaGateway*>::iterator it = m_gatewayList.begin(); it != m_gatewayList.end();
          ++it)
@@ -104,12 +104,12 @@ UaStatus ProcessHandler::build()
     m_pMessageFeeder = new MessageFeeder(m_gatewayList[MODULENUMBERMESSAGEFEEDER],
                                          MODULENUMBERMESSAGEFEEDER);
     // 2. Stelle ÄNDERN
-    m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
-            MODULENUMBERXTS1, m_pMessageFeeder);
-    m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
-            MODULENUMBERXTS2, m_pMessageFeeder);
-    m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
-            MODULENUMBERXTS3, m_pMessageFeeder);
+    //m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
+    //        MODULENUMBERXTS1, m_pMessageFeeder);
+    //m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
+    //        MODULENUMBERXTS2, m_pMessageFeeder);
+    //m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
+    //        MODULENUMBERXTS3, m_pMessageFeeder);
 
     m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
             MODULEX, m_pMessageFeeder);
@@ -126,8 +126,6 @@ UaStatus ProcessHandler::build()
 
     //ENDE ÄNDERN
 
-    //m_xts = new Xts(m_pOpcuaGateway, MODULENUMBERXTS);
-    //m_cremeModule = new CremeModule(m_pOpcuaGateway, MODULENUMBERCREME);
     m_taskModule = new TaskModule(m_gatewayList[MODULENUMBERTASK], MODULENUMBERTASK,
                                   m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);
 
@@ -159,7 +157,6 @@ void ProcessHandler::run()
     QLOG_DEBUG() << "Startup finished." ;
     m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
 
-    // Nur eine kosmetische Ausgabe.
     buildSkillList();
 
     //initialInit();
@@ -175,12 +172,13 @@ void ProcessHandler::run()
 
 }
 
-void ProcessHandler::buildSkillList() //obsolete here.
+void ProcessHandler::buildSkillList()
 {
     for (std::map<int, IProductionModule*>::iterator it = m_productionModuleList.begin();
          it != m_productionModuleList.end(); ++it)
     {
-        m_moduleSkillList.insert(std::pair<int, std::map<int, int>>(it->first, it->second->getSkills()));
+        m_moduleSkillList.insert(std::pair<int, std::map<int, int>>(it->first,
+                                 it->second->getSkills())); //The getskills() call actually triggers the build of modules' skill lists.
     }
 
     QLOG_DEBUG() << "\nAvailable skills:" ;
@@ -215,7 +213,6 @@ void ProcessHandler::initialInit()
     m_initModule->positionCalibration(MODULEX);
     m_initModule->positionCalibration(MODULEY);
     m_initModule->positionCalibration(MODULEZ);
-
 
     m_pMessageFeeder->write("Initialization of the production modules done.", msgSuccess);
 }

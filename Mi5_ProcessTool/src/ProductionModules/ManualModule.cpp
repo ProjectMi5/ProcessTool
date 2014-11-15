@@ -123,7 +123,7 @@ void ManualModule::createMonitoredItems()
 void ManualModule::write()
 {
     UaWriteValues nodesToWrite;
-    nodesToWrite.create(5 + 1 * (1    + PARAMETERCOUNT * 1)); // Fill in number
+    nodesToWrite.create(4 + PARAMETERCOUNT * (5)); // Fill in number
     int writeCounter = 0;
     UaVariant tmpValue;
 
@@ -152,7 +152,7 @@ void ManualModule::write()
 
     tmpNodeId = baseNodeIdToWrite;
     tmpNodeId += "SkillID";
-    tmpValue.setInt32(data.iSkillId);
+    tmpValue.setUInt16(data.iSkillId);
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
     nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
     OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
@@ -161,7 +161,7 @@ void ManualModule::write()
 
     tmpNodeId = baseNodeIdToWrite;
     tmpNodeId += "TaskID";
-    tmpValue.setInt32(data.iTaskId);
+    tmpValue.setUInt16(data.iTaskId);
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
     nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
     OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
@@ -178,7 +178,7 @@ void ManualModule::write()
 
         tmpNodeId = baseParamNodeId;
         tmpNodeId += "ID";
-        tmpValue.setInt32(data.iParameter[j].id);
+        tmpValue.setUInt16(data.iParameter[j].id);
         UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
         nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
         OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
@@ -238,28 +238,63 @@ void ManualModule::moduleDataChange(const UaDataNotifications& dataNotifications
             if (dataNotifications[i].ClientHandle == 100)
             {
                 tempValue.toBool(data.oBusy);
+                skillStateChanged(0, 0);
             }
             else if (dataNotifications[i].ClientHandle == 101)
             {
                 tempValue.toBool(data.oDone);
+                skillStateChanged(0, 0);
             }
             else if (dataNotifications[i].ClientHandle == 102)
             {
                 tempValue.toBool(data.oError);
+                skillStateChanged(0, 0);
             }
             else if (dataNotifications[i].ClientHandle == 103)
             {
-                tempValue.toInt32(data.oErrorId);
+                tempValue.toUInt16(data.oErrorId);
             }
             else if (dataNotifications[i].ClientHandle == 104)
             {
                 tempValue.toBool(data.oReady);
+                skillStateChanged(0, 0);
             }
             else if (dataNotifications[i].ClientHandle == 105)
             {
                 tempValue.toDouble(data.oPosition);
             }
         }
+    }
+}
+
+void ManualModule::skillStateChanged(int skillPos, int state)
+{
+    if (m_skillRegistrationList.count(skillPos) > 0) //task registered for this skillpos
+    {
+        ISkillRegistration* pTask = m_skillRegistrationList[skillPos];
+
+        if (data.oBusy)
+        {
+            pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEBUSY);
+        }
+
+        else if (data.oDone)
+        {
+            pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEDONE);
+        }
+
+        else if (data.oError)
+        {
+            pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEERROR);
+        }
+
+        else if (data.oReady)
+        {
+            pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEREADY);
+        }
+    }
+    else // no task registered for this skill position
+    {
     }
 }
 
@@ -426,5 +461,21 @@ bool ManualModule::checkConnectionTestOutput()
 
 void ManualModule::moduleDisconnected()
 {
+    //
+}
+
+bool ManualModule::isBlocked()
+{
+    return false;
+}
+
+bool ManualModule::isReserved()
+{
+    return false;
+}
+
+int ManualModule::translateSkillPosToSkillId(int skillPos)
+{
+    return 0;
     //
 }

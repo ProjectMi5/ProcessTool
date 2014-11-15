@@ -7,7 +7,7 @@ static const int MODULENUMBERXTS2 = 2002;
 static const int MODULENUMBERXTS3 = 2003;
 
 // Manual modules
-static const int MANUALMODULE1 = 2401;
+static const int MANUALMODULE1 = 2403;
 
 // Simu modules
 static const int MODULEX = 1202;
@@ -25,6 +25,10 @@ static const int MODULENUMBERMESSAGEFEEDER = 10;
 static const int MANUALUNIVERSALSKILL = 1400;
 static const int POSCALSKILLID = 1321;
 static const int SKILLTRANSPORT = 1320; // Param1: pos x
+static const int SKILLIDXTSRESERVE = 1310;
+static const int SKILLIDXTSRELEASE = 1311;
+static const int SKILLIDXTSBLOCK = 1315;
+static const int SKILLIDXTSUNBLOCK = 1316;
 
 enum messageFeedLevel
 {
