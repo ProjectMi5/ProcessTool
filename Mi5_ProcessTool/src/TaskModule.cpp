@@ -302,7 +302,7 @@ void TaskModule::updateTaskState(int taskNumber, OpcUa_Int32 state)
 
     m_pOpcuaGateway->write(nodesToWrite);
 
-    if (state == TaskDone)
+    if ((TaskDone == state) || (TaskError == state))
     {
         nodesToWrite.clear();
         nodesToWrite.create(1);

@@ -7,10 +7,10 @@
 #include <Mi5_ProcessTool/include/ISkillRegistration.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 #include <QMutex>
-#include <qobject.h>
-#include <qtimer.h>
-#include <qthread.h>
-
+#include <QObject>
+#include <QTimer>
+#include <QThread>
+#include <QWaitCondition>
 
 class TaskModule;
 class Task : public QObject, public ISkillRegistration
@@ -52,12 +52,16 @@ private:
     std::vector<skillModuleList> m_skillListInSystem; /*moduleNumber, skillId, skillPos*/
     std::map<int, matchedSkill> m_matchedSkills;
     MessageFeeder* m_pMsgFeed;
-    QMutex mutex;
-    QTimer* m_deletionTimer;
-    QThread m_thread;
     bool m_foundTransport;
     int m_transportModuleNumber;
     IProductionModule* m_pManual;
+    bool m_aborted;
+
+private: //Qt
+    QMutex m_mutex;
+    QTimer* m_deletionTimer;
+    QThread m_thread;
+    QWaitCondition m_waitCondition;
 
 private slots:
     void deleteTaskObject();

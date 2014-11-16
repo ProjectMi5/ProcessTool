@@ -411,7 +411,7 @@ void ManualModule::deregisterTaskForSkill(int& skillPos)
     else
     {
         QLOG_DEBUG() << "Module number " << m_moduleNumber <<
-                     ": Received deregistration request for unknown skillpos " << skillPos;
+                     ": Received deregistration request for not registered skillpos " << skillPos;
     }
 }
 

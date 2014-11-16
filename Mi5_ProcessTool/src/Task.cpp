@@ -5,8 +5,9 @@
 
 Task::Task(ProductionTask productionTask, std::map<int, IProductionModule*>moduleList,
            TaskModule* taskModule, MessageFeeder* pMessageFeeder,
-           IProductionModule* pManual) : mutex(QMutex::Recursive),
-    m_foundTransport(false), m_state(m_task.taskState), m_transportModuleNumber(-1), m_pManual(pManual)
+           IProductionModule* pManual) : m_foundTransport(false), m_state(m_task.taskState),
+    m_transportModuleNumber(-1), m_pManual(pManual),
+    m_aborted(false)
 {
     m_task = productionTask;
     m_moduleList = moduleList;
@@ -273,10 +274,16 @@ void Task::evaluateSkillState(int skillNumberInTask)
             //          m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber] ;
             QLOG_INFO() << "Task #" << m_task.taskId << ": Skill #" <<
                         skillNumberInTask << " done." ;
-            m_pTaskModule->updateSkillState(m_task.taskId, skillNumberInTask, SKILLTASKFINISHED);
+            m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, skillNumberInTask, SKILLTASKFINISHED);
             m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
             m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
                 m_matchedSkills[skillNumberInTask].skillPosition);
+
+            if (m_aborted)
+            {
+                m_waitCondition.wakeAll();
+            }
+
             processNextOpenSkill();
             break;
 
@@ -295,6 +302,12 @@ void Task::evaluateSkillState(int skillNumberInTask)
 
 void Task::processNextOpenSkill()
 {
+    if (m_aborted)
+    {
+        return;
+        // Dont process new skill, when the abortion was requested and/or is in process.
+    }
+
     bool nextSkillToProcess = false;
 
     for (std::map<int, matchedSkill>::iterator it = m_matchedSkills.begin();
@@ -390,7 +403,6 @@ void Task::processNextOpenSkill()
         //triggerTaskObjectDeletion();
         m_task.taskState = TaskDone;
         m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, m_task.taskState);
-
     }
 }
 
@@ -414,46 +426,92 @@ void Task::triggerTaskObjectDeletion()
 
 void Task::abortTask()
 {
+    m_aborted = true;
+
     for (std::map<int, matchedSkill>::iterator it = m_matchedSkills.begin();
          it != m_matchedSkills.end(); it++)
     {
         if (it->second.taskSkillState == SKILLTASKINPROCESS)
         {
             m_moduleList[it->second.moduleNumber]->deregisterTaskForSkill(
-                m_matchedSkills[it->second.moduleNumber].skillPosition);
+                m_matchedSkills[it->first].skillPosition);
+            // Wait til its done.
+            m_mutex.lock();
+            m_waitCondition.wait(&m_mutex);
+            m_mutex.unlock();
         }
 
-        // Reset XTS
-        if (m_foundTransport)
-        {
-            ParameterInputArray tmpParam;
 
-            for (int i = 0; i < PARAMETERCOUNT; i++)
-            {
-                tmpParam.paramInput[i].string = UaString("");
-                tmpParam.paramInput[i].value = 0;
-            }
-
-            if (m_moduleList[m_transportModuleNumber]->isBlocked())
-            {
-                int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSUNBLOCK);
-                m_moduleList[m_transportModuleNumber]->executeSkill(skillPos, tmpParam);
-                QLOG_DEBUG() << "Unblocked Transport.";
-            }
-
-            if (m_moduleList[m_transportModuleNumber]->isReserved())
-            {
-                int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSRELEASE);
-                m_moduleList[m_transportModuleNumber]->executeSkill(skillPos, tmpParam);
-                QLOG_DEBUG() << "Released Transport.";
-            }
-        }
 
         it->second.taskSkillState = SKILLTASKERROR;
-        m_pTaskModule->updateSkillState(m_task.taskId, it->first, SKILLTASKERROR);
+        m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, it->first, SKILLTASKERROR);
+    }
+
+    // Reset XTS
+    if (m_foundTransport)
+    {
+        ParameterInputArray tmpParam;
+
+        for (int i = 0; i < PARAMETERCOUNT; i++)
+        {
+            tmpParam.paramInput[i].string = UaString("");
+            tmpParam.paramInput[i].value = 0;
+        }
+
+        std::map<int, matchedSkill>::iterator matchedSkillsIterator;
+
+        if (m_moduleList[m_transportModuleNumber]->isBlocked())
+        {
+            int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSUNBLOCK);
+
+            // set skillstateinprocess
+            for (matchedSkillsIterator = m_matchedSkills.begin();
+                 matchedSkillsIterator != m_matchedSkills.end(); matchedSkillsIterator++)
+            {
+                if (matchedSkillsIterator->second.skillId == SKILLIDXTSUNBLOCK)
+                {
+                    matchedSkillsIterator->second.taskSkillState = SKILLTASKINPROCESS;
+                }
+            }
+
+            m_moduleList[m_transportModuleNumber]->registerTaskForSkill(this, skillPos);
+            m_moduleList[m_transportModuleNumber]->executeSkill(skillPos, tmpParam);
+            QLOG_DEBUG() << "Unblocked Transport.";
+
+            // Wait til its done.
+            m_mutex.lock();
+            m_waitCondition.wait(&m_mutex);
+            m_mutex.unlock();
+        }
+
+        if (m_moduleList[m_transportModuleNumber]->isReserved())
+        {
+            int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSRELEASE);
+
+            // set skillstateinprocess
+            for (matchedSkillsIterator = m_matchedSkills.begin();
+                 matchedSkillsIterator != m_matchedSkills.end(); matchedSkillsIterator++)
+            {
+                if (matchedSkillsIterator->second.skillId == SKILLIDXTSRELEASE)
+                {
+                    matchedSkillsIterator->second.taskSkillState == SKILLTASKINPROCESS;
+                }
+            }
+
+            m_moduleList[m_transportModuleNumber]->registerTaskForSkill(this, skillPos);
+            m_moduleList[m_transportModuleNumber]->executeSkill(skillPos, tmpParam);
+            QLOG_DEBUG() << "Released Transport.";
+            // Wait til its done.
+            m_mutex.lock();
+            m_waitCondition.wait(&m_mutex);
+            m_mutex.unlock();
+        }
     }
 
     m_matchedSkills.clear();
     m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, TaskError);
-    QLOG_INFO() << "Aborted Task #" << m_task.taskId;
+    UaString tmpMsg = UaString("Aborted Task #");
+    tmpMsg += UaString::number(m_task.taskId);
+    QLOG_INFO() << tmpMsg.toUtf8();
+    m_pMsgFeed->write(tmpMsg, msgSuccess);
 }
