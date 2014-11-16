@@ -433,12 +433,13 @@ void Task::abortTask()
     {
         if (it->second.taskSkillState == SKILLTASKINPROCESS)
         {
-            m_moduleList[it->second.moduleNumber]->deregisterTaskForSkill(
-                m_matchedSkills[it->first].skillPosition);
             // Wait til its done.
             m_mutex.lock();
             m_waitCondition.wait(&m_mutex);
             m_mutex.unlock();
+            m_moduleList[it->second.moduleNumber]->deregisterTaskForSkill(
+                m_matchedSkills[it->first].skillPosition);
+
         }
 
 
