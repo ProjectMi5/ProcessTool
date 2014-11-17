@@ -3,7 +3,7 @@
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
-                                   MessageFeeder* pMessageFeeder)
+                                   MessageFeeder* pMessageFeeder) : m_disconnected(false)
 {
     m_moduleSkillList.clear();
     m_skillRegistrationList.clear();
@@ -25,6 +25,8 @@ ProductionModule::~ProductionModule()
 void ProductionModule::startup()
 {
     setupOpcua();
+
+    changeModuleMode(ModuleModeInit);
 }
 
 void ProductionModule::setupOpcua()
@@ -78,11 +80,52 @@ std::map<int, int> ProductionModule::getSkills()
     return m_moduleSkillList;
 }
 
-void ProductionModule::moduleDisconnected()
+void ProductionModule::moduleConnectionStatusChanged(int state)
 {
     UaString message("Module ");
     message += getModuleName();
-    message += " disconnected.";
+
+    if (state == ModuleConnectionConnected)
+    {
+        switch (m_disconnected)
+        {
+        case true:
+            message += " reconnected.";
+            setupOpcua();
+            break;
+
+        case false:
+            message += " connected.";
+            break;
+        }
+
+        m_disconnected = false;
+
+        // todo: create subscriptions, if reconnect.
+    }
+    else if (state == ModuleConnectionDisconnected)
+    {
+        m_disconnected = true;
+        message += " disconnected.";
+
+        m_pOpcuaGateway->deleteSubscription(m_moduleNumber);
+        QLOG_DEBUG() << "Erased subscriptions.";
+
+        if (m_skillRegistrationList.size() > 0)
+        {
+            for (std::map<int, ISkillRegistration*>::iterator it = m_skillRegistrationList.begin();
+                 it != m_skillRegistrationList.end(); it++)
+            {
+                it->second->skillStateChanged(m_moduleNumber, it->first, SKILLMODULEERROR);
+            }
+        }
+    }
+    else
+    {
+        // .. wait, what?
+        return;
+    }
+
     m_pMsgFeed->write(message, msgError);
     QLOG_ERROR() << message.toUtf8();
 }
@@ -334,10 +377,10 @@ void ProductionModule::writeConnectionTestInput(bool input)
     nodesToWrite[0].AttributeId = OpcUa_Attributes_Value;
     OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[0].Value.Value);
 
-    m_pOpcuaGateway->write(nodesToWrite);
+    m_pOpcuaGateway->write(nodesToWrite, 100);
 }
 
-bool ProductionModule::checkConnectionTestOutput()
+int ProductionModule::checkConnectionTestOutput()
 {
     // Read state.
     UaStatus status;
@@ -353,10 +396,14 @@ bool ProductionModule::checkConnectionTestOutput()
     UaNodeId::fromXmlString(baseNodeId).copyTo(&nodesToRead[0].NodeId);
     nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
 
-    returnValues = m_pOpcuaGateway->read(nodesToRead);
+    returnValues = m_pOpcuaGateway->read(nodesToRead, 50);
 
-    OpcUa_Boolean returnVal = 0;
-    UaVariant(returnValues[0].Value).toBool(returnVal);
+    OpcUa_Int32 returnVal = -1;
+
+    if (returnValues.length() != 0)
+    {
+        UaVariant(returnValues[0].Value).toInt32(returnVal);
+    }
 
     return returnVal;
 }
@@ -711,7 +758,7 @@ void ProductionModule::writeModuleInput()
 
     tmpNodeId = baseNodeIdToWrite; // TODO!
     tmpNodeId += "Mode";
-    tmpValue.setByteString(input.moduleMode, OpcUa_False);
+    tmpValue.setInt16(input.moduleMode);
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
     nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
     OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
@@ -1110,4 +1157,28 @@ bool ProductionModule::isBlocked()
 void ProductionModule::checkMoverState(int skillPos)
 {
 
+}
+
+void ProductionModule::changeModuleMode(int mode)
+{
+    input.moduleMode = mode;
+
+    UaWriteValues nodesToWrite;
+    nodesToWrite.create(1); // Fill in number
+    int writeCounter = 0;
+    UaVariant tmpValue;
+
+    UaString baseNodeIdToWrite = "ns=4;s=MI5.Module";
+    baseNodeIdToWrite += UaString::number(m_moduleNumber);
+    baseNodeIdToWrite += ".Input.";
+    baseNodeIdToWrite += "Mode";
+    tmpValue.setInt16(input.moduleMode);
+    UaNodeId::fromXmlString(baseNodeIdToWrite).copyTo(&nodesToWrite[writeCounter].NodeId);
+    nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
+    OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
+    writeCounter++;
+    tmpValue.clear();
+
+    // Write!
+    m_pOpcuaGateway->write(nodesToWrite);
 }

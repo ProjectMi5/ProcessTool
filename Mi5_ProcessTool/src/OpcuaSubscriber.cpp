@@ -116,12 +116,14 @@ UaStatus OpcuaSubscriber::deleteSubscription(UaSession* pSession,
 
     if (result.isGood())
     {
-        printf("DeleteSubscription succeeded\n");
+        QLOG_DEBUG() << "DeleteSubscription succeeded";
     }
     else
     {
         QLOG_ERROR() << "DeleteSubscription failed with status " << result.toString().toUtf8();
     }
+
+    m_subscriptionList.erase(m_subscriptionList.find(subscriptionClientHandle));
 
     return result;
 }

@@ -65,17 +65,20 @@ UaStatus ProcessHandler::build()
     UaPlatformLayer::init();
 
     // Create instance of OpcuaGateway
-    // 1. Stelle ÄNDERN
+    //1. Stelle ÄNDERN
+    m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
+        UaString("opc.tcp://192.168.192.136:4840"));
+
     m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
     m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
     m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
 
     m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
-    //m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
-    m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
+    m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
+    //m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
 
     m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
-    // ENDE ÄNDERN
+    //// ENDE ÄNDERN
     m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
     m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(
         UaString("opc.tcp://192.168.192.116:4840"));
@@ -104,6 +107,9 @@ UaStatus ProcessHandler::build()
     m_pMessageFeeder = new MessageFeeder(m_gatewayList[MODULENUMBERMESSAGEFEEDER],
                                          MODULENUMBERMESSAGEFEEDER);
     // 2. Stelle ÄNDERN
+    m_productionModuleList[MODULENUMBERCOOKIESEPARATOR] = new CookieSeparator(
+        m_gatewayList[MODULENUMBERCOOKIESEPARATOR], MODULENUMBERCOOKIESEPARATOR, m_pMessageFeeder);
+
     m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
             MODULENUMBERXTS1, m_pMessageFeeder);
     m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
@@ -113,10 +119,10 @@ UaStatus ProcessHandler::build()
 
     m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
             MODULEX, m_pMessageFeeder);
-    /*  m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
-              MODULEY, m_pMessageFeeder);*/
-    m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
-            MODULEZ, m_pMessageFeeder);
+    m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
+            MODULEY, m_pMessageFeeder);
+    //m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
+    //        MODULEZ, m_pMessageFeeder);
 
     // Manual Module
 
@@ -124,7 +130,7 @@ UaStatus ProcessHandler::build()
             MANUALMODULE1, m_pMessageFeeder);
 
 
-    //ENDE ÄNDERN
+    ////ENDE ÄNDERN
 
     m_taskModule = new TaskModule(m_gatewayList[MODULENUMBERTASK], MODULENUMBERTASK,
                                   m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);

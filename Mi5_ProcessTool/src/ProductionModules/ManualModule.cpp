@@ -454,12 +454,12 @@ void ManualModule::writeConnectionTestInput(bool input)
     //
 }
 
-bool ManualModule::checkConnectionTestOutput()
+int ManualModule::checkConnectionTestOutput()
 {
     return false;
 }
 
-void ManualModule::moduleDisconnected()
+void ManualModule::moduleConnectionStatusChanged(int state)
 {
     //
 }
@@ -478,4 +478,8 @@ int ManualModule::translateSkillPosToSkillId(int skillPos)
 {
     return 0;
     //
+}
+void ManualModule::changeModuleMode(int mode)
+{
+    // do nothing
 }

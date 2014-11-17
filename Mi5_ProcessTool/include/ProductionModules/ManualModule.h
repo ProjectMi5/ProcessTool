@@ -38,10 +38,12 @@ public: //IProductionModule Methods
     int getModulePosition();
     int registerTaskForSkill(ISkillRegistration* pTask, int skillPos);
     void writeConnectionTestInput(bool input);
-    bool checkConnectionTestOutput();
-    void moduleDisconnected();
+    int checkConnectionTestOutput();
+    void moduleConnectionStatusChanged(int state);
     virtual bool isBlocked();
     virtual bool isReserved();
+    virtual void changeModuleMode(int mode);
+
 private:
     void createMonitoredItems();
     void write();

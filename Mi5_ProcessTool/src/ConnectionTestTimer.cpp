@@ -4,7 +4,8 @@
 #include <Mi5_ProcessTool/include/IProductionModule.h>
 #include <iostream>
 
-ConnectionTestTimer::ConnectionTestTimer(IProductionModule* pModule)
+ConnectionTestTimer::ConnectionTestTimer(IProductionModule* pModule) : m_lastConnectionState(-1),
+    m_connectionTestBool(false)
 {
     m_pModule = pModule;
     m_timer1 = new QTimer(this);
@@ -14,6 +15,9 @@ ConnectionTestTimer::ConnectionTestTimer(IProductionModule* pModule)
     m_timer2 = new QTimer(this);
     m_timer2->setSingleShot(true);
     connect(m_timer2, SIGNAL(timeout()), this, SLOT(evaluateConnectionTest()));
+
+    moveToThread(&m_thread);
+    m_thread.start();
 }
 
 ConnectionTestTimer::~ConnectionTestTimer()
@@ -22,28 +26,32 @@ ConnectionTestTimer::~ConnectionTestTimer()
 
 void ConnectionTestTimer::timer1update()
 {
-    m_pModule->writeConnectionTestInput(true);
-    m_timer2->start(500);
+    m_connectionTestBool = !m_connectionTestBool;
+    m_pModule->writeConnectionTestInput(m_connectionTestBool);
+    m_timer2->start(200);
 }
 
 void ConnectionTestTimer::evaluateConnectionTest()
 {
-    bool result = false;
+    int result = !m_connectionTestBool; // Make sure its different.
     result = m_pModule->checkConnectionTestOutput();
 
-    if (result == true)
+    if (result == m_connectionTestBool)
     {
         // worked
+        connectionStateChanged(ModuleConnectionConnected);
     }
-
-    else
+    else // Wrong or -1
     {
-        /*QLOG_DEBUG() << "Module " << m_pModule->getModuleName().toUtf8() << " didnt respond to ConnectionTest"
-                  <<
-                  ;*/
-        m_pModule->moduleDisconnected();
+        connectionStateChanged(ModuleConnectionDisconnected);
     }
+}
 
-    m_pModule->writeConnectionTestInput(false);
-
+void ConnectionTestTimer::connectionStateChanged(int state)
+{
+    if (state != m_lastConnectionState)
+    {
+        m_pModule->moduleConnectionStatusChanged(state);
+        m_lastConnectionState = state;
+    }
 }

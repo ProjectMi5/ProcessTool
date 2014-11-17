@@ -30,12 +30,13 @@ public:
     UaStatus disconnect();
     UaStatus browseSimple();
     UaStatus browseContinuationPoint();
-    UaDataValues read(UaReadValueIds& nodesToRead);
-    UaStatus write(UaWriteValues& nodesToWrite);
+    UaDataValues read(UaReadValueIds& nodesToRead, OpcUa_Int32 timeout = 10000);
+    UaStatus write(UaWriteValues& nodesToWrite, OpcUa_Int32 timeout = 10000);
     UaStatus subscribe(int subscriptionHandle, UaNodeIdArray nodesToSubscribe);
     UaStatus unsubscribe();
 
     UaStatus createSubscription(int subscriptionHandle);
+    UaStatus deleteSubscription(int subscriptionHandle);
     UaStatus createSingleMonitoredItem(OpcUa_UInt32 clientHandle, OpcUa_UInt32 subscriptionHandle,
                                        UaNodeIdArray nodesToSubscribe);
 

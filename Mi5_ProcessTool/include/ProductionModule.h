@@ -40,17 +40,19 @@ public:
     void deregisterTaskForSkill(int& skillPos);
     bool checkSkillReadyState(int& skillId);
     void writeConnectionTestInput(bool input);
-    bool checkConnectionTestOutput();
+    int checkConnectionTestOutput();
     int translateSkillIdToSkillPos(int skillId);
     void serverReconnected();
-    void moduleDisconnected();
+    void moduleConnectionStatusChanged(int state);
     virtual bool isBlocked();
     virtual bool isReserved();
     int translateSkillPosToSkillId(int skillPos);
+    virtual void changeModuleMode(int mode);
 
 private:
     OpcuaGateway* m_pOpcuaGateway;
     MessageFeeder* m_pMsgFeed;
+    bool m_disconnected;
 
 private:
     UaString nodeIdToSubscribe;

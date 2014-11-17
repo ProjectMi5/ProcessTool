@@ -5,6 +5,7 @@
 static const int MODULENUMBERXTS1 = 2001; //2001
 static const int MODULENUMBERXTS2 = 2002;
 static const int MODULENUMBERXTS3 = 2003;
+static const int MODULENUMBERCOOKIESEPARATOR = 2101;
 
 // Manual modules
 static const int MANUALMODULE1 = 2403;

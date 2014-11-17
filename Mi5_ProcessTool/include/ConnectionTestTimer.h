@@ -1,6 +1,7 @@
 #ifndef CONNECTIONTESTTIMER_H
 #define CONNECTIONTESTTIMER_H
 #include <QTimer>
+#include <QThread>
 
 class IProductionModule;
 class ConnectionTestTimer : public QObject
@@ -15,6 +16,14 @@ private:
     QTimer* m_timer1;
     QTimer* m_timer2;
     IProductionModule* m_pModule;
+
+private:
+    int m_lastConnectionState;
+
+private:
+    void connectionStateChanged(int state);
+    bool m_connectionTestBool;
+    QThread m_thread;
 
 private slots:
     void timer1update();

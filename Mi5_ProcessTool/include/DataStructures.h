@@ -12,6 +12,12 @@ enum ModuleMode
     ModuleModeManual = 2,
     ModuleModeReset = 3
 };
+
+enum ModuleConnectionStatus
+{
+    ModuleConnectionDisconnected = 0,
+    ModuleConnectionConnected = 1
+};
 struct ParameterInput
 {
     UaString string; // ......1 (e.g. 14000-1)
@@ -19,6 +25,7 @@ struct ParameterInput
 
     ParameterInput(): value(0) { string = "";};
 };
+
 struct ParameterInputArray
 {
     ParameterInput paramInput[PARAMETERCOUNT];
@@ -36,12 +43,12 @@ struct ModuleInput
 {
     OpcUa_Boolean connectionTestInput; // 1000
     OpcUa_Boolean emergencyStop; // 1100
-    UaByteString moduleMode; // 1200
+    OpcUa_Int16 moduleMode; // 1200
     OpcUa_Double positionInput; // 1300
     SkillInput skillInput[16]; // 1400..1409
 
     ModuleInput(): connectionTestInput(false), emergencyStop(false),
-        positionInput(0) { };
+        positionInput(0), moduleMode(-1) { };
 };
 
 // Module Output

@@ -21,10 +21,11 @@ public:
     virtual int getModulePosition() = 0;
     virtual int registerTaskForSkill(ISkillRegistration* pTask, int skillPos) = 0;
     virtual void writeConnectionTestInput(bool input) = 0;
-    virtual bool checkConnectionTestOutput() = 0;
-    virtual void moduleDisconnected() = 0;
+    virtual int checkConnectionTestOutput() = 0;
+    virtual void moduleConnectionStatusChanged(int state) = 0;
     virtual bool isBlocked() = 0;
     virtual bool isReserved() = 0;
+    virtual void changeModuleMode(int mode) = 0;
 };
 
 enum moduleSkillState

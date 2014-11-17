@@ -68,27 +68,27 @@ void OpcuaGateway::connectionStatusChanged(
         QLOG_INFO() << "Connection status changed to Disconnected\n";
 
         // Delete subscriptions for the connected module.
-        for (std::map<int, IModule*>::iterator it = m_moduleList.begin(); it != m_moduleList.end(); it++)
-        {
-            m_pSubscription->deleteAllSubscriptions(m_pSession);
-        }
+        //for (std::map<int, IModule*>::iterator it = m_moduleList.begin(); it != m_moduleList.end(); it++)
+        //{
+        //    m_pSubscription->deleteAllSubscriptions(m_pSession);
+        //}
 
         break;
 
     case UaClient::Connected:
         QLOG_INFO() << "Connection status changed to Connected\n";
 
-        if (m_serverStatus != UaClient::NewSessionCreated)
-        {
-            m_pConfiguration->updateNamespaceIndexes(m_pSession->getNamespaceTable());
+        //if (m_serverStatus != UaClient::NewSessionCreated)
+        //{
+        //    m_pConfiguration->updateNamespaceIndexes(m_pSession->getNamespaceTable());
 
-            // Renew subscriptions for the connected module.
-            for (std::map<int, IModule*>::iterator it = m_moduleList.begin(); it != m_moduleList.end(); it++)
-            {
-                m_pSubscription->deleteAllSubscriptions(m_pSession);
-                it->second->serverReconnected();
-            }
-        }
+        //    // Renew subscriptions for the connected module.
+        //    for (std::map<int, IModule*>::iterator it = m_moduleList.begin(); it != m_moduleList.end(); it++)
+        //    {
+        //        m_pSubscription->deleteAllSubscriptions(m_pSession);
+        //        it->second->serverReconnected();
+        //    }
+        //}
 
 
         break;
@@ -208,10 +208,11 @@ UaStatus OpcuaGateway::browseContinuationPoint()
     return result;
 }
 
-UaDataValues OpcuaGateway::read(UaReadValueIds& nodesToRead)
+UaDataValues OpcuaGateway::read(UaReadValueIds& nodesToRead, OpcUa_Int32 timeout /*= 10000*/)
 {
     UaStatus          result;
     ServiceSettings   serviceSettings;
+    serviceSettings.callTimeout = timeout;
     //UaReadValueIds    nodesToRead;
     UaDataValues      values;
     UaDiagnosticInfos diagnosticInfos;
@@ -235,35 +236,40 @@ UaDataValues OpcuaGateway::read(UaReadValueIds& nodesToRead)
                  values,
                  diagnosticInfos);
 
-    if (result.isGood())
+    // Only write error messages, if we dont use the connection test.
+    if (timeout == 10000)
     {
-        // Read service succeded - check individual status codes
-        for (OpcUa_UInt32 i = 0; i < nodesToRead.length(); i++)
+        if (result.isGood())
         {
-            if (OpcUa_IsGood(values[i].StatusCode))
+            // Read service succeded - check individual status codes
+            for (OpcUa_UInt32 i = 0; i < nodesToRead.length(); i++)
             {
-                //printf("Value[%d]: %s\n", i, UaVariant(values[i].Value).toString().toUtf8());
-            }
-            else
-            {
-                QLOG_ERROR() << "Read failed for item[%d] with status " <<
-                             UaStatus(values[i].StatusCode).toString().toUtf8();
+                if (OpcUa_IsGood(values[i].StatusCode))
+                {
+                    //printf("Value[%d]: %s\n", i, UaVariant(values[i].Value).toString().toUtf8());
+                }
+                else
+                {
+                    QLOG_ERROR() << "Read failed for item[%d] with status " <<
+                                 UaStatus(values[i].StatusCode).toString().toUtf8();
+                }
             }
         }
-    }
-    else
-    {
-        // Service call failed
-        QLOG_ERROR() << "Read failed with status " << result.toString().toUtf8();
+        else
+        {
+            // Service call failed
+            QLOG_ERROR() << "Read failed with status " << result.toString().toUtf8();
+        }
     }
 
     return values;
 }
 
-UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite)
+UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite, OpcUa_Int32 timeout /*= 10000*/)
 {
     UaStatus            result;
     ServiceSettings     serviceSettings;
+    serviceSettings.callTimeout = timeout;
     // UaWriteValues       nodesToWrite;
     UaStatusCodeArray   results;
     UaDiagnosticInfos   diagnosticInfos;
@@ -293,6 +299,11 @@ UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite)
                      results,
                      diagnosticInfos);
 
+        if (timeout == 100) //TODO: remove hack for connection test.
+        {
+            tryCounter = 2;
+        }
+
         if (result.isGood())
         {
             // Write service succeded - check individual status codes
@@ -319,6 +330,7 @@ UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite)
         {
             // Service call failed
             QLOG_ERROR() << "Write failed with status " << result.toString().toUtf8();
+            tryCounter++;
         }
     }
 
@@ -478,7 +490,7 @@ void OpcuaGateway::registerModule(int moduleNumber, IModule* pModule)
 
 void OpcuaGateway::subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
         const UaDataNotifications& dataNotifications,
-        const UaDiagnosticInfos&   diagnosticInfos)
+        const UaDiagnosticInfos&    diagnosticInfos)
 {
     if (m_moduleList.count(clientSubscriptionHandle) > 0)
     {
@@ -491,4 +503,11 @@ void OpcuaGateway::subscriptionDataChange(OpcUa_UInt32               clientSubsc
         QLOG_DEBUG() << "Subscription for module number " << clientSubscriptionHandle <<
                      " received, but module is not present." ;
     }
+}
+
+UaStatus OpcuaGateway::deleteSubscription(int subscriptionHandle)
+{
+    UaStatus status =  m_pSubscription->deleteSubscription(m_pSession, subscriptionHandle);
+
+    return status;
 }
