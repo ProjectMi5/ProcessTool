@@ -158,7 +158,7 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
         {
             bool searching = true;
 
-            while (searching)
+            while (searching) //TODO: possible endless loop
             {
                 for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
                      it != matchedSkillsVector.end(); it++)
@@ -266,6 +266,7 @@ void Task::evaluateSkillState(int skillNumberInTask)
                 // assign skill to new module
                 m_skillListInSystem = m_pTaskModule->getSkillList();
                 m_matchedSkills[skillNumberInTask] = assignSingleSkillToModule(m_skillQueue[skillNumberInTask]);
+                m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKOPEN;
             }
 
             break;
@@ -443,8 +444,6 @@ void Task::abortTask()
                 m_matchedSkills[it->first].skillPosition);
 
         }
-
-
 
         it->second.taskSkillState = SKILLTASKERROR;
         m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, it->first, SKILLTASKERROR);

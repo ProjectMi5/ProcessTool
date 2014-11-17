@@ -9,7 +9,8 @@ class Xts : public ProductionModule
 {
 
 public:
-    Xts(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder);
+    Xts(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
+        MaintenanceHelper* pHelper);
     ~Xts();
 
 public:
@@ -22,6 +23,10 @@ private:
 private:
     bool m_blocked;
     bool m_reserved;
+
+protected slots:
+    virtual void evaluateError();
+
 };
 
 #endif // XTS_H

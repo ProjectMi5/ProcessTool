@@ -1,6 +1,7 @@
-#ifndef INITMODULE_H
-#define INITMODULE_H
+#ifndef MAINTENANCEHELPER_H
+#define MAINTENANCEHELPER_H
 #include <iostream>
+
 
 #include <QThread>
 #include <QWaitCondition>
@@ -13,15 +14,12 @@
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
 #include <Mi5_ProcessTool/include/IModule.h>
 
-class OpcuaGateway; // Using forward declaration.
-
-class InitModule : public QObject, IModule, ISkillRegistration
+class MaintenanceHelper : public QObject, IModule, ISkillRegistration
 {
     Q_OBJECT
 public:
-    InitModule(std::map<int, OpcuaGateway*> pGatewayList,
-               std::map<int, IProductionModule*> pModuleList);
-    ~InitModule();
+    MaintenanceHelper();
+    ~MaintenanceHelper();
 
 public: //IModule methods
     void subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
@@ -35,23 +33,23 @@ public: //ISkillRegistration methods
     void skillStateChanged(int moduleNumber, int skillPos, int state);
 
 public:
-    int positionCalibration(int moduleNumber);
+    void maintain(int moduleNumber, int errorId);
+    void setModuleList(std::map<int, IProductionModule*> pModuleList);
 
 private:
-    int evalModuleList();
-    void positionCalibrationExecution(int moduleNumber, int xtsModuleNumber);
     void resetData();
+    void maintenanceExecution(int moduleNumber, int errorId);
 
 private:
     std::map<int, IProductionModule*> m_pModuleList;
-    std::map<int, OpcuaGateway*> m_pGatewayList;
-    std::vector<int> m_xtsModuleNumbers;
-    bool m_calibrationInProgress;
-    int m_moduleToCalibrate;
-    int m_usedXtsModuleNumber;
     QThread m_thread;
     QMutex m_mutex;
     QWaitCondition m_waitCondition;
+
+private:
+    int m_moduleToMaintain;
+    bool m_maintenanceInProcess;
+
 };
 
-#endif //INITMODULE_H
+#endif //MAINTENANCEHELPER_H

@@ -6,10 +6,15 @@
 
 class CookieSeparator : public ProductionModule
 {
-
+    Q_OBJECT
 public:
-    CookieSeparator(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder);
+    CookieSeparator(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
+                    MaintenanceHelper* pHelper);
     ~CookieSeparator();
+
+protected slots:
+    virtual void evaluateError();
+
 
 };
 

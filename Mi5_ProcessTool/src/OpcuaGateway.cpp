@@ -135,12 +135,15 @@ UaStatus OpcuaGateway::connect()
     sessionConnectInfo.sApplicationUri = UaString("urn:%1:%2:%3").arg(sNodeName).arg("ITQ").arg(
             "MI5");
     sessionConnectInfo.sProductUri = UaString("urn:%1:%2").arg("ITQ").arg("MI5");
-    sessionConnectInfo.sSessionName = UaString("MI5Session:%1").arg(UaString::number(rand() % 10000));
+    sessionConnectInfo.sSessionName = UaString("MI5ProcessTool:%1").arg(UaString::number(
+                                          rand() % 10000));
     sessionConnectInfo.bAutomaticReconnect = m_pConfiguration->getAutomaticReconnect();
     sessionConnectInfo.bRetryInitialConnect = m_pConfiguration->getRetryInitialConnect();
 
     // Security settings are not initialized - we connect without security for now
     SessionSecurityInfo sessionSecurityInfo;
+
+    sessionConnectInfo.nSessionTimeout = 10 * 60 * 1000; // 10min
 
     printf("\nConnecting to %s\n", m_serverUrl.toUtf8());
     result = m_pSession->connect(
@@ -540,7 +543,6 @@ UaString OpcuaGateway::buildBaseNodeId(int moduleNumber)
     {
         baseNodeId = "ns=4;s=MI5.Module";
         baseNodeId += UaString::number(moduleNumber);
-        baseNodeId += ".";
     }
     else if (serverVendor == "Bernecker & Rainer")
     {
@@ -550,7 +552,6 @@ UaString OpcuaGateway::buildBaseNodeId(int moduleNumber)
     {
         baseNodeId = "ns=4;s=MI5.Module";
         baseNodeId += UaString::number(moduleNumber);
-        baseNodeId += ".";
     }
 
     return baseNodeId;

@@ -1,9 +1,11 @@
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
+#include <Mi5_ProcessTool/include/MaintenanceHelper.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
-                                   MessageFeeder* pMessageFeeder) : m_disconnected(false)
+                                   MessageFeeder* pMessageFeeder, MaintenanceHelper* pHelper) : m_disconnected(false),
+    m_pMaintenanceHelper(pHelper)
 {
     m_moduleSkillList.clear();
     m_skillRegistrationList.clear();
@@ -15,18 +17,20 @@ ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber
     m_pOpcuaGateway->registerModule(m_moduleNumber, this);
 
     m_connectionTestTimer = new ConnectionTestTimer(this);
-
+    connect(this, SIGNAL(errorOccured()), this, SLOT(evaluateError()), Qt::QueuedConnection);
 }
 
 ProductionModule::~ProductionModule()
 {
+    m_pOpcuaGateway->disconnect();
 }
 
 void ProductionModule::startup()
 {
     setupOpcua();
 
-    changeModuleMode(ModuleModeInit);
+    changeModuleMode(ModuleModeAuto);
+
 
     m_connectionTestTimer->startUp();
 }
@@ -406,11 +410,12 @@ int ProductionModule::checkConnectionTestOutput()
 
     nodesToRead.create(1);
     UaString baseNodeId = m_baseNodeId;
+    baseNodeId += ".Output.ConnectionTestOutput";
 
     UaNodeId::fromXmlString(baseNodeId).copyTo(&nodesToRead[0].NodeId);
     nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
 
-    returnValues = m_pOpcuaGateway->read(nodesToRead, 50);
+    returnValues = m_pOpcuaGateway->read(nodesToRead, 500);
 
     OpcUa_Int32 returnVal = -1;
 
@@ -433,6 +438,7 @@ void ProductionModule::createMonitoredItems()
     UaStatus status;
     // Prepare
     UaString baseNodeId = m_baseNodeId;
+    baseNodeId += ".";
 
     // Following: input subscription
     // Create subscriptions
@@ -1001,6 +1007,11 @@ void ProductionModule::moduleDataChange(const UaDataNotifications& dataNotificat
             else if (dataNotifications[i].ClientHandle == 204)
             {
                 tempValue.toBool(output.error);
+
+                if (output.error)
+                {
+                    emit errorOccured();
+                }
             }
 
             else if (dataNotifications[i].ClientHandle == 205)

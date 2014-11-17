@@ -2,8 +2,9 @@
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 Xts::Xts(OpcuaGateway* pOpcuaGateway,
-         int moduleNumber, MessageFeeder* pMessageFeeder) : ProductionModule(pOpcuaGateway, moduleNumber,
-                     pMessageFeeder), m_reserved(false), m_blocked(false)
+         int moduleNumber, MessageFeeder* pMessageFeeder,
+         MaintenanceHelper* pHelper) : ProductionModule(pOpcuaGateway, moduleNumber,
+                     pMessageFeeder, pHelper), m_reserved(false), m_blocked(false)
 {
     QLOG_DEBUG() << "Created module XTS with module number " << moduleNumber ;
 }
@@ -49,4 +50,9 @@ void Xts::checkMoverState(int skillPos)
     default:
         break;
     }
+}
+
+void Xts::evaluateError()
+{
+
 }

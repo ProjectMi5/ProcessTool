@@ -27,7 +27,7 @@ void ConnectionTestTimer::timer1update()
 {
     m_connectionTestBool = !m_connectionTestBool;
     m_pModule->writeConnectionTestInput(m_connectionTestBool);
-    m_timer2->start(200);
+    m_timer2->start(500);
 }
 
 void ConnectionTestTimer::evaluateConnectionTest()
@@ -63,5 +63,5 @@ void ConnectionTestTimer::startUp()
         return;
     }
 
-    m_timer1->start(1000);
+    m_timer1->start(1500);
 }

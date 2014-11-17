@@ -8,8 +8,12 @@ class CremeModule : public ProductionModule
 {
 
 public:
-    CremeModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder);
+    CremeModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
+                MaintenanceHelper* pHelper);
     ~CremeModule();
+
+protected slots:
+    virtual void evaluateError();
 
 };
 

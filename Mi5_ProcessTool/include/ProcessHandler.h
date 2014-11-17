@@ -14,6 +14,7 @@
 #include <Mi5_ProcessTool/include/InitModule.h>
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
 #include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
+#include <Mi5_ProcessTool/include/MaintenanceHelper.h>
 
 class ProcessHandler
 {
@@ -32,6 +33,7 @@ private:
     std::map<int, IProductionModule*> m_productionModuleList;
     QThread m_thread;
     MessageFeeder* m_pMessageFeeder;
+    MaintenanceHelper* m_pMaintenanceHelper;
 
 private:
     UaStatus build();

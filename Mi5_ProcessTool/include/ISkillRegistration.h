@@ -9,4 +9,4 @@ public:
 
 };
 
-#endif //ISKILLREGISTRATION_H
+#endif

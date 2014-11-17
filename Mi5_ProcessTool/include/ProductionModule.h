@@ -2,6 +2,7 @@
 #define PRODUCTIONMODULE_H
 #include "uaclientsdk.h"
 #include <iostream>
+#include <QObject>
 #include <Mi5_ProcessTool/include/DataStructures.h>
 #include <Mi5_ProcessTool/include/IProductionModule.h>
 #include <Mi5_ProcessTool/include/ConnectionTestTimer.h>
@@ -9,16 +10,19 @@
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 
 class OpcuaGateway; // Using forward declaration.
+class MaintenanceHelper;
 
-class ProductionModule // Abstract base class.
-    : public IProductionModule
+class ProductionModule  : public QObject, public IProductionModule
 {
+    Q_OBJECT
 protected:
     ModuleInput input;
     ModuleOutput output;
+    int m_moduleNumber;
 
 public:
-    ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder);
+    ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
+                     MaintenanceHelper* pMaintenanceHelper);
     virtual ~ProductionModule();
     void subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
                                 const UaDataNotifications& dataNotifications,
@@ -49,16 +53,16 @@ public:
     int translateSkillPosToSkillId(int skillPos);
     virtual void changeModuleMode(int mode);
 
-private:
+protected:
     OpcuaGateway* m_pOpcuaGateway;
     MessageFeeder* m_pMsgFeed;
     bool m_disconnected;
     UaString m_baseNodeId;
+    MaintenanceHelper* m_pMaintenanceHelper;
 
 private:
     UaString nodeIdToSubscribe;
     UaNodeIdArray nodeToSubscribe;
-    int m_moduleNumber;
     ConnectionTestTimer* m_connectionTestTimer;
 
 private:
@@ -70,6 +74,9 @@ private:
     void setupOpcua();
     virtual void checkMoverState(int skillPos);
 
+protected slots:
+    virtual void evaluateError() = 0;
+
 private: //const
     static const int SKILLCOUNT = 16;
 
@@ -77,6 +84,8 @@ private: // module interface
     std::map<int, int> m_moduleSkillList; /* skillid, skillpos */
     std::map<int, ISkillRegistration*> m_skillRegistrationList; /*skillPos, pTask*/
 
+signals:
+    void errorOccured();
 };
 
 #endif // PRODUCTIONMODULE_H

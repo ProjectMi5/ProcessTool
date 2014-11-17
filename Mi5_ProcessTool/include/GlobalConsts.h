@@ -7,8 +7,12 @@ static const int MODULENUMBERXTS2 = 2002;
 static const int MODULENUMBERXTS3 = 2003;
 static const int MODULENUMBERCOOKIESEPARATOR = 2101;
 
+// Maintenance Error IDs
+static const int MODULECOOKIEREFILLERRORID = 123;
+
 // Manual modules
 static const int MANUALMODULE1 = 2403;
+static const int MAINTENANCEMODULE = 2402;
 
 // Simu modules
 static const int MODULEX = 1202;

@@ -130,11 +130,29 @@
     <ClCompile Include="GeneratedFiles\Release\moc_QsLogDestFunctor.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ProductionModule.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ProductionModule.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CookieSeparator.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CookieSeparator.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaintenanceHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MaintenanceHelper.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MaintenanceHelper.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CookieSeparator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\DataStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -154,9 +172,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\OpcuaSubscriber.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ProductionModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\TaskModule.h">
@@ -217,6 +232,15 @@
     </CustomBuild>
     <CustomBuild Include="include\QsLog\QsLogDestFunctor.h">
       <Filter>Header Files\QsLog</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\ProductionModule.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\CookieSeparator.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\MaintenanceHelper.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>
