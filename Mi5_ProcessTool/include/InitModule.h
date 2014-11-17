@@ -8,10 +8,10 @@
 
 #include "uaclientsdk.h"
 
-#include <Mi5_ProcessTool/include/IModule.h>
 #include <Mi5_ProcessTool/include/ISkillRegistration.h>
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
+#include <Mi5_ProcessTool/include/IModule.h>
 
 class OpcuaGateway; // Using forward declaration.
 

@@ -511,3 +511,47 @@ UaStatus OpcuaGateway::deleteSubscription(int subscriptionHandle)
 
     return status;
 }
+
+UaString OpcuaGateway::getServerVendor()
+{
+    UaStatus result;
+    ServiceSettings serviceSettings;
+    UaReadValueIds nodeToRead;
+    UaDataValues values;
+    UaDiagnosticInfos diagnosticInfos;
+    // Configure one node to read
+    // We read the value of the ServerStatus -> CurrentTime
+    nodeToRead.create(1);
+    nodeToRead[0].AttributeId = OpcUa_Attributes_Value;
+    nodeToRead[0].NodeId.Identifier.Numeric = OpcUaId_Server_ServerStatus_BuildInfo_ManufacturerName;
+
+    values = read(nodeToRead);
+
+    return UaVariant(values[0].Value).toString();
+}
+
+UaString OpcuaGateway::buildBaseNodeId(int moduleNumber)
+{
+    UaString baseNodeId = "";
+    UaString serverVendor;
+    serverVendor = getServerVendor();
+
+    if (serverVendor == "Beckhoff")
+    {
+        baseNodeId = "ns=4;s=MI5.Module";
+        baseNodeId += UaString::number(moduleNumber);
+        baseNodeId += ".";
+    }
+    else if (serverVendor == "Bernecker & Rainer")
+    {
+        baseNodeId = "BundR";
+    }
+    else //? Fallback Beckhoff.
+    {
+        baseNodeId = "ns=4;s=MI5.Module";
+        baseNodeId += UaString::number(moduleNumber);
+        baseNodeId += ".";
+    }
+
+    return baseNodeId;
+}

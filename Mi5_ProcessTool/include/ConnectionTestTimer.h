@@ -12,6 +12,9 @@ public:
     ConnectionTestTimer(IProductionModule* pModule);
     ~ConnectionTestTimer();
 
+public slots:
+    void startUp();
+
 private:
     QTimer* m_timer1;
     QTimer* m_timer2;

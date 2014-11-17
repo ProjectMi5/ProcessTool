@@ -27,12 +27,18 @@ void ProductionModule::startup()
     setupOpcua();
 
     changeModuleMode(ModuleModeInit);
+
+    m_connectionTestTimer->startUp();
 }
 
-void ProductionModule::setupOpcua()
+void ProductionModule::setupOpcua() // TODO: Implement this in the Init, Task etc. modules, too.
 {
     UaStatus status;
+
+    m_baseNodeId = m_pOpcuaGateway->buildBaseNodeId(m_moduleNumber);
+
     status = m_pOpcuaGateway->createSubscription(m_moduleNumber);
+
 
     if (!status.isGood())
     {
@@ -76,6 +82,12 @@ int ProductionModule::translateSkillPosToSkillId(int skillPos)
 
 std::map<int, int> ProductionModule::getSkills()
 {
+    if (m_disconnected)
+    {
+        std::map<int, int> emptyList;
+        return emptyList;
+    }
+
     buildSkillList();
     return m_moduleSkillList;
 }
@@ -239,6 +251,11 @@ int ProductionModule::checkSkillState(int& skillId)
 {
     int returnVal = -1;
 
+    if (m_disconnected)
+    {
+        return SKILLMODULEERROR;
+    }
+
     for (int i = 0; i < SKILLCOUNT; i++)
     {
         if (output.skillOutput[i].id == skillId)
@@ -253,8 +270,7 @@ int ProductionModule::checkSkillState(int& skillId)
             UaReadValueIds nodesToRead;
 
             nodesToRead.create(1);
-            UaString baseNodeId = "ns=4;s=MI5.Module";
-            baseNodeId += UaString::number(m_moduleNumber);
+            UaString baseNodeId = m_baseNodeId;
             baseNodeId += ".Output.SkillOutput.SkillOutput";
             baseNodeId += UaString::number(i);
             baseNodeId += ".";
@@ -389,9 +405,7 @@ int ProductionModule::checkConnectionTestOutput()
     UaReadValueIds nodesToRead;
 
     nodesToRead.create(1);
-    UaString baseNodeId = "ns=4;s=MI5.Module";
-    baseNodeId += UaString::number(m_moduleNumber);
-    baseNodeId += ".Output.ConnectionTestOutput";
+    UaString baseNodeId = m_baseNodeId;
 
     UaNodeId::fromXmlString(baseNodeId).copyTo(&nodesToRead[0].NodeId);
     nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
@@ -418,9 +432,7 @@ void ProductionModule::createMonitoredItems()
     int clientHandleNumber;
     UaStatus status;
     // Prepare
-    UaString baseNodeId = "ns=4;s=MI5.Module";
-    baseNodeId += UaString::number(m_moduleNumber);
-    baseNodeId += ".";
+    UaString baseNodeId = m_baseNodeId;
 
     // Following: input subscription
     // Create subscriptions

@@ -4,7 +4,7 @@
     <QTDIR>C:\Qt\5.3\msvc2010_opengl</QTDIR>
     <LocalDebuggerEnvironment>PATH=$(QTDIR)\bin%3b$(PATH)</LocalDebuggerEnvironment>
     <RemoteDebuggerCommand>C:\Users\ow\ProcessToolDebug\Mi5_ProcessTool.exe</RemoteDebuggerCommand>
-    <DebuggerFlavor>WindowsRemoteDebugger</DebuggerFlavor>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <RemoteDebuggerServerName>ow@192.168.192.115</RemoteDebuggerServerName>
     <RemoteDebuggerDebuggerType>Auto</RemoteDebuggerDebuggerType>
     <RemoteDebuggerConnection>RemoteWithAuthentication</RemoteDebuggerConnection>

@@ -45,6 +45,8 @@ public:
                                 const UaDiagnosticInfos&   diagnosticInfos);
     void registerModule(int moduleNumber, IModule* pModule);
     UaString getServerUrl();
+    UaString getServerVendor();
+    UaString buildBaseNodeId(int moduleNumber);
 
 private:
     // helper methods

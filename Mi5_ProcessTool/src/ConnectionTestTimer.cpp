@@ -10,7 +10,6 @@ ConnectionTestTimer::ConnectionTestTimer(IProductionModule* pModule) : m_lastCon
     m_pModule = pModule;
     m_timer1 = new QTimer(this);
     connect(m_timer1, SIGNAL(timeout()), this, SLOT(timer1update()));
-    m_timer1->start(1000);
 
     m_timer2 = new QTimer(this);
     m_timer2->setSingleShot(true);
@@ -54,4 +53,15 @@ void ConnectionTestTimer::connectionStateChanged(int state)
         m_pModule->moduleConnectionStatusChanged(state);
         m_lastConnectionState = state;
     }
+}
+
+void ConnectionTestTimer::startUp()
+{
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "startUp", Qt::QueuedConnection);
+        return;
+    }
+
+    m_timer1->start(1000);
 }

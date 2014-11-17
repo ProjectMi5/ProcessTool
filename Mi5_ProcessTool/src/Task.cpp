@@ -264,6 +264,8 @@ void Task::evaluateSkillState(int skillNumberInTask)
             else
             {
                 // assign skill to new module
+                m_skillListInSystem = m_pTaskModule->getSkillList();
+                m_matchedSkills[skillNumberInTask] = assignSingleSkillToModule(m_skillQueue[skillNumberInTask]);
             }
 
             break;

@@ -53,6 +53,7 @@ private:
     OpcuaGateway* m_pOpcuaGateway;
     MessageFeeder* m_pMsgFeed;
     bool m_disconnected;
+    UaString m_baseNodeId;
 
 private:
     UaString nodeIdToSubscribe;

@@ -630,10 +630,10 @@ int TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
 
 std::vector<skillModuleList> TaskModule::getSkillList()
 {
-    if (m_moduleSkillList.size() == 0)
-    {
-        buildSkillList();
-    }
+    //if (m_moduleSkillList.size() == 0)
+    //{
+    buildSkillList(); // Possible overhead.
+    //}
 
     return m_moduleSkillList;
 }
