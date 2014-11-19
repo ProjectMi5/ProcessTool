@@ -165,7 +165,8 @@ void ProductionModule::executeSkill(int& skillPos, ParameterInputArray& paramInp
     }
 
     input.skillInput[skillPos].execute = true;
-    QLOG_DEBUG() << "Executing skill position #" << skillPos << " at module number " << m_moduleNumber;
+    QLOG_DEBUG() << "Executing skill position #" << skillPos << " at module number " << m_moduleNumber
+                 << " (" << output.name.toUtf8() << ")";
     writeSkillInput(skillPos);
 
     checkMoverState(skillPos);
@@ -388,8 +389,7 @@ void ProductionModule::writeConnectionTestInput(bool input)
     nodesToWrite.create(1);
     UaVariant tmpValue;
 
-    UaString baseNodeIdToWrite = "ns=4;s=MI5.Module";
-    baseNodeIdToWrite += UaString::number(m_moduleNumber);
+    UaString baseNodeIdToWrite = m_baseNodeId;
     baseNodeIdToWrite += ".Input.ConnectionTestInput";
 
     tmpValue.setBool(OpcUa_Boolean(input));
@@ -1191,8 +1191,7 @@ void ProductionModule::changeModuleMode(int mode)
     int writeCounter = 0;
     UaVariant tmpValue;
 
-    UaString baseNodeIdToWrite = "ns=4;s=MI5.Module";
-    baseNodeIdToWrite += UaString::number(m_moduleNumber);
+    UaString baseNodeIdToWrite = m_baseNodeId;
     baseNodeIdToWrite += ".Input.";
     baseNodeIdToWrite += "Mode";
     tmpValue.setInt16(input.moduleMode);

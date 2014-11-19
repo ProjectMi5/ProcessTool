@@ -2,7 +2,7 @@
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
 
-MaintenanceHelper::MaintenanceHelper() :
+MaintenanceHelper::MaintenanceHelper(MessageFeeder* pFeeder) : m_pMsgFeeder(pFeeder),
     m_moduleToMaintain(-1),
     m_maintenanceInProcess(false)
 {
@@ -80,7 +80,7 @@ void MaintenanceHelper::skillStateChanged(int moduleNumber, int skillPos, int st
     //if (m_calibrationInProgress &&
     //    (skillPos == m_pModuleList[moduleNumber]->translateSkillIdToSkillPos(POSCALSKILLID)) &&
     //    (moduleNumber == m_usedXtsModuleNumber))
-    if (1)
+    if (m_maintenanceInProcess && moduleNumber == MAINTENANCEMODULE)
     {
         QLOG_DEBUG() << "Statechange: " << state ;
 
@@ -125,11 +125,56 @@ void MaintenanceHelper::maintenanceExecution(int moduleNumber, int errorId)
 
     ParameterInputArray tmpParamArray;
 
-    for (int i = 0; i < PARAMETERCOUNT; i++)
-    {
-        tmpParamArray.paramInput[i].value = 0;
-        tmpParamArray.paramInput[i].string = "not used";
-    }
+    fillParams(tmpParamArray, errorId);
 
     m_pModuleList[MAINTENANCEMODULE]->executeSkill(skillpos, tmpParamArray);
+    UaString tmpstring = UaString("Maintenance required for module ");
+    tmpstring += UaString::number(m_moduleToMaintain);
+    m_pMsgFeeder->write(tmpstring, msgMaintenanceActionRequired);
+
+}
+
+void MaintenanceHelper::fillParams(ParameterInputArray& tmpParamArray, int errorId)
+{
+    int paramCounter = 0;
+
+    switch (errorId)
+    {
+    case MODULECOOKIEREFILLERRORID:
+        tmpParamArray.paramInput[paramCounter].string =
+            m_pModuleList[m_moduleToMaintain]->getModuleName().toUtf8();
+        tmpParamArray.paramInput[paramCounter].value = m_moduleToMaintain;
+        paramCounter++;
+        tmpParamArray.paramInput[paramCounter].string = "MaintenanceSkillId";
+        tmpParamArray.paramInput[paramCounter].value = 1501;
+        paramCounter++;
+        tmpParamArray.paramInput[paramCounter].string = "Refill the storage of the cookie module.";
+        tmpParamArray.paramInput[paramCounter].value = 0;
+        paramCounter++;
+        break;
+
+    case MODULECREAMREFILLERRORID:
+        tmpParamArray.paramInput[paramCounter].string =
+            m_pModuleList[m_moduleToMaintain]->getModuleName().toUtf8();
+        tmpParamArray.paramInput[paramCounter].value = m_moduleToMaintain;
+        paramCounter++;
+        tmpParamArray.paramInput[paramCounter].string = "MaintenanceSkillId";
+        tmpParamArray.paramInput[paramCounter].value = 1502;
+        paramCounter++;
+        tmpParamArray.paramInput[paramCounter].string = "Refill the storage a the cream module.";
+        tmpParamArray.paramInput[paramCounter].value = 0;
+        paramCounter++;
+        break;
+
+    default:
+        break;
+
+    }
+
+    for (paramCounter; paramCounter < PARAMETERCOUNT; paramCounter++)
+    {
+        tmpParamArray.paramInput[paramCounter].value = 0;
+        tmpParamArray.paramInput[paramCounter].string = "not used";
+    }
+
 }

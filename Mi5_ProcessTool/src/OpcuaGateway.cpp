@@ -331,9 +331,12 @@ UaStatus OpcuaGateway::write(UaWriteValues& nodesToWrite, OpcUa_Int32 timeout /*
         }
         else
         {
-            // Service call failed
-            QLOG_ERROR() << "Write failed with status " << result.toString().toUtf8();
-            tryCounter++;
+            if (timeout != 100)
+            {
+                // Service call failed
+                QLOG_ERROR() << "Write failed with status " << result.toString().toUtf8();
+                tryCounter++;
+            }
         }
     }
 
@@ -546,7 +549,12 @@ UaString OpcuaGateway::buildBaseNodeId(int moduleNumber)
     }
     else if (serverVendor == "Bernecker & Rainer")
     {
-        baseNodeId = "BundR";
+        baseNodeId = "ns=7;s=BundR";
+    }
+    else if (serverVendor == "Bosch Rexroth")
+    {
+        baseNodeId = "ns=2;s=.Module";
+        baseNodeId += UaString::number(moduleNumber);
     }
     else //? Fallback Beckhoff.
     {

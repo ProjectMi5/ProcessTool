@@ -5,7 +5,7 @@
 #include <iostream>
 
 ConnectionTestTimer::ConnectionTestTimer(IProductionModule* pModule) : m_lastConnectionState(-1),
-    m_connectionTestBool(false)
+    m_connectionTestBool(false), m_disconnected(false), m_lastConnectionTestBool(false)
 {
     m_pModule = pModule;
     m_timer1 = new QTimer(this);
@@ -25,7 +25,11 @@ ConnectionTestTimer::~ConnectionTestTimer()
 
 void ConnectionTestTimer::timer1update()
 {
-    m_connectionTestBool = !m_connectionTestBool;
+    if (!m_disconnected)
+    {
+        m_connectionTestBool = !m_connectionTestBool;
+    }
+
     m_pModule->writeConnectionTestInput(m_connectionTestBool);
     m_timer2->start(500);
 }
@@ -39,10 +43,13 @@ void ConnectionTestTimer::evaluateConnectionTest()
     {
         // worked
         connectionStateChanged(ModuleConnectionConnected);
+        m_disconnected = false;
     }
     else // Wrong or -1
     {
         connectionStateChanged(ModuleConnectionDisconnected);
+        m_disconnected = true;
+        m_lastConnectionTestBool = m_connectionTestBool;
     }
 }
 

@@ -11,6 +11,10 @@ TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
     m_moduleSkillList.clear();
     m_taskObjects.clear();
 
+    m_abortionTimer = new QTimer(this);
+    m_abortionTimer->setSingleShot(true);
+    connect(m_abortionTimer, SIGNAL(timeout()), this, SLOT(abortionTimerTriggered()));
+
     m_pOpcuaGateway = pOpcuaGateway;
     m_moduleNumber = moduleNumber;
     m_moduleList = moduleList;
@@ -23,6 +27,17 @@ TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
 TaskModule::~TaskModule()
 {
 }
+
+void TaskModule::abortionTimerTriggered()
+{
+    if (m_taskObjects.count(m_tasklist[m_taskNumberToAbort].taskId) == 0)
+    {
+        return;
+    }
+
+    m_taskObjects[m_tasklist[m_taskNumberToAbort].taskId]->triggerAbortTaskTimeout();
+}
+
 
 void TaskModule::startup()
 {
@@ -164,6 +179,10 @@ void TaskModule::abortTheTask(int taskNumber)
     }
 
     m_taskObjects[m_tasklist[taskNumber].taskId]->abortTask();
+    m_abortionTimer->start(20000);
+    m_taskNumberToAbort = taskNumber;
+    QLOG_DEBUG() << "Started: Abortion timer.";
+
 }
 
 
@@ -244,7 +263,7 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
 
                     else
                     {
-                        // Subscription for someone else, or dummy changed from false to trues
+                        // Subscription for someone else, or dummy changed from false to true
                     }
                 }
             }

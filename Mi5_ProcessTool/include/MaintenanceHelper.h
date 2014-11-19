@@ -13,12 +13,13 @@
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
 #include <Mi5_ProcessTool/include/IModule.h>
+#include <Mi5_ProcessTool/include/MessageFeeder.h>
 
 class MaintenanceHelper : public QObject, IModule, ISkillRegistration
 {
     Q_OBJECT
 public:
-    MaintenanceHelper();
+    MaintenanceHelper(MessageFeeder* pFeeder);
     ~MaintenanceHelper();
 
 public: //IModule methods
@@ -39,12 +40,14 @@ public:
 private:
     void resetData();
     void maintenanceExecution(int moduleNumber, int errorId);
+    void fillParams(ParameterInputArray& tmpParamArray, int errorId);
 
 private:
     std::map<int, IProductionModule*> m_pModuleList;
     QThread m_thread;
     QMutex m_mutex;
     QWaitCondition m_waitCondition;
+    MessageFeeder* m_pMsgFeeder;
 
 private:
     int m_moduleToMaintain;

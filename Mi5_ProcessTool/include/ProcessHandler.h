@@ -34,6 +34,8 @@ private:
     QThread m_thread;
     MessageFeeder* m_pMessageFeeder;
     MaintenanceHelper* m_pMaintenanceHelper;
+    bool m_xts_enabled;
+
 
 private:
     UaStatus build();

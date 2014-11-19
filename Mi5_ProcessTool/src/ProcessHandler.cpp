@@ -59,6 +59,8 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
+    m_xts_enabled = true;
+
     UaStatus status;
 
     // Initialize the UA Stack platform layer
@@ -69,13 +71,16 @@ UaStatus ProcessHandler::build()
     m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
         UaString("opc.tcp://192.168.192.136:4840"));
 
-    m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
-    m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
-    m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+    if (m_xts_enabled)
+    {
+        m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+        m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+        m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+    }
 
     m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
-    m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
-    m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
+    //m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
+    //m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
 
     m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
     m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
@@ -85,6 +90,11 @@ UaStatus ProcessHandler::build()
     m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
     m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(
         UaString("opc.tcp://192.168.192.116:4840"));
+
+    m_gatewayList[MODULENUMBERCREMEBECKHOFF] = new OpcuaGateway(
+        UaString("opc.tcp://192.168.192.138:4840"));
+    m_gatewayList[MODULENUMBERCREMEBOSCH] = new OpcuaGateway(
+        UaString("opc.tcp://192.168.192.139:4840"));
 
     for (std::map<int, OpcuaGateway*>::iterator it = m_gatewayList.begin(); it != m_gatewayList.end();
          ++it)
@@ -111,25 +121,28 @@ UaStatus ProcessHandler::build()
                                          MODULENUMBERMESSAGEFEEDER);
     // 2. Stelle ÄNDERN
 
-    m_pMaintenanceHelper = new MaintenanceHelper();
+    m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
 
     m_productionModuleList[MODULENUMBERCOOKIESEPARATOR] = new CookieSeparator(
         m_gatewayList[MODULENUMBERCOOKIESEPARATOR], MODULENUMBERCOOKIESEPARATOR, m_pMessageFeeder,
         m_pMaintenanceHelper);
 
-    m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
-            MODULENUMBERXTS1, m_pMessageFeeder, m_pMaintenanceHelper);
-    m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
-            MODULENUMBERXTS2, m_pMessageFeeder, m_pMaintenanceHelper);
-    m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
-            MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper);
+    if (m_xts_enabled)
+    {
+        m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
+                MODULENUMBERXTS1, m_pMessageFeeder, m_pMaintenanceHelper);
+        m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
+                MODULENUMBERXTS2, m_pMessageFeeder, m_pMaintenanceHelper);
+        m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
+                MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper);
+    }
 
     m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
             MODULEX, m_pMessageFeeder, m_pMaintenanceHelper);
-    m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
-            MODULEY, m_pMessageFeeder, m_pMaintenanceHelper);
-    m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
-            MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper);
+    //m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
+    //        MODULEY, m_pMessageFeeder, m_pMaintenanceHelper);
+    //m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
+    //        MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper);
 
     // Manual Module
 
@@ -139,6 +152,13 @@ UaStatus ProcessHandler::build()
     m_productionModuleList[MAINTENANCEMODULE] = new ManualModule(m_gatewayList[MAINTENANCEMODULE],
             MAINTENANCEMODULE,
             m_pMessageFeeder);
+
+    m_productionModuleList[MODULENUMBERCREMEBECKHOFF] = new CremeModule(
+        m_gatewayList[MODULENUMBERCREMEBECKHOFF], MODULENUMBERCREMEBECKHOFF, m_pMessageFeeder,
+        m_pMaintenanceHelper);
+    //m_productionModuleList[MODULENUMBERCREMEBOSCH] = new CremeModule(
+    //    m_gatewayList[MODULENUMBERCREMEBOSCH], MODULENUMBERCREMEBOSCH, m_pMessageFeeder,
+    //    m_pMaintenanceHelper);
 
     ////ENDE ÄNDERN
 
@@ -197,6 +217,7 @@ void ProcessHandler::buildSkillList()
     {
         m_moduleSkillList.insert(std::pair<int, std::map<int, int>>(it->first,
                                  it->second->getSkills())); //The getskills() call actually triggers the build of modules' skill lists.
+        QLOG_DEBUG() << "Active Module: " << it->second->getModuleName().toUtf8() << ", Nr. #" << it->first;
     }
 
     QLOG_DEBUG() << "\nAvailable skills:" ;

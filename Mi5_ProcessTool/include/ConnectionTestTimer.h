@@ -27,6 +27,8 @@ private:
     void connectionStateChanged(int state);
     bool m_connectionTestBool;
     QThread m_thread;
+    bool m_disconnected;
+    bool m_lastConnectionTestBool;
 
 private slots:
     void timer1update();

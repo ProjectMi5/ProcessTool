@@ -6,9 +6,12 @@ static const int MODULENUMBERXTS1 = 2001; //2001
 static const int MODULENUMBERXTS2 = 2002;
 static const int MODULENUMBERXTS3 = 2003;
 static const int MODULENUMBERCOOKIESEPARATOR = 2101;
+static const int MODULENUMBERCREMEBECKHOFF = 2301;
+static const int MODULENUMBERCREMEBOSCH = 2302;
 
 // Maintenance Error IDs
 static const int MODULECOOKIEREFILLERRORID = 123;
+static const int MODULECREAMREFILLERRORID = 666; //TODO!
 
 // Manual modules
 static const int MANUALMODULE1 = 2403;
@@ -19,8 +22,6 @@ static const int MODULEX = 1202;
 static const int MODULEY = 1203;
 static const int MODULEZ = 1204;
 
-static const int MODULENUMBERCOOKIE = 2101;
-static const int MODULENUMBERCREME = 2;
 static const int MODULENUMBERTASK = 11;
 static const int MODULENUMBERXTSMIN = 2001;  //2001
 static const int MODULENUMBERXTSMAX = 2005; //2005
@@ -39,10 +40,14 @@ enum messageFeedLevel
 {
     msgClear = 0,
     msgSuccess = 1,
-    msgInfo,
-    msgWarning,
-    msgError,
-    msgFatal
+    msgInfo = 2,
+    msgWarning = 3,
+    msgError = 4,
+    msgFatal = 5,
+    msgManualActionRequired = 100,
+    msgMaintenanceActionRequired = 101,
+    msgInputModule = 102,
+    msgOutputModule = 103
 };
 
 #endif // GLOBALCONSTS_H

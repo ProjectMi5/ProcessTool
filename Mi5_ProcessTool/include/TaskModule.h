@@ -7,12 +7,13 @@
 #include <Mi5_ProcessTool/include/Task.h>
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
+#include <QTimer>
 
 class OpcuaGateway; // Using forward declaration.
 
-class TaskModule : public IModule
+class TaskModule : public QObject, public IModule
 {
-
+    Q_OBJECT
 public:
     TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder,
@@ -44,6 +45,8 @@ private:
     std::vector<skillModuleList> m_moduleSkillList;
     MessageFeeder* m_pMsgFeed;
     IProductionModule* m_pManual;
+    QTimer* m_abortionTimer;
+    int m_taskNumberToAbort;
 
 private:
     void createMonitoredItems();
@@ -61,6 +64,8 @@ private: //const
     static const int PARAMETERCOUNT = 6;
 
 
+private slots:
+    void abortionTimerTriggered();
 };
 
 #endif // TASKMODULE_H

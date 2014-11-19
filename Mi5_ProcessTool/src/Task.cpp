@@ -201,7 +201,8 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
     m_task.skill[nextItem.skillNumberInTask].assignedModulePosition =
         m_moduleList[chosenModule.moduleNumber]->getModulePosition();
     QLOG_DEBUG() << "Task #" << m_task.taskId  << ": Writing assignment for skill position " <<
-                 chosenModule.skillPosition << " (assignedModule: " << chosenModule.moduleNumber <<
+                 chosenModule.skillPosition << " (assignedModule: " << chosenModule.moduleNumber << " - " <<
+                 m_moduleList[chosenModule.moduleNumber]->getModuleName().toUtf8() <<
                  "), skillNumberInTask" << nextItem.skillNumberInTask;
 
     m_task.taskState = TaskAssigned;
@@ -386,6 +387,13 @@ void Task::processNextOpenSkill()
                 QLOG_DEBUG() << "Task number in structure #" << m_task.taskNumberInStructure;
                 m_moduleList[it->second.moduleNumber]->executeSkill(it->second.skillPosition, tmpParamArray);
 
+                if (it->second.moduleNumber == MANUALMODULE1) //TODO: remove this hack.
+                {
+                    UaString tmpstring = UaString("Manual action required for Task ID #");
+                    tmpstring += UaString::number(m_task.taskId);
+                    m_pMsgFeed->write(tmpstring, msgManualActionRequired);
+                }
+
                 m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, it->first, SKILLTASKINPROCESS);
                 m_matchedSkills[it->first].taskSkillState = SKILLTASKINPROCESS;
             }
@@ -436,7 +444,7 @@ void Task::abortTask()
     {
         if (it->second.taskSkillState == SKILLTASKINPROCESS)
         {
-            // Wait til its done.
+            // Wait til its done or timeout (triggered from outside).
             m_mutex.lock();
             m_waitCondition.wait(&m_mutex);
             m_mutex.unlock();
@@ -516,4 +524,10 @@ void Task::abortTask()
     tmpMsg += UaString::number(m_task.taskId);
     QLOG_INFO() << tmpMsg.toUtf8();
     m_pMsgFeed->write(tmpMsg, msgSuccess);
+}
+
+void Task::triggerAbortTaskTimeout()
+{
+    QLOG_DEBUG() << "Timeout: Abort Task";
+    m_waitCondition.wakeAll();
 }

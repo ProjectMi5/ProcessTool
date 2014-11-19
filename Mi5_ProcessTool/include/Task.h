@@ -26,6 +26,7 @@ public:
     void skillStateChanged(int moduleNumber, int skillPos, int state);
     void start();
     void abortTask();
+    void triggerAbortTaskTimeout();
 
 public slots:
     void triggerTaskObjectDeletion();

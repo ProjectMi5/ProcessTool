@@ -71,6 +71,8 @@ UaStatus OpcuaSubscriber::createSubscription(UaSession* pSession,
     // subscriptionSettings.priority = 0; // relative priority, if multiple subscriptions are used
     //subscriptionSettings.publishingInterval = 1000.0; // cyclic rate [ms]
     subscriptionSettings.publishingInterval = 1;
+    subscriptionSettings.lifetimeCount = 1200 * 1000;
+    subscriptionSettings.maxKeepAliveCount = 5 * 1000;
 
     m_subscriptionList[subscriptionClientHandle] = NULL;
     UaSubscription* tempSubscription;
