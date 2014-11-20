@@ -47,6 +47,12 @@ void TaskModule::abortionTimerTriggered()
 
 void TaskModule::startup()
 {
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "startup", Qt::QueuedConnection);
+        return;
+    }
+
     setupOpcua();
     m_taskUpdateCounter->start(2000);
 }
@@ -75,25 +81,25 @@ void TaskModule::createMonitoredItems()
     int clientHandleNumber;
     UaStatus status;
 
-    for (OpcUa_Int32 i = 0; i < TASKCOUNT; i++)
-    {
-        nodeIdToSubscribe = "ns=4;s=MI5.ProductionList[";
-        nodeIdToSubscribe += UaString::number(i);
-        nodeIdToSubscribe += "].";
-        nodeIdToSubscribe += "Dummy";
-        createNodeStructure();
-        status = m_pOpcuaGateway->createSingleMonitoredItem(1000 + i, m_moduleNumber,
-                 nodeToSubscribe);
+    //for (OpcUa_Int32 i = 0; i < TASKCOUNT; i++)
+    //{
+    //    nodeIdToSubscribe = "ns=4;s=MI5.ProductionList[";
+    //    nodeIdToSubscribe += UaString::number(i);
+    //    nodeIdToSubscribe += "].";
+    //    nodeIdToSubscribe += "Dummy";
+    //    createNodeStructure();
+    //    status = m_pOpcuaGateway->createSingleMonitoredItem(1000 + i, m_moduleNumber,
+    //             nodeToSubscribe);
 
-        nodeIdToSubscribe = "ns=4;s=MI5.ProductionList[";
-        nodeIdToSubscribe += UaString::number(i);
-        nodeIdToSubscribe += "].";
-        nodeIdToSubscribe += "AbortTask";
-        createNodeStructure();
-        status = m_pOpcuaGateway->createSingleMonitoredItem(666 + i, m_moduleNumber,
-                 nodeToSubscribe);
+    //    nodeIdToSubscribe = "ns=4;s=MI5.ProductionList[";
+    //    nodeIdToSubscribe += UaString::number(i);
+    //    nodeIdToSubscribe += "].";
+    //    nodeIdToSubscribe += "AbortTask";
+    //    createNodeStructure();
+    //    status = m_pOpcuaGateway->createSingleMonitoredItem(666 + i, m_moduleNumber,
+    //             nodeToSubscribe);
 
-    }
+    //}
 
 }
 
@@ -142,7 +148,7 @@ bool TaskModule::isTaskDone(int taskStructNumber)
 {
     bool val = false;
 
-    UaStatus status;
+    /*UaStatus status;
     UaDataValues returnValues;
     OpcUa_NodeId tmpNodeId;
     UaReadValueIds nodesToRead;
@@ -165,6 +171,11 @@ bool TaskModule::isTaskDone(int taskStructNumber)
     UaVariant(returnValues[0].Value).toInt32(tmpReturnVal);
 
     if (tmpReturnVal == TaskDone)
+    {
+        val = true;
+    }*/
+
+    if (m_tasklist[taskStructNumber].taskState == TaskDone)
     {
         val = true;
     }
@@ -297,7 +308,7 @@ void TaskModule::notifyTaskDone(OpcUa_Int32 taskId, OpcUa_Int32 taskNumber, OpcU
     if (m_taskObjects.count(taskId) > 0)
     {
         m_tasklist.erase(m_tasklist.find(taskNumber));
-
+        m_activeTasks.erase(std::find(m_activeTasks.begin(), m_activeTasks.end(), taskNumber));
         std::map<int, Task*>::iterator it = m_taskObjects.find(taskId);
 
         if (it != m_taskObjects.end())
@@ -725,29 +736,29 @@ void TaskModule::checkTaskStates()
     UaReadValueIds nodesToRead;
     int readCounter = 0;
 
-    nodesToRead.create(2 * PARAMETERCOUNT);
+    nodesToRead.create(3 * TASKCOUNT);
     UaString baseNodeId = "ns=4;s=MI5.ProductionList[";
 
 
-    for (int i = 0; i < PARAMETERCOUNT; i++)
+    for (int i = 0; i < TASKCOUNT; i++)
     {
         UaString tmpNodeId = baseNodeId;
         tmpNodeId += UaString::number(i);
         tmpNodeId += "].";
 
-        UaString nodeIdToRead = baseNodeId;
+        UaString nodeIdToRead = tmpNodeId;
         nodeIdToRead += "Dummy";
         UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
         nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
         readCounter++;
 
-        nodeIdToRead = baseNodeId;
+        nodeIdToRead = tmpNodeId;
         nodeIdToRead += "State";
         UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
         nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
         readCounter++;
 
-        nodeIdToRead = baseNodeId;
+        nodeIdToRead = tmpNodeId;
         nodeIdToRead += "AbortTask";
         UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
         nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
@@ -766,7 +777,7 @@ void TaskModule::checkTaskStates()
 
     for (int i = 0; i < PARAMETERCOUNT; i++)
     {
-        m_tasklist[i].name = UaVariant(returnValues[readCounter].Value).toString();
+        UaVariant(returnValues[readCounter].Value).toBool(m_tasklist[i].dummy);
         readCounter++;
         UaVariant(returnValues[readCounter].Value).toInt32(m_tasklist[i].taskState);
         readCounter++;
@@ -774,4 +785,46 @@ void TaskModule::checkTaskStates()
         readCounter++;
     }
 
+    evalTaskList();
+}
+
+void TaskModule::evalTaskList()
+{
+    for (int taskNumber = 0; taskNumber < TASKCOUNT; taskNumber++)
+    {
+        if (m_tasklist[taskNumber].abortTask == true)
+        {
+            abortTheTask(taskNumber);
+        }
+        else if (m_tasklist[taskNumber].dummy == false && !isTaskDone(taskNumber))
+        {
+            if (std::find(m_activeTasks.begin(), m_activeTasks.end(), taskNumber) == m_activeTasks.end())
+            {
+                m_activeTasks.push_back(taskNumber);
+                m_tasklist[taskNumber].dummy = true;
+                m_tasklist[taskNumber].taskNumberInStructure = taskNumber;
+
+                int status = getTaskInformation(taskNumber);
+
+                if ((-1) == status)
+                {
+                    QLOG_ERROR() << "Error: Couldn't retrieve task information for task number " << taskNumber;
+                    return;
+                }
+
+                QLOG_DEBUG() << "Received new task (#" << taskNumber << ", ID #" << m_tasklist[taskNumber].taskId <<
+                             "): " <<
+                             m_tasklist[taskNumber].name.toUtf8();
+                m_taskObjects[m_tasklist[taskNumber].taskId] = new Task(m_tasklist[taskNumber], m_moduleList, this,
+                        m_pMsgFeed, m_pManual);
+                m_taskObjects[m_tasklist[taskNumber].taskId]->start();
+            }
+
+            else
+            {
+                //task number already exists
+                //QLOG_ERROR() << "Error, task number " << taskNumber << " already exists in tasklist." ;
+            }
+        }
+    }
 }

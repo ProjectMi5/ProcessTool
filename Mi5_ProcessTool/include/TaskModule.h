@@ -23,7 +23,6 @@ public:
                                 const UaDataNotifications& dataNotifications,
                                 const UaDiagnosticInfos&   diagnosticInfos);
     void moduleDataChange(const UaDataNotifications& dataNotifications);
-    void startup();
     void updateTaskStructure(ProductionTask& updatedTask, int skillNumberInTask);
     std::vector<skillModuleList> getSkillList();
     void serverReconnected();
@@ -32,6 +31,7 @@ public:
 
 public slots:
     void notifyTaskDone(OpcUa_Int32 taskId, OpcUa_Int32 taskNumber, OpcUa_Int32 state);
+    void startup();
 
 private:
     OpcuaGateway* m_pOpcuaGateway;
@@ -43,6 +43,7 @@ private:
     int m_taskCounter;
     std::map<int, Task*> m_taskObjects;
     std::map<OpcUa_Int32, ProductionTask> m_tasklist;
+    std::vector<int> m_activeTasks;
     std::map<int, IProductionModule*> m_moduleList;
     std::vector<skillModuleList> m_moduleSkillList;
     MessageFeeder* m_pMsgFeed;
@@ -50,6 +51,9 @@ private:
     QTimer* m_abortionTimer;
     QTimer* m_taskUpdateCounter;
     int m_taskNumberToAbort;
+
+private:
+    void evalTaskList();
 
 private: //Qt
     QThread m_thread;

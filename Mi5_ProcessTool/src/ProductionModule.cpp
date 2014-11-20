@@ -16,8 +16,8 @@ ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber
 
     m_pOpcuaGateway->registerModule(m_moduleNumber, this);
 
-    m_connectionTestTimer = new ConnectionTestTimer(this);
-    connect(this, SIGNAL(errorOccured()), this, SLOT(evaluateError()), Qt::QueuedConnection);
+    /*m_connectionTestTimer = new ConnectionTestTimer(this);
+    connect(this, SIGNAL(errorOccured()), this, SLOT(evaluateError()), Qt::QueuedConnection);*/
 
     moveToThread(&m_thread);
     m_thread.start();
@@ -35,7 +35,7 @@ void ProductionModule::startup()
     changeModuleMode(ModuleModeAuto);
 
 
-    m_connectionTestTimer->startUp();
+    // m_connectionTestTimer->startUp();
 }
 
 void ProductionModule::setupOpcua() // TODO: Implement this in the Init, Task etc. modules, too.
@@ -168,7 +168,6 @@ void ProductionModule::assignSkill(int& taskId, Skill skill, int& skillPos)
 
 void ProductionModule::executeSkill(int& skillPos, ParameterInputArray& paramInput)
 {
-
     for (int i = 0; i < PARAMETERCOUNT; i++)
     {
         input.skillInput[skillPos].parameterInput[i] = paramInput.paramInput[i];
@@ -197,6 +196,12 @@ void ProductionModule::deregisterTaskForSkill(int& skillPos)
         }
 
         writeSkillInput(skillPos);
+
+        if (m_skillStatePollerList.count(skillPos) > 0)
+        {
+            m_skillStatePollerList[skillPos]->deleteLater();
+            m_skillStatePollerList.erase(m_skillStatePollerList.find(skillPos));
+        }
     }
 
     else
@@ -383,10 +388,22 @@ int ProductionModule::registerTaskForSkill(ISkillRegistration* pTask, int skillP
     else
     {
         m_skillRegistrationList[skillPos] = pTask;
+        createPoller(skillPos);
         returnVal = 0;
     }
 
     return returnVal;
+}
+
+void ProductionModule::createPoller(int skillPos)
+{
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "createPoller", Qt::QueuedConnection, Q_ARG(int, skillPos));
+        return;
+    }
+
+    m_skillStatePollerList[skillPos] = new SkillStatePoller(this, skillPos, m_pOpcuaGateway);
 }
 
 /*
@@ -681,7 +698,7 @@ void ProductionModule::createMonitoredItems()
         baseNodeIdParam += "ParameterOutput.ParameterOutput";
 
         // Parameters
-        for (int j = 0; j <= PARAMETERCOUNT; j++)
+        for (int j = 0; j <= PARAMETERCOUNTOSUBSCRIBE; j++)
         {
             tempNodeid = baseNodeIdParam;
             tempNodeid += UaString::number(j);
@@ -1090,13 +1107,13 @@ void ProductionModule::moduleDataChange(const UaDataNotifications& dataNotificat
                     else if ((dataNotifications[i].ClientHandle % (2200 + k * 10 + 2)) == 0)
                     {
                         tempValue.toBool(output.skillOutput[k].busy);
-                        skillStateChanged(k, SKILLMODULEBUSY);
+                        //skillStateChanged(k, SKILLMODULEBUSY);
                     }
 
                     else if ((dataNotifications[i].ClientHandle % (2200 + k * 10 + 3)) == 0)
                     {
                         tempValue.toBool(output.skillOutput[k].done);
-                        skillStateChanged(k, SKILLMODULEDONE);
+                        //skillStateChanged(k, SKILLMODULEDONE);
                     }
 
                     else if ((dataNotifications[i].ClientHandle % (2200 + k * 10 + 4)) == 0)
@@ -1107,7 +1124,7 @@ void ProductionModule::moduleDataChange(const UaDataNotifications& dataNotificat
                     else if ((dataNotifications[i].ClientHandle % (2200 + k * 10 + 5)) == 0)
                     {
                         tempValue.toBool(output.skillOutput[k].error);
-                        skillStateChanged(k, SKILLMODULEERROR);
+                        //skillStateChanged(k, SKILLMODULEERROR);
                     }
 
                     else if ((dataNotifications[i].ClientHandle % (2200 + k * 10 + 6)) == 0)
@@ -1123,7 +1140,7 @@ void ProductionModule::moduleDataChange(const UaDataNotifications& dataNotificat
                     else if ((dataNotifications[i].ClientHandle % (2200 + k * 10 + 9)) == 0)
                     {
                         tempValue.toBool(output.skillOutput[k].ready);
-                        skillStateChanged(k, SKILLMODULEREADY);
+                        //skillStateChanged(k, SKILLMODULEREADY);
                     }
 
                     else

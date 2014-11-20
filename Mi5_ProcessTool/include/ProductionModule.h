@@ -9,6 +9,9 @@
 #include <Mi5_ProcessTool/include/ConnectionTestTimer.h>
 #include <Mi5_ProcessTool/include/ISkillRegistration.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
+#include <Mi5_ProcessTool/include/SkillStatePoller.h>
+#include <Mi5_ProcessTool/include/ProductionModule.h>
+
 
 class OpcuaGateway; // Using forward declaration.
 class MaintenanceHelper;
@@ -56,6 +59,7 @@ public:
 public slots:
     void moduleConnectionStatusChanged(int state);
     void serverReconnected();
+    void skillStateChanged(int skillPos, int state);
 
 protected:
     OpcuaGateway* m_pOpcuaGateway;
@@ -70,12 +74,14 @@ private:
     ConnectionTestTimer* m_connectionTestTimer;
     QThread m_thread;
 
+private slots:
+    void createPoller(int skillPos);
+
 private:
     void createMonitoredItems();
     void createNodeStructure();
     void buildSkillList();
     void writeSkillInput(int skillPos);
-    void skillStateChanged(int skillPos, int state);
     void setupOpcua();
     virtual void checkMoverState(int skillPos);
 
@@ -88,6 +94,7 @@ private: //const
 private: // module interface
     std::map<int, int> m_moduleSkillList; /* skillid, skillpos */
     std::map<int, ISkillRegistration*> m_skillRegistrationList; /*skillPos, pTask*/
+    std::map<int, SkillStatePoller*> m_skillStatePollerList; /* skillPos, pSkillStaterPoller */
 
 signals:
     void errorOccured();

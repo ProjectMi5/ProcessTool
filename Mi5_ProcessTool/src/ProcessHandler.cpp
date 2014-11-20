@@ -1,7 +1,7 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
-static const UaString MAINSERVER("opc.tcp://192.168.192.116:4840");
+static const UaString MAINSERVER("opc.tcp://192.168.192.132:4840"); //116
 
 ProcessHandler::ProcessHandler()
 {
@@ -61,12 +61,12 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
-    m_xts_enabled = true;
-    m_cookie_enabled = true;
-    m_topping_beckhoff_enabled = true;
+    m_xts_enabled = false;
+    m_cookie_enabled = false;
+    m_topping_beckhoff_enabled = false;
     m_topping_bosch_enabled = false;
     m_cocktail_enabled = false;
-    m_virtualModules_enabled = false;
+    m_virtualModules_enabled = true;
     m_init = false;
 
     UaStatus status;

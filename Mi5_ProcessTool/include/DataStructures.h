@@ -3,6 +3,7 @@
 #include <uaclientsdk.h>
 
 static const int PARAMETERCOUNT = 6;
+static const int PARAMETERCOUNTOSUBSCRIBE = 0;
 
 // Module Input
 enum ModuleMode
@@ -153,6 +154,7 @@ struct ProductionTask
     OpcUa_Int32 taskState;
     OpcUa_Boolean abortTask;
     Skill skill[51];
+    ProductionTask::ProductionTask(): dummy(true) {  };
 };
 
 struct taskSkillQueue
