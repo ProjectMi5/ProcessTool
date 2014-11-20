@@ -3,6 +3,7 @@
 #include "uaclientsdk.h"
 #include <iostream>
 #include <QObject>
+#include <QThread>
 #include <Mi5_ProcessTool/include/DataStructures.h>
 #include <Mi5_ProcessTool/include/IProductionModule.h>
 #include <Mi5_ProcessTool/include/ConnectionTestTimer.h>
@@ -39,19 +40,22 @@ public:
     void removeExecute(int& skillPos);
     UaString getSkillName(int& skillPos);
     UaString getModuleName();
-    int getModulePosition();
+    double getModulePosition();
     int registerTaskForSkill(ISkillRegistration* pTask, int skillPos);
     void deregisterTaskForSkill(int& skillPos);
     bool checkSkillReadyState(int& skillId);
     void writeConnectionTestInput(bool input);
     int checkConnectionTestOutput();
     int translateSkillIdToSkillPos(int skillId);
-    void serverReconnected();
-    void moduleConnectionStatusChanged(int state);
     virtual bool isBlocked();
     virtual bool isReserved();
     int translateSkillPosToSkillId(int skillPos);
     virtual void changeModuleMode(int mode);
+    UaString getBaseNodeId();
+
+public slots:
+    void moduleConnectionStatusChanged(int state);
+    void serverReconnected();
 
 protected:
     OpcuaGateway* m_pOpcuaGateway;
@@ -64,6 +68,7 @@ private:
     UaString nodeIdToSubscribe;
     UaNodeIdArray nodeToSubscribe;
     ConnectionTestTimer* m_connectionTestTimer;
+    QThread m_thread;
 
 private:
     void createMonitoredItems();
@@ -86,6 +91,8 @@ private: // module interface
 
 signals:
     void errorOccured();
+    void skillStateChangeSignal(int moduleNumber, int skillPos, int state);
+
 };
 
 #endif // PRODUCTIONMODULE_H

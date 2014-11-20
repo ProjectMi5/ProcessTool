@@ -18,6 +18,9 @@ ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber
 
     m_connectionTestTimer = new ConnectionTestTimer(this);
     connect(this, SIGNAL(errorOccured()), this, SLOT(evaluateError()), Qt::QueuedConnection);
+
+    moveToThread(&m_thread);
+    m_thread.start();
 }
 
 ProductionModule::~ProductionModule()
@@ -98,6 +101,13 @@ std::map<int, int> ProductionModule::getSkills()
 
 void ProductionModule::moduleConnectionStatusChanged(int state)
 {
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "moduleConnectionStatusChanged", Qt::QueuedConnection, Q_ARG(int,
+                                  state));
+        return;
+    }
+
     UaString message("Module ");
     message += getModuleName();
 
@@ -196,9 +206,11 @@ void ProductionModule::deregisterTaskForSkill(int& skillPos)
     }
 }
 
-int ProductionModule::getModulePosition()
+double ProductionModule::getModulePosition()
 {
-    return output.positionOutput;
+    double returnVal = 0;
+    UaVariant(output.positionOutput).toDouble(returnVal);
+    return fmod(returnVal, 4000.0);
 }
 
 UaString ProductionModule::getSkillName(int& skillPos)
@@ -265,8 +277,6 @@ int ProductionModule::checkSkillState(int& skillId)
     {
         if (output.skillOutput[i].id == skillId)
         {
-
-
             // Read state.
             int readCounter = 0;
             UaStatus status;
@@ -315,7 +325,6 @@ int ProductionModule::checkSkillState(int& skillId)
     }
 
     return returnVal;
-
 }
 
 void ProductionModule::buildSkillList()
@@ -429,6 +438,12 @@ int ProductionModule::checkConnectionTestOutput()
 
 void ProductionModule::serverReconnected()
 {
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "serverReconnected", Qt::QueuedConnection);
+        return;
+    }
+
     setupOpcua();
 }
 
@@ -742,6 +757,8 @@ void ProductionModule::createMonitoredItems()
         }
     }
 
+    QLOG_DEBUG() "Finished creating the monitored items for module number " << m_moduleNumber << " (" <<
+            getModuleName().toUtf8() << ").";
 }
 
 void ProductionModule::writeModuleInput()
@@ -1203,4 +1220,9 @@ void ProductionModule::changeModuleMode(int mode)
 
     // Write!
     m_pOpcuaGateway->write(nodesToWrite);
+}
+
+UaString ProductionModule::getBaseNodeId()
+{
+    return m_baseNodeId;
 }

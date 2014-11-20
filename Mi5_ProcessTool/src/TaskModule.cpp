@@ -15,13 +15,19 @@ TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
     m_abortionTimer->setSingleShot(true);
     connect(m_abortionTimer, SIGNAL(timeout()), this, SLOT(abortionTimerTriggered()));
 
+    m_taskUpdateCounter = new QTimer(this);
+    connect(m_taskUpdateCounter, SIGNAL(timeout()), this, SLOT(checkTaskStates()));
+
     m_pOpcuaGateway = pOpcuaGateway;
     m_moduleNumber = moduleNumber;
     m_moduleList = moduleList;
     m_pMsgFeed = pMessageFeeder;
 
     m_pOpcuaGateway->registerModule(m_moduleNumber, this);
-    QLOG_DEBUG() << "Created TaskModule with module number " << moduleNumber ;
+    QLOG_DEBUG() << "Created TaskModule with module number " << moduleNumber;
+
+    moveToThread(&m_thread);
+    m_thread.start();
 }
 
 TaskModule::~TaskModule()
@@ -42,6 +48,7 @@ void TaskModule::abortionTimerTriggered()
 void TaskModule::startup()
 {
     setupOpcua();
+    m_taskUpdateCounter->start(2000);
 }
 
 void TaskModule::setupOpcua()
@@ -168,6 +175,12 @@ bool TaskModule::isTaskDone(int taskStructNumber)
 
 void TaskModule::abortTheTask(int taskNumber)
 {
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "abortTheTask", Qt::QueuedConnection, Q_ARG(int, taskNumber));
+        return;
+    }
+
     if (m_tasklist.count(taskNumber) == 0)
     {
         return;
@@ -181,7 +194,7 @@ void TaskModule::abortTheTask(int taskNumber)
     m_taskObjects[m_tasklist[taskNumber].taskId]->abortTask();
     m_abortionTimer->start(20000);
     m_taskNumberToAbort = taskNumber;
-    QLOG_DEBUG() << "Started: Abortion timer.";
+    QLOG_DEBUG() << "Started: Abortion timer for task #" << taskNumber << ".";
 
 }
 
@@ -267,14 +280,20 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
                     }
                 }
             }
-
-
         }
     }
 }
 
-void TaskModule::notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber, OpcUa_Int32 state)
+void TaskModule::notifyTaskDone(OpcUa_Int32 taskId, OpcUa_Int32 taskNumber, OpcUa_Int32 state)
 {
+    if (thread() != QThread::currentThread())
+    {
+        qRegisterMetaType<OpcUa_Int32>("OpcUa_Int32");
+        QMetaObject::invokeMethod(this, "notifyTaskDone", Qt::QueuedConnection, Q_ARG(OpcUa_Int32,
+                                  taskId), Q_ARG(OpcUa_Int32, taskNumber), Q_ARG(OpcUa_Int32, state));
+        return;
+    }
+
     if (m_taskObjects.count(taskId) > 0)
     {
         m_tasklist.erase(m_tasklist.find(taskNumber));
@@ -287,7 +306,7 @@ void TaskModule::notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber, Op
             Task* tmp = it->second;
             m_taskObjects.erase(it);
             return;
-            //delete tmp; // whoops, we have a memory leak here, as the task objects still receives skillStateUpdates
+            delete tmp; // whoops, we have a memory leak here, as the task objects still receives skillStateUpdates
         }
     }
 
@@ -697,4 +716,62 @@ void TaskModule::updateSkillState(int taskNumber, int skillNumber, OpcUa_Int32 s
     tmpValue.clear();
 
     m_pOpcuaGateway->write(nodesToWrite);
+}
+
+void TaskModule::checkTaskStates()
+{
+    UaDataValues returnValues;
+    OpcUa_NodeId tmpNodeId;
+    UaReadValueIds nodesToRead;
+    int readCounter = 0;
+
+    nodesToRead.create(2 * PARAMETERCOUNT);
+    UaString baseNodeId = "ns=4;s=MI5.ProductionList[";
+
+
+    for (int i = 0; i < PARAMETERCOUNT; i++)
+    {
+        UaString tmpNodeId = baseNodeId;
+        tmpNodeId += UaString::number(i);
+        tmpNodeId += "].";
+
+        UaString nodeIdToRead = baseNodeId;
+        nodeIdToRead += "Dummy";
+        UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+        nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+        readCounter++;
+
+        nodeIdToRead = baseNodeId;
+        nodeIdToRead += "State";
+        UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+        nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+        readCounter++;
+
+        nodeIdToRead = baseNodeId;
+        nodeIdToRead += "AbortTask";
+        UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+        nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+        readCounter++;
+    }
+
+    // Read!
+    returnValues = m_pOpcuaGateway->read(nodesToRead);
+
+    if (returnValues.length() != readCounter)
+    {
+        return;
+    }
+
+    readCounter = 0;
+
+    for (int i = 0; i < PARAMETERCOUNT; i++)
+    {
+        m_tasklist[i].name = UaVariant(returnValues[readCounter].Value).toString();
+        readCounter++;
+        UaVariant(returnValues[readCounter].Value).toInt32(m_tasklist[i].taskState);
+        readCounter++;
+        UaVariant(returnValues[readCounter].Value).toBool(m_tasklist[i].abortTask);
+        readCounter++;
+    }
+
 }

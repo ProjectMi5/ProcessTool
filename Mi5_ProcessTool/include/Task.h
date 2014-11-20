@@ -23,21 +23,23 @@ public:
 
 public:
     int getTaskId();
-    void skillStateChanged(int moduleNumber, int skillPos, int state);
     void start();
-    void abortTask();
     void triggerAbortTaskTimeout();
 
 public slots:
     void triggerTaskObjectDeletion();
+    void abortTask();
+    void skillStateChanged(int moduleNumber, int skillPos, int state);
 
 private:
     void evaluateTask();
     void assignSkillsToModules();
-    void processNextOpenSkill();
     void evaluateSkillState(int skillNumberInTask);
     matchedSkill assignSingleSkillToModule(taskSkillQueue& nextItem);
     bool isTransportModule(int moduleNumber);
+
+private slots:
+    void processNextOpenSkill();
 
 private: //const
     static const int TASKCOUNT = 30;

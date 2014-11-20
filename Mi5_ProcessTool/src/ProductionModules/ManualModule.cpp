@@ -425,7 +425,7 @@ UaString ManualModule::getModuleName()
     return UaString("ManualModule");
 }
 
-int ManualModule::getModulePosition()
+double ManualModule::getModulePosition()
 {
     return data.oPosition;
 }
@@ -482,4 +482,9 @@ int ManualModule::translateSkillPosToSkillId(int skillPos)
 void ManualModule::changeModuleMode(int mode)
 {
     // do nothing
+}
+
+UaString ManualModule::getBaseNodeId()
+{
+    return UaString("Handmodul");
 }

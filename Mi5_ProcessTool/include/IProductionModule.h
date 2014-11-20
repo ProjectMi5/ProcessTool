@@ -18,7 +18,7 @@ public:
     virtual void deregisterTaskForSkill(int& skillPos) = 0;
     virtual UaString getSkillName(int& skillPos) = 0;
     virtual UaString getModuleName() = 0;
-    virtual int getModulePosition() = 0;
+    virtual double getModulePosition() = 0;
     virtual int registerTaskForSkill(ISkillRegistration* pTask, int skillPos) = 0;
     virtual void writeConnectionTestInput(bool input) = 0;
     virtual int checkConnectionTestOutput() = 0;
@@ -26,6 +26,7 @@ public:
     virtual bool isBlocked() = 0;
     virtual bool isReserved() = 0;
     virtual void changeModuleMode(int mode) = 0;
+    virtual UaString getBaseNodeId() = 0;
 };
 
 enum moduleSkillState

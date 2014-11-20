@@ -138,35 +138,56 @@ void MaintenanceHelper::fillParams(ParameterInputArray& tmpParamArray, int error
 {
     int paramCounter = 0;
 
+    tmpParamArray.paramInput[paramCounter].string =
+        m_pModuleList[m_moduleToMaintain]->getModuleName().toUtf8();
+    tmpParamArray.paramInput[paramCounter].value = m_moduleToMaintain;
+    paramCounter++;
+    tmpParamArray.paramInput[paramCounter].string = "MaintenanceSkillId";
+    tmpParamArray.paramInput[paramCounter].value = 0;
+    paramCounter++;
+
     switch (errorId)
     {
     case MODULECOOKIEREFILLERRORID:
-        tmpParamArray.paramInput[paramCounter].string =
-            m_pModuleList[m_moduleToMaintain]->getModuleName().toUtf8();
-        tmpParamArray.paramInput[paramCounter].value = m_moduleToMaintain;
-        paramCounter++;
-        tmpParamArray.paramInput[paramCounter].string = "MaintenanceSkillId";
-        tmpParamArray.paramInput[paramCounter].value = 1501;
-        paramCounter++;
         tmpParamArray.paramInput[paramCounter].string = "Refill the storage of the cookie module.";
         tmpParamArray.paramInput[paramCounter].value = 0;
         paramCounter++;
         break;
 
-    case MODULECREAMREFILLERRORID:
-        tmpParamArray.paramInput[paramCounter].string =
-            m_pModuleList[m_moduleToMaintain]->getModuleName().toUtf8();
-        tmpParamArray.paramInput[paramCounter].value = m_moduleToMaintain;
+    case MODULECOOKIEAXISSTUCKERRORID:
+        tmpParamArray.paramInput[paramCounter].string = "Axis of the cookie module is stuck.";
+        tmpParamArray.paramInput[paramCounter].value = 0;
         paramCounter++;
-        tmpParamArray.paramInput[paramCounter].string = "MaintenanceSkillId";
-        tmpParamArray.paramInput[paramCounter].value = 1502;
+        break;
+
+    case MODULECOOKIEEMERGENCYSTOPERRORID:
+        tmpParamArray.paramInput[paramCounter].string = "Cookie module is in emergency stop.";
+        tmpParamArray.paramInput[paramCounter].value = 0;
         paramCounter++;
+        break;
+
+    case MODULECREMEREFILLERRORID:
         tmpParamArray.paramInput[paramCounter].string = "Refill the storage a the cream module.";
         tmpParamArray.paramInput[paramCounter].value = 0;
         paramCounter++;
         break;
 
+    case MODULECREMEEMERGENCYSTOPERRORID:
+        tmpParamArray.paramInput[paramCounter].string = "Creme module is in emergency stop.";
+        tmpParamArray.paramInput[paramCounter].value = 0;
+        paramCounter++;
+        break;
+
+    case MODULECREMEAXISSTUCKERRORID:
+        tmpParamArray.paramInput[paramCounter].string = "Axis of the cream module is stuck.";
+        tmpParamArray.paramInput[paramCounter].value = 0;
+        paramCounter++;
+        break;
+
     default:
+        tmpParamArray.paramInput[paramCounter].string = "Received unknown error ID.";
+        tmpParamArray.paramInput[paramCounter].value = 0;
+        paramCounter++;
         break;
 
     }

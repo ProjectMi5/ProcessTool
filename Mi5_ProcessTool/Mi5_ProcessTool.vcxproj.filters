@@ -157,6 +157,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_TaskModule.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProductionModules\CocktailModule.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\DataStructures.h">
@@ -218,6 +221,9 @@
     </ClInclude>
     <ClInclude Include="include\QsLog\QsLogLevel.h">
       <Filter>Header Files\QsLog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProductionModules\CocktailModule.h">
+      <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

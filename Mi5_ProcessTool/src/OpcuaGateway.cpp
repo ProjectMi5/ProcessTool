@@ -547,9 +547,10 @@ UaString OpcuaGateway::buildBaseNodeId(int moduleNumber)
         baseNodeId = "ns=4;s=MI5.Module";
         baseNodeId += UaString::number(moduleNumber);
     }
-    else if (serverVendor == "Bernecker & Rainer")
+    else if (serverVendor == "Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.")
     {
-        baseNodeId = "ns=7;s=BundR";
+        baseNodeId = "ns=6;s=::AsGlobalPV:Module";
+        baseNodeId += UaString::number(moduleNumber);
     }
     else if (serverVendor == "Bosch Rexroth")
     {

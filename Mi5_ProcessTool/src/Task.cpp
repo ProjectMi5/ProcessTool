@@ -19,6 +19,8 @@ Task::Task(ProductionTask productionTask, std::map<int, IProductionModule*>modul
     m_pMsgFeed->write(message, msgInfo);
 
     moveToThread(&m_thread);
+    QString threadName = "Task" + QString::number(productionTask.taskId);
+    m_thread.setObjectName(threadName);
     m_thread.start();
 }
 
@@ -212,9 +214,15 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
 }
 
 
-
 void Task::skillStateChanged(int moduleNumber, int skillPos, int state)
 {
+    if (!m_aborted && thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "skillStateChanged", Qt::QueuedConnection, Q_ARG(int,
+                                  moduleNumber), Q_ARG(int,
+                                          skillPos), Q_ARG(int, state));
+        return;
+    }
 
     for (std::map<int, matchedSkill>::iterator it = m_matchedSkills.begin();
          it != m_matchedSkills.end(); it++)
@@ -306,6 +314,12 @@ void Task::evaluateSkillState(int skillNumberInTask)
 
 void Task::processNextOpenSkill()
 {
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "processNextOpenSkill", Qt::QueuedConnection);
+        return;
+    }
+
     if (m_aborted)
     {
         return;
@@ -437,6 +451,12 @@ void Task::triggerTaskObjectDeletion()
 
 void Task::abortTask()
 {
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "abortTask", Qt::QueuedConnection);
+        return;
+    }
+
     m_aborted = true;
 
     for (std::map<int, matchedSkill>::iterator it = m_matchedSkills.begin();
@@ -519,11 +539,11 @@ void Task::abortTask()
     }
 
     m_matchedSkills.clear();
-    m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, TaskError);
     UaString tmpMsg = UaString("Aborted Task #");
     tmpMsg += UaString::number(m_task.taskId);
     QLOG_INFO() << tmpMsg.toUtf8();
     m_pMsgFeed->write(tmpMsg, msgSuccess);
+    m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, TaskError);
 }
 
 void Task::triggerAbortTaskTimeout()

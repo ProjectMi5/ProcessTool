@@ -15,6 +15,7 @@
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
 #include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
 #include <Mi5_ProcessTool/include/MaintenanceHelper.h>
+#include <Mi5_ProcessTool/include/ProductionModules/CocktailModule.h>
 
 class ProcessHandler
 {
@@ -35,7 +36,12 @@ private:
     MessageFeeder* m_pMessageFeeder;
     MaintenanceHelper* m_pMaintenanceHelper;
     bool m_xts_enabled;
-
+    bool m_cookie_enabled;
+    bool m_topping_beckhoff_enabled;
+    bool m_topping_bosch_enabled;
+    bool m_cocktail_enabled;
+    bool m_virtualModules_enabled;
+    bool m_init;
 
 private:
     UaStatus build();

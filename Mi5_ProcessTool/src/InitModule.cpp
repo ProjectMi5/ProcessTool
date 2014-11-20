@@ -118,19 +118,24 @@ void InitModule::positionCalibrationExecution(int moduleNumber, int xtsModuleNum
         tmpParamArray.paramInput[0].value = 0;
         tmpParamArray.paramInput[0].string = m_pGatewayList[moduleNumber]->getServerUrl();
 
-        tmpString = "MI5.Module";
-        tmpString += UaString::number(moduleNumber);
+        QString tmpQString = m_pModuleList[m_moduleToCalibrate]->getBaseNodeId().toUtf8();
+        QStringList tmpStringList = tmpQString.split("=");//ns=4;s=asdf
+        tmpString = UaString(tmpStringList[2].toUtf8());
         tmpString += ".Output.PositionSensor";
         tmpParamArray.paramInput[1].value = 0;
         tmpParamArray.paramInput[1].string = tmpString;
 
-        tmpString = "MI5.Module";
-        tmpString += UaString::number(moduleNumber);
+        tmpString = UaString(tmpStringList[2].toUtf8());
         tmpString += ".Input.PositionInput";
         tmpParamArray.paramInput[2].value = 0;
         tmpParamArray.paramInput[2].string = tmpString;
 
-        for (int i = 3; i < PARAMETERCOUNT; i++)
+        QStringList tmpStringList2 = tmpStringList[1].split(";");
+        tmpString = UaString(tmpStringList2[0].toUtf8());
+        tmpParamArray.paramInput[3].value = 0;
+        tmpParamArray.paramInput[3].string = tmpString;
+
+        for (int i = 4; i < PARAMETERCOUNT; i++)
         {
             tmpParamArray.paramInput[i].value = 0;
             tmpParamArray.paramInput[i].string = "not used";

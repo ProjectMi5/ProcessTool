@@ -1,6 +1,8 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
+static const UaString MAINSERVER("opc.tcp://192.168.192.116:4840");
+
 ProcessHandler::ProcessHandler()
 {
     m_xts = NULL;
@@ -60,6 +62,12 @@ void ProcessHandler::start()
 UaStatus ProcessHandler::build()
 {
     m_xts_enabled = true;
+    m_cookie_enabled = true;
+    m_topping_beckhoff_enabled = true;
+    m_topping_bosch_enabled = false;
+    m_cocktail_enabled = false;
+    m_virtualModules_enabled = false;
+    m_init = false;
 
     UaStatus status;
 
@@ -68,8 +76,11 @@ UaStatus ProcessHandler::build()
 
     // Create instance of OpcuaGateway
     //1. Stelle ÄNDERN
-    m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
-        UaString("opc.tcp://192.168.192.136:4840"));
+    if (m_cookie_enabled)
+    {
+        m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
+            UaString("opc.tcp://192.168.192.136:4840"));
+    }
 
     if (m_xts_enabled)
     {
@@ -78,23 +89,37 @@ UaStatus ProcessHandler::build()
         m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
     }
 
-    m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
-    //m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
-    //m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
+    if (m_virtualModules_enabled)
+    {
+        m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
+        m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
+        m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
+    }
 
-    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
-    m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
+    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(MAINSERVER);
+    m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(MAINSERVER);
 
 
     //// ENDE ÄNDERN
-    m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString("opc.tcp://192.168.192.116:4840"));
-    m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(
-        UaString("opc.tcp://192.168.192.116:4840"));
+    m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(MAINSERVER);
+    m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(MAINSERVER);
 
-    m_gatewayList[MODULENUMBERCREMEBECKHOFF] = new OpcuaGateway(
-        UaString("opc.tcp://192.168.192.138:4840"));
-    m_gatewayList[MODULENUMBERCREMEBOSCH] = new OpcuaGateway(
-        UaString("opc.tcp://192.168.192.139:4840"));
+    if (m_topping_beckhoff_enabled)
+    {
+        m_gatewayList[MODULENUMBERCREMEBECKHOFF] = new OpcuaGateway(
+            UaString("opc.tcp://192.168.192.138:4840"));
+    }
+
+    if (m_topping_bosch_enabled)
+    {
+        m_gatewayList[MODULENUMBERCREMEBOSCH] = new OpcuaGateway(
+            UaString("opc.tcp://192.168.192.139:4840"));
+    }
+
+    if (m_cocktail_enabled)
+    {
+        m_gatewayList[MODULENUMBERCOCKTAIL] = new OpcuaGateway(UaString("opc.tcp://192.168.192.121:4840"));
+    }
 
     for (std::map<int, OpcuaGateway*>::iterator it = m_gatewayList.begin(); it != m_gatewayList.end();
          ++it)
@@ -104,15 +129,13 @@ UaStatus ProcessHandler::build()
         if (!status.isGood())
         {
             QLOG_DEBUG() << "Config load failed." ;
-            return status;
         }
 
         status = it->second->connect();
 
         if (!status.isGood())
         {
-            QLOG_DEBUG() << "Connection to server failed." ;
-            return status;
+            QLOG_DEBUG() << "Connection to server of module number " << it->first << " failed." ;
         }
 
     }
@@ -123,9 +146,12 @@ UaStatus ProcessHandler::build()
 
     m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
 
-    m_productionModuleList[MODULENUMBERCOOKIESEPARATOR] = new CookieSeparator(
-        m_gatewayList[MODULENUMBERCOOKIESEPARATOR], MODULENUMBERCOOKIESEPARATOR, m_pMessageFeeder,
-        m_pMaintenanceHelper);
+    if (m_cookie_enabled)
+    {
+        m_productionModuleList[MODULENUMBERCOOKIESEPARATOR] = new CookieSeparator(
+            m_gatewayList[MODULENUMBERCOOKIESEPARATOR], MODULENUMBERCOOKIESEPARATOR, m_pMessageFeeder,
+            m_pMaintenanceHelper);
+    }
 
     if (m_xts_enabled)
     {
@@ -137,12 +163,15 @@ UaStatus ProcessHandler::build()
                 MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper);
     }
 
-    m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
-            MODULEX, m_pMessageFeeder, m_pMaintenanceHelper);
-    //m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
-    //        MODULEY, m_pMessageFeeder, m_pMaintenanceHelper);
-    //m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
-    //        MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper);
+    if (m_virtualModules_enabled)
+    {
+        m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
+                MODULEX, m_pMessageFeeder, m_pMaintenanceHelper);
+        m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
+                MODULEY, m_pMessageFeeder, m_pMaintenanceHelper);
+        m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
+                MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper);
+    }
 
     // Manual Module
 
@@ -153,12 +182,26 @@ UaStatus ProcessHandler::build()
             MAINTENANCEMODULE,
             m_pMessageFeeder);
 
-    m_productionModuleList[MODULENUMBERCREMEBECKHOFF] = new CremeModule(
-        m_gatewayList[MODULENUMBERCREMEBECKHOFF], MODULENUMBERCREMEBECKHOFF, m_pMessageFeeder,
-        m_pMaintenanceHelper);
-    //m_productionModuleList[MODULENUMBERCREMEBOSCH] = new CremeModule(
-    //    m_gatewayList[MODULENUMBERCREMEBOSCH], MODULENUMBERCREMEBOSCH, m_pMessageFeeder,
-    //    m_pMaintenanceHelper);
+    if (m_topping_beckhoff_enabled)
+    {
+        m_productionModuleList[MODULENUMBERCREMEBECKHOFF] = new CremeModule(
+            m_gatewayList[MODULENUMBERCREMEBECKHOFF], MODULENUMBERCREMEBECKHOFF, m_pMessageFeeder,
+            m_pMaintenanceHelper);
+    }
+
+    if (m_topping_bosch_enabled)
+    {
+        m_productionModuleList[MODULENUMBERCREMEBOSCH] = new CremeModule(
+            m_gatewayList[MODULENUMBERCREMEBOSCH], MODULENUMBERCREMEBOSCH, m_pMessageFeeder,
+            m_pMaintenanceHelper);
+    }
+
+    if (m_cocktail_enabled)
+    {
+        m_productionModuleList[MODULENUMBERCOCKTAIL] = new CocktailModule(
+            m_gatewayList[MODULENUMBERCOCKTAIL], MODULENUMBERCOCKTAIL, m_pMessageFeeder,
+            m_pMaintenanceHelper);
+    }
 
     ////ENDE ÄNDERN
 
@@ -197,8 +240,10 @@ void ProcessHandler::run()
 
     buildSkillList();
 
-    //initialInit();
-
+    if (m_init)
+    {
+        initialInit();
+    }
 
 
     //getchar();
@@ -249,9 +294,10 @@ void ProcessHandler::initialInit()
     //    m_initModule->positionCalibration(it->first);
     //}
     //Dont init the XTS modules!
-    m_initModule->positionCalibration(MODULEX);
-    m_initModule->positionCalibration(MODULEY);
-    m_initModule->positionCalibration(MODULEZ);
+    //m_initModule->positionCalibration(MODULEX);
+    //m_initModule->positionCalibration(MODULEY);
+    //m_initModule->positionCalibration(MODULEZ);
+    m_initModule->positionCalibration(MODULENUMBERCREMEBECKHOFF);
 
     m_pMessageFeeder->write("Initialization of the production modules done.", msgSuccess);
 }

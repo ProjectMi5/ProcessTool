@@ -26,10 +26,12 @@ public:
     void startup();
     void updateTaskStructure(ProductionTask& updatedTask, int skillNumberInTask);
     std::vector<skillModuleList> getSkillList();
-    void notifyTaskDone(OpcUa_Int32& taskId, OpcUa_Int32& taskNumber, OpcUa_Int32 state);
     void serverReconnected();
     void updateTaskState(int taskNumber, OpcUa_Int32 state);
     void updateSkillState(int taskNumber, int skillNumber, OpcUa_Int32 state);
+
+public slots:
+    void notifyTaskDone(OpcUa_Int32 taskId, OpcUa_Int32 taskNumber, OpcUa_Int32 state);
 
 private:
     OpcuaGateway* m_pOpcuaGateway;
@@ -46,7 +48,11 @@ private:
     MessageFeeder* m_pMsgFeed;
     IProductionModule* m_pManual;
     QTimer* m_abortionTimer;
+    QTimer* m_taskUpdateCounter;
     int m_taskNumberToAbort;
+
+private: //Qt
+    QThread m_thread;
 
 private:
     void createMonitoredItems();
@@ -56,6 +62,11 @@ private:
     void buildSkillList();
     void setupOpcua();
     bool isTaskDone(int taskStructNumber);
+
+private slots:
+    void checkTaskStates();
+
+private slots:
     void abortTheTask(int taskNumber);
 
 private: //const

@@ -35,7 +35,7 @@ public: //IProductionModule Methods
     void deregisterTaskForSkill(int& skillPos);
     UaString getSkillName(int& skillPos);
     UaString getModuleName();
-    int getModulePosition();
+    double getModulePosition();
     int registerTaskForSkill(ISkillRegistration* pTask, int skillPos);
     void writeConnectionTestInput(bool input);
     int checkConnectionTestOutput();
@@ -43,6 +43,7 @@ public: //IProductionModule Methods
     virtual bool isBlocked();
     virtual bool isReserved();
     virtual void changeModuleMode(int mode);
+    UaString getBaseNodeId();
 
 private:
     void createMonitoredItems();

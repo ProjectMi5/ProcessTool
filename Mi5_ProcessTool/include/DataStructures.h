@@ -151,6 +151,7 @@ struct ProductionTask
     OpcUa_Int32 recipeId;
     UaString timestamp;
     OpcUa_Int32 taskState;
+    OpcUa_Boolean abortTask;
     Skill skill[51];
 };
 
