@@ -61,13 +61,14 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
-    m_xts_enabled = false;
+    m_xts_enabled = true;
     m_cookie_enabled = false;
-    m_topping_beckhoff_enabled = false;
+    m_topping_beckhoff_enabled = true;
     m_topping_bosch_enabled = false;
     m_cocktail_enabled = false;
-    m_virtualModules_enabled = true;
+    m_virtualModules_enabled = false;
     m_init = true;
+    m_simuEnabled = false;
 
     UaStatus status;
 
@@ -76,6 +77,12 @@ UaStatus ProcessHandler::build()
 
     // Create instance of OpcuaGateway
     //1. Stelle ÄNDERN
+    if (m_simuEnabled)
+    {
+        m_gatewayList[MODULENUMBERSIMULATIONFEEDER] = new OpcuaGateway(
+            UaString("opc.tcp://192.168.192.76:4840"));
+    }
+
     if (m_cookie_enabled)
     {
         m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
@@ -214,6 +221,13 @@ UaStatus ProcessHandler::build()
     m_initManager->setConnections(m_gatewayList, m_productionModuleList, m_pMessageFeeder);
     m_pMaintenanceHelper->setModuleList(m_productionModuleList);
 
+    if (m_simuEnabled)
+    {
+        m_simuFeeder = new SimulationFeeder(m_gatewayList[MODULENUMBERSIMULATIONFEEDER],
+                                            MODULENUMBERSIMULATIONFEEDER, m_productionModuleList, m_pMessageFeeder);
+
+    }
+
     return status;
 }
 
@@ -249,10 +263,10 @@ void ProcessHandler::run()
     /*
     ** Start the task module.
     */
-    while (m_initManager->isInitialInitDone())
-    {
-        m_taskModule->startup();
-    }
+    getchar();
+
+    m_taskModule->startup();
+
 }
 
 void ProcessHandler::buildSkillList()

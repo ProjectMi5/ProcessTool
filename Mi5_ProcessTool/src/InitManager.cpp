@@ -76,6 +76,7 @@ void InitManager::setConnections(std::map<int, OpcuaGateway*> pGatewayList,
     m_pMsgFeeder = pMsgFeeder;
 
     m_positionCalibrator = new PositionCalibrator(pGatewayList, pModuleList, pMsgFeeder);
+    m_positionCalibrator->startup();
 }
 
 bool InitManager::isInitialInitDone()

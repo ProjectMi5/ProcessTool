@@ -16,6 +16,7 @@
 #include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
 #include <Mi5_ProcessTool/include/MaintenanceHelper.h>
 #include <Mi5_ProcessTool/include/ProductionModules/CocktailModule.h>
+#include <Mi5_ProcessTool/include/Synchronization/SimulationFeeder.h>
 
 class ProcessHandler
 {
@@ -35,6 +36,7 @@ private:
     QThread m_thread;
     MessageFeeder* m_pMessageFeeder;
     MaintenanceHelper* m_pMaintenanceHelper;
+    SimulationFeeder* m_simuFeeder;
     bool m_xts_enabled;
     bool m_cookie_enabled;
     bool m_topping_beckhoff_enabled;
@@ -42,6 +44,7 @@ private:
     bool m_cocktail_enabled;
     bool m_virtualModules_enabled;
     bool m_init;
+    bool m_simuEnabled;
 
 private:
     UaStatus build();

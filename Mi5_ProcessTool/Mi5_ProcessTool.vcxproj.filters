@@ -41,36 +41,42 @@
     <Filter Include="Source Files\QsLog">
       <UniqueIdentifier>{e64fd69f-f1ce-47b2-b0c2-7ad739ca57bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\HelperClasses">
+      <UniqueIdentifier>{5bea4638-c95a-42e1-bb78-bec8bc714de2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OpcUa">
+      <UniqueIdentifier>{770e63a2-97cc-494d-8df0-37b52771cc4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Calibration">
+      <UniqueIdentifier>{4df2d611-1c1b-444c-81ae-b54915268ea4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Interfaces">
+      <UniqueIdentifier>{85a20f5e-423d-48bc-a5d8-af747abf4d80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Data">
+      <UniqueIdentifier>{e838f6f9-515b-4196-92c1-8a45c58dd7c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Synchronization">
+      <UniqueIdentifier>{95b3f5b4-253b-4c8c-b9f9-6794a5bffefc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\HelperClasses">
+      <UniqueIdentifier>{9224c935-718b-43e2-9fb9-8c7227c9ab13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Calibration">
+      <UniqueIdentifier>{f0299984-e2fd-439d-b067-6733a7eb2912}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Synchronization">
+      <UniqueIdentifier>{957eb0cf-5d4d-42e0-8465-aa879a6f772d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OpcUa">
+      <UniqueIdentifier>{4e08a865-1780-4ae5-94b3-2dc7b3d9a2e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\CookieSeparator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Mi5ProcessTool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OpcuaConfigurator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpcuaGateway.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpcuaSubscriber.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ProcessHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ProductionModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TaskModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\UaHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\ProductionModules\CremeModule.cpp">
@@ -79,17 +85,11 @@
     <ClCompile Include="src\ProductionModules\XTS.cpp">
       <Filter>Source Files\ProductionModules</Filter>
     </ClCompile>
-    <ClCompile Include="src\ConnectionTestTimer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ConnectionTestTimer.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ConnectionTestTimer.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MessageFeeder.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_Task.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -133,9 +133,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_CookieSeparator.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="src\MaintenanceHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_MaintenanceHelper.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
@@ -151,20 +148,11 @@
     <ClCompile Include="src\ProductionModules\CocktailModule.cpp">
       <Filter>Source Files\ProductionModules</Filter>
     </ClCompile>
-    <ClCompile Include="src\SkillStatePoller.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_SkillStatePoller.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_SkillStatePoller.cpp">
       <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="src\InitManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PositionCalibrator.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_PositionCalibrator.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -178,46 +166,64 @@
     <ClCompile Include="GeneratedFiles\Release\moc_InitManager.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProductionModule.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CookieSeparator.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConnectionTestTimer.cpp">
+      <Filter>Source Files\HelperClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UaHelper.cpp">
+      <Filter>Source Files\HelperClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\InitManager.cpp">
+      <Filter>Source Files\Calibration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PositionCalibrator.cpp">
+      <Filter>Source Files\Calibration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpcuaConfigurator.cpp">
+      <Filter>Source Files\OpcUa</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpcuaSubscriber.cpp">
+      <Filter>Source Files\OpcUa</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpcuaGateway.cpp">
+      <Filter>Source Files\OpcUa</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task.cpp">
+      <Filter>Source Files\Synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TaskModule.cpp">
+      <Filter>Source Files\Synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MessageFeeder.cpp">
+      <Filter>Source Files\Synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaintenanceHelper.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SkillStatePoller.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Synchronization\SimulationFeeder.cpp">
+      <Filter>Source Files\Synchronization</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_SimulationFeeder.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_SimulationFeeder.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\DataStructures.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IOpcuaGateway.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\IProductionModule.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OpcuaConfigurator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OpcuaGateway.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OpcuaSubscriber.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\UaHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ProductionModules\CremeModule.h">
       <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
     <ClInclude Include="include\ProductionModules\XTS.h">
       <Filter>Header Files\ProductionModules</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ISkillRegistration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GlobalConsts.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MessageFeeder.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ProductionModules\ManualModule.h">
       <Filter>Header Files\ProductionModules</Filter>
@@ -243,40 +249,76 @@
     <ClInclude Include="include\ProductionModules\CocktailModule.h">
       <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
+    <ClInclude Include="include\OpcuaSubscriber.h">
+      <Filter>Header Files\OpcUa</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpcuaConfigurator.h">
+      <Filter>Header Files\OpcUa</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpcuaGateway.h">
+      <Filter>Header Files\OpcUa</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IModule.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IProductionModule.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ISkillRegistration.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DataStructures.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GlobalConsts.h">
+      <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IOpcuaGateway.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MessageFeeder.h">
+      <Filter>Header Files\Synchronization</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UaHelper.h">
+      <Filter>Header Files\HelperClasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="include\ConnectionTestTimer.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="include\ProcessHandler.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="include\Task.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="include\QsLog\QsLogDestFunctor.h">
       <Filter>Header Files\QsLog</Filter>
     </CustomBuild>
-    <CustomBuild Include="include\ProductionModule.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="include\CookieSeparator.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\ProductionModules</Filter>
     </CustomBuild>
-    <CustomBuild Include="include\MaintenanceHelper.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="include\TaskModule.h">
-      <Filter>Header Files</Filter>
+    <CustomBuild Include="include\ProductionModule.h">
+      <Filter>Header Files\ProductionModules</Filter>
     </CustomBuild>
     <CustomBuild Include="include\SkillStatePoller.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\ProductionModules</Filter>
     </CustomBuild>
-    <CustomBuild Include="include\PositionCalibrator.h">
-      <Filter>Header Files</Filter>
+    <CustomBuild Include="include\TaskModule.h">
+      <Filter>Header Files\Synchronization</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\Task.h">
+      <Filter>Header Files\Synchronization</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\MaintenanceHelper.h">
+      <Filter>Header Files\ProductionModules</Filter>
     </CustomBuild>
     <CustomBuild Include="include\InitManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Calibration</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\PositionCalibrator.h">
+      <Filter>Header Files\Calibration</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\ConnectionTestTimer.h">
+      <Filter>Header Files\HelperClasses</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\Synchronization\SimulationFeeder.h">
+      <Filter>Header Files\Synchronization</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

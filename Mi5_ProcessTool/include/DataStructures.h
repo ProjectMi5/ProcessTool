@@ -19,6 +19,12 @@ enum ModuleConnectionStatus
     ModuleConnectionDisconnected = 0,
     ModuleConnectionConnected = 1
 };
+
+struct SimulationData
+{
+    double XPosition[11];
+};
+
 struct ParameterInput
 {
     UaString string; // ......1 (e.g. 14000-1)

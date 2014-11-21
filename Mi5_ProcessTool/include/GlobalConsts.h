@@ -12,7 +12,7 @@ static const int MODULENUMBERCOCKTAIL = 2201;
 
 // Maintenance Error IDs
 static const int MODULECOOKIEREFILLERRORID = 1;
-static const int MODULECOOKIEEMERGENCYSTOPERRORID = 002;
+static const int MODULECOOKIEEMERGENCYSTOPERRORID = 2;
 static const int MODULECOOKIEAXISSTUCKERRORID = 101;
 static const int MODULECOOKIEUNKNOWNERRORID = 199;
 static const int MODULECREMEREFILLERRORID = 201;
@@ -33,6 +33,8 @@ static const int MODULENUMBERTASK = 11;
 static const int MODULENUMBERXTSMIN = 2001;  //2001
 static const int MODULENUMBERXTSMAX = 2005; //2005
 static const int MODULENUMBERMESSAGEFEEDER = 10;
+
+static const int MODULENUMBERSIMULATIONFEEDER = 9;
 
 // Specific skills
 static const int MANUALUNIVERSALSKILL = 1400;
