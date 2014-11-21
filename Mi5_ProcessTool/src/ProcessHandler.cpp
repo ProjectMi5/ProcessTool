@@ -61,11 +61,11 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
-    m_xts_enabled = true;
-    m_cookie_enabled = true;
-    m_topping_beckhoff_enabled = true;
-    m_topping_bosch_enabled = true;
-    m_cocktail_enabled = true;
+    m_xts_enabled = false;
+    m_cookie_enabled = false;
+    m_topping_beckhoff_enabled = false;
+    m_topping_bosch_enabled = false;
+    m_cocktail_enabled = false;
     m_virtualModules_enabled = true;
     m_init = true;
 
@@ -145,32 +145,33 @@ UaStatus ProcessHandler::build()
     // 2. Stelle ÄNDERN
 
     m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
+    m_initManager = new InitManager();
 
     if (m_cookie_enabled)
     {
         m_productionModuleList[MODULENUMBERCOOKIESEPARATOR] = new CookieSeparator(
             m_gatewayList[MODULENUMBERCOOKIESEPARATOR], MODULENUMBERCOOKIESEPARATOR, m_pMessageFeeder,
-            m_pMaintenanceHelper);
+            m_pMaintenanceHelper, m_initManager);
     }
 
     if (m_xts_enabled)
     {
         m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
-                MODULENUMBERXTS1, m_pMessageFeeder, m_pMaintenanceHelper);
+                MODULENUMBERXTS1, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
         m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
-                MODULENUMBERXTS2, m_pMessageFeeder, m_pMaintenanceHelper);
+                MODULENUMBERXTS2, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
         m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
-                MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper);
+                MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
     }
 
     if (m_virtualModules_enabled)
     {
         m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
-                MODULEX, m_pMessageFeeder, m_pMaintenanceHelper);
+                MODULEX, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
         m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
-                MODULEY, m_pMessageFeeder, m_pMaintenanceHelper);
+                MODULEY, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
         m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
-                MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper);
+                MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
     }
 
     // Manual Module
@@ -186,21 +187,21 @@ UaStatus ProcessHandler::build()
     {
         m_productionModuleList[MODULENUMBERCREMEBECKHOFF] = new CremeModule(
             m_gatewayList[MODULENUMBERCREMEBECKHOFF], MODULENUMBERCREMEBECKHOFF, m_pMessageFeeder,
-            m_pMaintenanceHelper);
+            m_pMaintenanceHelper, m_initManager);
     }
 
     if (m_topping_bosch_enabled)
     {
         m_productionModuleList[MODULENUMBERCREMEBOSCH] = new CremeModule(
             m_gatewayList[MODULENUMBERCREMEBOSCH], MODULENUMBERCREMEBOSCH, m_pMessageFeeder,
-            m_pMaintenanceHelper);
+            m_pMaintenanceHelper, m_initManager);
     }
 
     if (m_cocktail_enabled)
     {
         m_productionModuleList[MODULENUMBERCOCKTAIL] = new CocktailModule(
             m_gatewayList[MODULENUMBERCOCKTAIL], MODULENUMBERCOCKTAIL, m_pMessageFeeder,
-            m_pMaintenanceHelper);
+            m_pMaintenanceHelper, m_initManager);
     }
 
     ////ENDE ÄNDERN
@@ -209,8 +210,8 @@ UaStatus ProcessHandler::build()
                                   m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);
 
 
-    m_initModule = new InitModule(m_gatewayList, m_productionModuleList, m_pMessageFeeder);
 
+    m_initManager->setConnections(m_gatewayList, m_productionModuleList, m_pMessageFeeder);
     m_pMaintenanceHelper->setModuleList(m_productionModuleList);
 
     return status;
@@ -229,12 +230,9 @@ void ProcessHandler::run()
         it->second->startup();
     }
 
-
-
     /*
     ** Startup init module and initialize the positions.
     */
-    m_initModule->startup();
     QLOG_DEBUG() << "Startup finished." ;
     m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
 
@@ -242,7 +240,7 @@ void ProcessHandler::run()
 
     if (m_init)
     {
-        initialInit();
+        QMetaObject::invokeMethod(m_initManager, "startUpSystem", Qt::QueuedConnection);
     }
 
 
@@ -251,8 +249,10 @@ void ProcessHandler::run()
     /*
     ** Start the task module.
     */
-    m_taskModule->startup();
-
+    while (m_initManager->isInitialInitDone())
+    {
+        m_taskModule->startup();
+    }
 }
 
 void ProcessHandler::buildSkillList()
@@ -284,24 +284,4 @@ void ProcessHandler::buildSkillList()
 
     QLOG_DEBUG() << "=======End of Skill list=========" ;
 
-}
-
-void ProcessHandler::initialInit()
-{
-    //for (std::map<int, IProductionModule*>::iterator it = m_productionModuleList.begin();
-    //     it != m_productionModuleList.end(); ++it)
-    //{
-    //    m_initModule->positionCalibration(it->first);
-    //}
-    //Dont init the XTS modules!
-    //m_initModule->positionCalibration(MODULEX);
-    //m_initModule->positionCalibration(MODULEY);
-    //m_initModule->positionCalibration(MODULEZ);
-    //m_initModule->positionCalibration(MODULENUMBERCOCKTAIL);
-    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
-    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
-    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
-    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
-    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
-    m_pMessageFeeder->write("Initialization of the production modules done.", msgSuccess);
 }

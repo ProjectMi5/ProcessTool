@@ -9,7 +9,7 @@ class CremeModule : public ProductionModule
 
 public:
     CremeModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
-                MaintenanceHelper* pHelper);
+                MaintenanceHelper* pHelper, InitManager* pInitManager);
     ~CremeModule();
 
 protected slots:

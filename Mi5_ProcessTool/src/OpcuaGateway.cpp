@@ -533,6 +533,11 @@ UaString OpcuaGateway::getServerVendor()
 
     values = read(nodeToRead);
 
+    if (values.length() != 1)
+    {
+        return UaString("Connection error.");
+    }
+
     return UaVariant(values[0].Value).toString();
 }
 

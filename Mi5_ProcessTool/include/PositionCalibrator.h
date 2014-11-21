@@ -16,13 +16,13 @@
 
 class OpcuaGateway; // Using forward declaration.
 
-class InitModule : public QObject, IModule, ISkillRegistration
+class PositionCalibrator : public QObject, IModule, ISkillRegistration
 {
     Q_OBJECT
 public:
-    InitModule(std::map<int, OpcuaGateway*> pGatewayList,
-               std::map<int, IProductionModule*> pModuleList, MessageFeeder* pMsgFeeder);
-    ~InitModule();
+    PositionCalibrator(std::map<int, OpcuaGateway*> pGatewayList,
+                       std::map<int, IProductionModule*> pModuleList, MessageFeeder* pMsgFeeder);
+    ~PositionCalibrator();
 
 public: //IModule methods
     void subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,

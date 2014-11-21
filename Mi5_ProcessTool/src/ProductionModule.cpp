@@ -2,10 +2,12 @@
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <Mi5_ProcessTool/include/MaintenanceHelper.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
+#include <Mi5_ProcessTool/include/InitManager.h>
 
 ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
-                                   MessageFeeder* pMessageFeeder, MaintenanceHelper* pHelper) : m_disconnected(false),
-    m_pMaintenanceHelper(pHelper)
+                                   MessageFeeder* pMessageFeeder, MaintenanceHelper* pHelper,
+                                   InitManager* pInitManager) : m_disconnected(false),
+    m_pMaintenanceHelper(pHelper), m_pInitManager(pInitManager)
 {
     m_moduleSkillList.clear();
     m_skillRegistrationList.clear();
@@ -34,6 +36,14 @@ void ProductionModule::startup()
 
     changeModuleMode(ModuleModeAuto);
 
+    if ((m_moduleNumber >= MODULENUMBERXTSMIN) && (m_moduleNumber <= MODULENUMBERXTSMAX))
+    {
+        // Dont init the XTS modules.
+    }
+    else
+    {
+        m_pInitManager->enqueueForInit(m_moduleNumber);
+    }
 
     m_connectionTestTimer->startUp();
 }
@@ -117,15 +127,13 @@ void ProductionModule::moduleConnectionStatusChanged(int state)
         {
         case true:
             message += " reconnected.";
-            setupOpcua();
+            startup();
             break;
 
         case false:
             message += " connected.";
             break;
         }
-
-        m_disconnected = false;
 
         // todo: create subscriptions, if reconnect.
     }

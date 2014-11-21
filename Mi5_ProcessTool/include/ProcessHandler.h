@@ -11,7 +11,7 @@
 #include <Mi5_ProcessTool/include/ProductionModules/CremeModule.h>
 #include <Mi5_ProcessTool/include/ProductionModules/XTS.h>
 #include <Mi5_ProcessTool/include/TaskModule.h>
-#include <Mi5_ProcessTool/include/InitModule.h>
+#include <Mi5_ProcessTool/include/InitManager.h>
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
 #include <Mi5_ProcessTool/include/ProductionModules/ManualModule.h>
 #include <Mi5_ProcessTool/include/MaintenanceHelper.h>
@@ -28,7 +28,7 @@ private:
     Xts* m_xts;
     CremeModule* m_cremeModule;
     TaskModule* m_taskModule;
-    InitModule* m_initModule;
+    InitManager* m_initManager;
     std::multimap<int, std::map<int, int>> m_moduleSkillList;
     std::map<int, OpcuaGateway*> m_gatewayList;
     std::map<int, IProductionModule*> m_productionModuleList;
@@ -48,7 +48,6 @@ private:
     UaStatus loadConfig();
     void run();
     void buildSkillList();
-    void initialInit();
 
 };
 

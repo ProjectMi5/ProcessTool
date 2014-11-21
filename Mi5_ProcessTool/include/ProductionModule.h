@@ -11,10 +11,11 @@
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 #include <Mi5_ProcessTool/include/SkillStatePoller.h>
 #include <Mi5_ProcessTool/include/ProductionModule.h>
-#include <Mi5_ProcessTool/include/InitModule.h>
+#include <Mi5_ProcessTool/include/PositionCalibrator.h>
 
 class OpcuaGateway; // Using forward declaration.
 class MaintenanceHelper;
+class InitManager;
 
 class ProductionModule  : public QObject, public IProductionModule
 {
@@ -26,7 +27,7 @@ protected:
 
 public:
     ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
-                     MaintenanceHelper* pMaintenanceHelper);
+                     MaintenanceHelper* pMaintenanceHelper, InitManager* pInitManager);
     virtual ~ProductionModule();
     void subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
                                 const UaDataNotifications& dataNotifications,
@@ -67,6 +68,7 @@ protected:
     bool m_disconnected;
     UaString m_baseNodeId;
     MaintenanceHelper* m_pMaintenanceHelper;
+    InitManager* m_pInitManager;
 
 private:
     UaString nodeIdToSubscribe;

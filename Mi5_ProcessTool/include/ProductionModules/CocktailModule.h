@@ -9,7 +9,7 @@ class CocktailModule : public ProductionModule
 
 public:
     CocktailModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
-                   MaintenanceHelper* pHelper);
+                   MaintenanceHelper* pHelper, InitManager* pInitManager);
     ~CocktailModule();
 
 protected slots:

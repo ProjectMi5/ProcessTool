@@ -4,8 +4,9 @@
 
 CookieSeparator::CookieSeparator(OpcuaGateway* pOpcuaGateway,
                                  int moduleNumber, MessageFeeder* pMessageFeeder,
-                                 MaintenanceHelper* pHelper) : ProductionModule(pOpcuaGateway, moduleNumber,
-                                             pMessageFeeder, pHelper)
+                                 MaintenanceHelper* pHelper, InitManager* pInitManager) : ProductionModule(pOpcuaGateway,
+                                             moduleNumber,
+                                             pMessageFeeder, pHelper, pInitManager)
 {
     QLOG_DEBUG() << "Created module CookieSeparator with module number " << moduleNumber ;
 }

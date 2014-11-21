@@ -10,7 +10,7 @@ class Xts : public ProductionModule
 
 public:
     Xts(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
-        MaintenanceHelper* pHelper);
+        MaintenanceHelper* pHelper, InitManager* pInitManager);
     ~Xts();
 
 public:

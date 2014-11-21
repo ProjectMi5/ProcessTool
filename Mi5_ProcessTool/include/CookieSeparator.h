@@ -9,7 +9,7 @@ class CookieSeparator : public ProductionModule
     Q_OBJECT
 public:
     CookieSeparator(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
-                    MaintenanceHelper* pHelper);
+                    MaintenanceHelper* pHelper, InitManager* pInitManager);
     ~CookieSeparator();
 
 protected slots:

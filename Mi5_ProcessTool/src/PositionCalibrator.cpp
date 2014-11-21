@@ -1,8 +1,8 @@
-#include <Mi5_ProcessTool/include/InitModule.h>
+#include <Mi5_ProcessTool/include/PositionCalibrator.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
-InitModule::InitModule(std::map<int, OpcuaGateway*> pGatewayList,
-                       std::map<int, IProductionModule*> pModuleList, MessageFeeder* pMsgFeeder) : m_pMsgFeeder(pMsgFeeder)
+PositionCalibrator::PositionCalibrator(std::map<int, OpcuaGateway*> pGatewayList,
+                                       std::map<int, IProductionModule*> pModuleList, MessageFeeder* pMsgFeeder) : m_pMsgFeeder(pMsgFeeder)
 {
     m_xtsModuleNumbers.clear();
     m_pGatewayList.clear();
@@ -18,28 +18,28 @@ InitModule::InitModule(std::map<int, OpcuaGateway*> pGatewayList,
     m_thread.start();
 }
 
-InitModule::~InitModule()
+PositionCalibrator::~PositionCalibrator()
 {
 }
 
-void InitModule::startup()
+void PositionCalibrator::startup()
 {
     int xtsModulesCount = evalModuleList();
     QLOG_DEBUG() << "Initmodule found " << xtsModulesCount << " XTS module(s)." ;
 }
 
-void InitModule::serverReconnected()
+void PositionCalibrator::serverReconnected()
 {
 
 }
 
-void InitModule::subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
-                                        const UaDataNotifications& dataNotifications,
-                                        const UaDiagnosticInfos&   diagnosticInfos)
+void PositionCalibrator::subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
+        const UaDataNotifications& dataNotifications,
+        const UaDiagnosticInfos&   diagnosticInfos)
 {
 }
 
-int InitModule::positionCalibration(int moduleNumber)
+int PositionCalibrator::positionCalibration(int moduleNumber)
 {
     m_moduleToCalibrate = moduleNumber;
     int returnval = -1;
@@ -81,7 +81,7 @@ int InitModule::positionCalibration(int moduleNumber)
     return returnval;
 }
 
-int InitModule::evalModuleList()
+int PositionCalibrator::evalModuleList()
 {
     m_xtsModuleNumbers.clear();
 
@@ -99,7 +99,7 @@ int InitModule::evalModuleList()
     return m_xtsModuleNumbers.size();
 }
 
-void InitModule::positionCalibrationExecution(int moduleNumber, int xtsModuleNumber)
+void PositionCalibrator::positionCalibrationExecution(int moduleNumber, int xtsModuleNumber)
 {
     m_usedXtsModuleNumber = xtsModuleNumber;
     // We already checked, that the module's skill is ready.
@@ -159,12 +159,12 @@ void InitModule::positionCalibrationExecution(int moduleNumber, int xtsModuleNum
     }
 }
 
-int InitModule::getTaskId()
+int PositionCalibrator::getTaskId()
 {
     return 1337;
 }
 
-void InitModule::skillStateChanged(int moduleNumber, int skillPos, int state)
+void PositionCalibrator::skillStateChanged(int moduleNumber, int skillPos, int state)
 {
     if (m_calibrationInProgress &&
         (skillPos == m_pModuleList[moduleNumber]->translateSkillIdToSkillPos(POSCALSKILLID)) &&
@@ -202,7 +202,7 @@ void InitModule::skillStateChanged(int moduleNumber, int skillPos, int state)
     }
 }
 
-void InitModule::resetData()
+void PositionCalibrator::resetData()
 {
     // Reset vars
     m_calibrationInProgress = false;

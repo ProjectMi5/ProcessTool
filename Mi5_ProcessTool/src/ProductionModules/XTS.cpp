@@ -3,8 +3,9 @@
 
 Xts::Xts(OpcuaGateway* pOpcuaGateway,
          int moduleNumber, MessageFeeder* pMessageFeeder,
-         MaintenanceHelper* pHelper) : ProductionModule(pOpcuaGateway, moduleNumber,
-                     pMessageFeeder, pHelper), m_reserved(false), m_blocked(false)
+         MaintenanceHelper* pHelper, InitManager* pInitManager) : ProductionModule(pOpcuaGateway,
+                     moduleNumber,
+                     pMessageFeeder, pHelper, pInitManager), m_reserved(false), m_blocked(false)
 {
     QLOG_DEBUG() << "Created module XTS with module number " << moduleNumber ;
 }
