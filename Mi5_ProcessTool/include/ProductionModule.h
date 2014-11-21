@@ -11,7 +11,7 @@
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 #include <Mi5_ProcessTool/include/SkillStatePoller.h>
 #include <Mi5_ProcessTool/include/ProductionModule.h>
-
+#include <Mi5_ProcessTool/include/InitModule.h>
 
 class OpcuaGateway; // Using forward declaration.
 class MaintenanceHelper;

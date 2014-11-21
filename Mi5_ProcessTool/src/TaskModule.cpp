@@ -775,7 +775,7 @@ void TaskModule::checkTaskStates()
 
     readCounter = 0;
 
-    for (int i = 0; i < PARAMETERCOUNT; i++)
+    for (int i = 0; i < TASKCOUNT; i++)
     {
         UaVariant(returnValues[readCounter].Value).toBool(m_tasklist[i].dummy);
         readCounter++;
@@ -806,8 +806,9 @@ void TaskModule::evalTaskList()
 
                 int status = getTaskInformation(taskNumber);
 
-                if ((-1) == status)
+                while ((1) != status)
                 {
+                    status = getTaskInformation(taskNumber);
                     QLOG_ERROR() << "Error: Couldn't retrieve task information for task number " << taskNumber;
                     return;
                 }

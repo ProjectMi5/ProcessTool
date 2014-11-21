@@ -1,7 +1,7 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 
-static const UaString MAINSERVER("opc.tcp://192.168.192.132:4840"); //116
+static const UaString MAINSERVER("opc.tcp://192.168.192.116:4840"); //116 Production //132 dummy
 
 ProcessHandler::ProcessHandler()
 {
@@ -61,13 +61,13 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
-    m_xts_enabled = false;
-    m_cookie_enabled = false;
-    m_topping_beckhoff_enabled = false;
-    m_topping_bosch_enabled = false;
-    m_cocktail_enabled = false;
+    m_xts_enabled = true;
+    m_cookie_enabled = true;
+    m_topping_beckhoff_enabled = true;
+    m_topping_bosch_enabled = true;
+    m_cocktail_enabled = true;
     m_virtualModules_enabled = true;
-    m_init = false;
+    m_init = true;
 
     UaStatus status;
 
@@ -209,7 +209,7 @@ UaStatus ProcessHandler::build()
                                   m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);
 
 
-    m_initModule = new InitModule(m_gatewayList, m_productionModuleList);
+    m_initModule = new InitModule(m_gatewayList, m_productionModuleList, m_pMessageFeeder);
 
     m_pMaintenanceHelper->setModuleList(m_productionModuleList);
 
@@ -297,7 +297,11 @@ void ProcessHandler::initialInit()
     //m_initModule->positionCalibration(MODULEX);
     //m_initModule->positionCalibration(MODULEY);
     //m_initModule->positionCalibration(MODULEZ);
-    m_initModule->positionCalibration(MODULENUMBERCREMEBECKHOFF);
-
+    //m_initModule->positionCalibration(MODULENUMBERCOCKTAIL);
+    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
+    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
+    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
+    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
+    m_initModule->positionCalibration(MODULENUMBERCREMEBOSCH);
     m_pMessageFeeder->write("Initialization of the production modules done.", msgSuccess);
 }

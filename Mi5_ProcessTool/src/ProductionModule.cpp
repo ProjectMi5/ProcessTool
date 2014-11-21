@@ -16,8 +16,8 @@ ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber
 
     m_pOpcuaGateway->registerModule(m_moduleNumber, this);
 
-    /*m_connectionTestTimer = new ConnectionTestTimer(this);
-    connect(this, SIGNAL(errorOccured()), this, SLOT(evaluateError()), Qt::QueuedConnection);*/
+    m_connectionTestTimer = new ConnectionTestTimer(this);
+    connect(this, SIGNAL(errorOccured()), this, SLOT(evaluateError()), Qt::QueuedConnection);
 
     moveToThread(&m_thread);
     m_thread.start();
@@ -35,7 +35,7 @@ void ProductionModule::startup()
     changeModuleMode(ModuleModeAuto);
 
 
-    // m_connectionTestTimer->startUp();
+    m_connectionTestTimer->startUp();
 }
 
 void ProductionModule::setupOpcua() // TODO: Implement this in the Init, Task etc. modules, too.
@@ -883,8 +883,7 @@ void ProductionModule::writeSkillInput(int skillPos)
     int writeCounter = 0;
     UaVariant tmpValue;
 
-    UaString baseNodeIdToWrite = "ns=4;s=MI5.Module";
-    baseNodeIdToWrite += UaString::number(m_moduleNumber);
+    UaString baseNodeIdToWrite = m_baseNodeId;
     baseNodeIdToWrite += ".Input.";
 
     UaString baseSkillNodeId = baseNodeIdToWrite;

@@ -12,6 +12,7 @@
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 #include <Mi5_ProcessTool/include/GlobalConsts.h>
 #include <Mi5_ProcessTool/include/IModule.h>
+#include <Mi5_ProcessTool/include/MessageFeeder.h>
 
 class OpcuaGateway; // Using forward declaration.
 
@@ -20,7 +21,7 @@ class InitModule : public QObject, IModule, ISkillRegistration
     Q_OBJECT
 public:
     InitModule(std::map<int, OpcuaGateway*> pGatewayList,
-               std::map<int, IProductionModule*> pModuleList);
+               std::map<int, IProductionModule*> pModuleList, MessageFeeder* pMsgFeeder);
     ~InitModule();
 
 public: //IModule methods
@@ -52,6 +53,7 @@ private:
     QThread m_thread;
     QMutex m_mutex;
     QWaitCondition m_waitCondition;
+    MessageFeeder* m_pMsgFeeder;
 };
 
 #endif //INITMODULE_H

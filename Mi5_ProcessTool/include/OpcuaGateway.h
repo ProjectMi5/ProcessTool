@@ -47,6 +47,7 @@ public:
     UaString getServerUrl();
     UaString getServerVendor();
     UaString buildBaseNodeId(int moduleNumber);
+    UaStringArray getNameSpaceTable();
 
 private:
     // helper methods

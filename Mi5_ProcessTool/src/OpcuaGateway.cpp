@@ -143,7 +143,7 @@ UaStatus OpcuaGateway::connect()
     // Security settings are not initialized - we connect without security for now
     SessionSecurityInfo sessionSecurityInfo;
 
-    sessionConnectInfo.nSessionTimeout = 10 * 60 * 1000; // 10min
+    sessionConnectInfo.nSessionTimeout = 20 * 60 * 1000; // 10min
 
     printf("\nConnecting to %s\n", m_serverUrl.toUtf8());
     result = m_pSession->connect(
@@ -564,4 +564,9 @@ UaString OpcuaGateway::buildBaseNodeId(int moduleNumber)
     }
 
     return baseNodeId;
+}
+
+UaStringArray OpcuaGateway::getNameSpaceTable()
+{
+    return m_pSession->getNamespaceTable();
 }

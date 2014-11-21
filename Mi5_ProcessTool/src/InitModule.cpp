@@ -2,7 +2,7 @@
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 InitModule::InitModule(std::map<int, OpcuaGateway*> pGatewayList,
-                       std::map<int, IProductionModule*> pModuleList)
+                       std::map<int, IProductionModule*> pModuleList, MessageFeeder* pMsgFeeder) : m_pMsgFeeder(pMsgFeeder)
 {
     m_xtsModuleNumbers.clear();
     m_pGatewayList.clear();
@@ -135,7 +135,17 @@ void InitModule::positionCalibrationExecution(int moduleNumber, int xtsModuleNum
         tmpParamArray.paramInput[3].value = 0;
         tmpParamArray.paramInput[3].string = tmpString;
 
-        for (int i = 4; i < PARAMETERCOUNT; i++)
+        UaStringArray nameSpaceTable = m_pGatewayList[moduleNumber]->getNameSpaceTable();
+
+        UaVariant nameSpace;
+        tmpString.toVariant(nameSpace);
+        OpcUa_Int16 nameSpaceInt;
+        nameSpace.toInt16(nameSpaceInt);
+        UaString nameSpaceUri = nameSpaceTable[nameSpaceInt];
+        tmpParamArray.paramInput[4].value = 0;
+        tmpParamArray.paramInput[4].string = nameSpaceUri;
+
+        for (int i = 5; i < PARAMETERCOUNT; i++)
         {
             tmpParamArray.paramInput[i].value = 0;
             tmpParamArray.paramInput[i].string = "not used";
@@ -161,15 +171,24 @@ void InitModule::skillStateChanged(int moduleNumber, int skillPos, int state)
         (moduleNumber == m_usedXtsModuleNumber))
     {
         QLOG_DEBUG() << "Statechange: " << state ;
+        UaString tmpstring;
 
         switch (state)
         {
 
         case SKILLMODULEERROR:
+            QLOG_ERROR() << "Calibration error. Aborting..";
+            tmpstring = UaString("Position calibration error for module ");
+            tmpstring += UaString::number(m_moduleToCalibrate);
+            m_pMsgFeeder->write(tmpstring, msgError);
+            resetData();
             break;
 
         case SKILLMODULEDONE:
             QLOG_DEBUG() << "Calibration done." ;
+            tmpstring = UaString("Position calibration done for module ");
+            tmpstring += UaString::number(m_moduleToCalibrate);
+            m_pMsgFeeder->write(tmpstring, msgSuccess);
             resetData();
             break;
 

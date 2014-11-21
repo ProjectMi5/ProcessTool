@@ -7,7 +7,7 @@ SkillStatePoller::SkillStatePoller(ProductionModule* productionModule,
                                    int skillPos, OpcuaGateway* pGateway) : m_pModule(productionModule), m_skillPos(skillPos),
     m_pGateway(pGateway)
 {
-    QLOG_DEBUG() << "Created SkillStatePoller for module " << m_pModule->getModuleName();
+    //QLOG_DEBUG() << "Created SkillStatePoller for module " << m_pModule->getModuleName().toUtf8();
 
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(checkSkillState()));
@@ -19,7 +19,7 @@ SkillStatePoller::SkillStatePoller(ProductionModule* productionModule,
 
 SkillStatePoller::~SkillStatePoller()
 {
-    QLOG_DEBUG() << "Deleted SkillStatePoller for module " << m_pModule->getModuleName().toUtf8();
+    //QLOG_DEBUG() << "Deleted SkillStatePoller for module " << m_pModule->getModuleName().toUtf8();
 }
 
 void SkillStatePoller::checkSkillState()
@@ -82,7 +82,6 @@ void SkillStatePoller::evalState()
     else if (m_busy)
     {
         state = SKILLMODULEBUSY;
-
     }
     else if (m_error)
     {
