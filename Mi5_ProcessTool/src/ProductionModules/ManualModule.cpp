@@ -243,12 +243,12 @@ void ManualModule::moduleDataChange(const UaDataNotifications& dataNotifications
             else if (dataNotifications[i].ClientHandle == 101)
             {
                 tempValue.toBool(data.oDone);
-                skillStateChanged(0, 0);
+                //skillStateChanged(0, 0);
             }
             else if (dataNotifications[i].ClientHandle == 102)
             {
                 tempValue.toBool(data.oError);
-                skillStateChanged(0, 0);
+                //skillStateChanged(0, 0);
             }
             else if (dataNotifications[i].ClientHandle == 103)
             {
@@ -406,6 +406,12 @@ void ManualModule::deregisterTaskForSkill(int& skillPos)
         }
 
         write();
+
+        if (m_skillStatePollerList.count(skillPos) > 0)
+        {
+            m_skillStatePollerList[skillPos]->deleteLater();
+            m_skillStatePollerList.erase(m_skillStatePollerList.find(skillPos));
+        }
     }
 
     else
@@ -442,6 +448,7 @@ int ManualModule::registerTaskForSkill(ISkillRegistration* pTask, int skillPos)
     else
     {
         m_skillRegistrationList[skillPos] = pTask;
+        createPoller(skillPos);
         returnVal = 0;
     }
 
@@ -487,4 +494,16 @@ void ManualModule::changeModuleMode(int mode)
 UaString ManualModule::getBaseNodeId()
 {
     return UaString("Handmodul");
+}
+
+void ManualModule::createPoller(int skillPos)
+{
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "createPoller", Qt::QueuedConnection, Q_ARG(int, skillPos));
+        return;
+    }
+
+    m_skillStatePollerList[skillPos] = new SkillStatePoller(this, skillPos, m_pGateway);
+
 }

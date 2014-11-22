@@ -24,7 +24,7 @@ public:
     bool isInitialInitDone();
 
 public slots:
-    void startUpSystem();
+    int startUpSystem();
 
 private:
     PositionCalibrator* m_positionCalibrator;

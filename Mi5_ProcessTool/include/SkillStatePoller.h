@@ -8,28 +8,28 @@
 #include <Mi5_ProcessTool/include/DataStructures.h>
 
 class OpcuaGateway;
-class ProductionModule;
+class IProductionModule;
 class SkillStatePoller : public QObject
 {
     Q_OBJECT
 public:
-    SkillStatePoller(ProductionModule* productionModule, int skillPos, OpcuaGateway* pGateway);
+    SkillStatePoller(IProductionModule* productionModule, int skillPos, OpcuaGateway* pGateway);
     ~SkillStatePoller();
 
 public:
 
 private slots:
-    void checkSkillState();
+    virtual void checkSkillState();
 
-private:
+protected:
     void evalState();
 
-private: //Qt
+protected: //Qt
     QThread m_thread;
     QTimer* m_timer;
 
-private:
-    ProductionModule* m_pModule;
+protected:
+    IProductionModule* m_pModule;
     OpcuaGateway* m_pGateway;
     int m_skillPos;
     OpcUa_Boolean m_busy;

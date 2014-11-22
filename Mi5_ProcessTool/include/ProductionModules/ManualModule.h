@@ -3,15 +3,18 @@
 
 #include "uaclientsdk.h"
 
+#include <QObject>
 #include <Mi5_ProcessTool/include/DataStructures.h>
 #include <Mi5_ProcessTool/include/IProductionModule.h>
 #include <Mi5_ProcessTool/include/ISkillRegistration.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
+#include <Mi5_ProcessTool/include/ProductionModules/SkillStatePollerManual.h>
 
 class OpcuaGateway;
 
-class ManualModule : public IProductionModule
+class ManualModule : public QObject, public IProductionModule
 {
+    Q_OBJECT
 public:
     ManualModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                  MessageFeeder* pMessageFeeder);
@@ -51,6 +54,11 @@ private:
     void moduleDataChange(const UaDataNotifications& dataNotifications);
     void createNodeStructure();
     void setupOpcua();
+
+private slots:
+    void createPoller(int skillPos);
+
+public slots:
     void skillStateChanged(int skillPos, int state);
 
 private:
@@ -60,6 +68,7 @@ private:
     UaNodeIdArray nodeToSubscribe;
     UaString nodeIdToSubscribe;
     std::map<int, ISkillRegistration*> m_skillRegistrationList; /*skillPos, pTask*/
+    std::map<int, SkillStatePoller*> m_skillStatePollerList; /* skillPos, pSkillStaterPoller */
 
 };
 

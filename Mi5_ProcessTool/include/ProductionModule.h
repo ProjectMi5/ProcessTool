@@ -69,6 +69,7 @@ protected:
     UaString m_baseNodeId;
     MaintenanceHelper* m_pMaintenanceHelper;
     InitManager* m_pInitManager;
+    bool m_enableConnectionTest;
 
 private:
     UaString nodeIdToSubscribe;

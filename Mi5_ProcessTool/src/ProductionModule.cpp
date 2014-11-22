@@ -36,7 +36,8 @@ void ProductionModule::startup()
 
     // changeModuleMode(ModuleModeAuto);
 
-    if ((m_moduleNumber >= MODULENUMBERXTSMIN) && (m_moduleNumber <= MODULENUMBERXTSMAX))
+    if (((m_moduleNumber >= MODULENUMBERXTSMIN) && (m_moduleNumber <= MODULENUMBERXTSMAX)) ||
+        m_moduleNumber == INPUTMODULE || m_moduleNumber == OUTPUTMODULE)
     {
         // Dont init the XTS modules.
     }
@@ -45,7 +46,10 @@ void ProductionModule::startup()
         m_pInitManager->enqueueForInit(m_moduleNumber);
     }
 
-    m_connectionTestTimer->startUp();
+    if (m_enableConnectionTest)
+    {
+        m_connectionTestTimer->startUp();
+    }
 }
 
 void ProductionModule::setupOpcua() // TODO: Implement this in the Init, Task etc. modules, too.

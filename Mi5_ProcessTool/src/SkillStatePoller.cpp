@@ -1,9 +1,9 @@
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 #include <Mi5_ProcessTool/include/SkillStatePoller.h>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
-#include <Mi5_ProcessTool/include/ProductionModule.h>
+#include <Mi5_ProcessTool/include/IProductionModule.h>
 
-SkillStatePoller::SkillStatePoller(ProductionModule* productionModule,
+SkillStatePoller::SkillStatePoller(IProductionModule* productionModule,
                                    int skillPos, OpcuaGateway* pGateway) : m_pModule(productionModule), m_skillPos(skillPos),
     m_pGateway(pGateway)
 {
@@ -88,7 +88,8 @@ void SkillStatePoller::evalState()
         state = SKILLMODULEERROR;
     }
 
-    QMetaObject::invokeMethod(m_pModule, "skillStateChanged", Qt::QueuedConnection, Q_ARG(int,
-                              m_skillPos), Q_ARG(int, state));
+    //QMetaObject::invokeMethod(m_pModule, "skillStateChanged", Qt::QueuedConnection, Q_ARG(int,
+    //                          m_skillPos), Q_ARG(int, state));
+    m_pModule->skillStateChanged(m_skillPos, state);
 }
 

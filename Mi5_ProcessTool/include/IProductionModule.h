@@ -27,6 +27,7 @@ public:
     virtual bool isReserved() = 0;
     virtual void changeModuleMode(int mode) = 0;
     virtual UaString getBaseNodeId() = 0;
+    virtual void skillStateChanged(int skillPos, int state) = 0;
 };
 
 enum moduleSkillState

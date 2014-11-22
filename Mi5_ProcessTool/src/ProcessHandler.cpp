@@ -1,5 +1,6 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
+#include <QApplication>
 
 static const UaString MAINSERVER("opc.tcp://192.168.192.116:4840"); //116 Production //132 dummy
 
@@ -61,14 +62,15 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
-    m_xts_enabled = true;
-    m_cookie_enabled = true;
-    m_topping_beckhoff_enabled = true;
-    m_topping_bosch_enabled = true;
-    m_cocktail_enabled = true;
+    m_xts_enabled = false;
+    m_cookie_enabled = false;
+    m_topping_beckhoff_enabled = false;
+    m_topping_bosch_enabled = false;
+    m_cocktail_enabled = false;
     m_virtualModules_enabled = false;
     m_init = false;
     m_simuEnabled = false;
+    m_enableInOutput = false;
 
     UaStatus status;
 
@@ -87,6 +89,13 @@ UaStatus ProcessHandler::build()
     {
         m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
             UaString("opc.tcp://192.168.192.136:4840"));
+    }
+
+    if (m_enableInOutput)
+    {
+        m_gatewayList[INPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
+        m_gatewayList[OUTPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
+
     }
 
     if (m_xts_enabled)
@@ -169,6 +178,15 @@ UaStatus ProcessHandler::build()
                 MODULENUMBERXTS2, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
         m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
                 MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+    }
+
+    if (m_enableInOutput)
+    {
+        m_productionModuleList[INPUTMODULE] = new ManualProductionModule(m_gatewayList[INPUTMODULE],
+                INPUTMODULE, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+        m_productionModuleList[OUTPUTMODULE] = new ManualProductionModule(m_gatewayList[OUTPUTMODULE],
+                OUTPUTMODULE, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+
     }
 
     if (m_virtualModules_enabled)
@@ -254,8 +272,11 @@ void ProcessHandler::run()
 
     if (m_init)
     {
-        QMetaObject::invokeMethod(m_initManager, "startUpSystem", Qt::QueuedConnection);
+        int calibrationStatus = m_initManager->startUpSystem();
+
     }
+
+
 
 
     //getchar();
@@ -263,10 +284,8 @@ void ProcessHandler::run()
     /*
     ** Start the task module.
     */
-    getchar();
 
     m_taskModule->startup();
-
 }
 
 void ProcessHandler::buildSkillList()

@@ -74,7 +74,7 @@ private slots:
     void abortTheTask(int taskNumber);
 
 private: //const
-    static const int TASKCOUNT = 30;
+    static const int TASKCOUNT = 31;
     static const int SKILLCOUNT = 51;
     static const int PARAMETERCOUNT = 6;
 

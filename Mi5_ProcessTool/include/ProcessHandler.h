@@ -17,6 +17,7 @@
 #include <Mi5_ProcessTool/include/MaintenanceHelper.h>
 #include <Mi5_ProcessTool/include/ProductionModules/CocktailModule.h>
 #include <Mi5_ProcessTool/include/Synchronization/SimulationFeeder.h>
+#include <Mi5_ProcessTool/include/ProductionModules/ManualProductionModule.h>
 
 class ProcessHandler
 {
@@ -45,7 +46,7 @@ private:
     bool m_virtualModules_enabled;
     bool m_init;
     bool m_simuEnabled;
-
+    bool m_enableInOutput;
 private:
     UaStatus build();
     UaStatus loadConfig();

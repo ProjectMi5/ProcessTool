@@ -29,29 +29,29 @@ void SimulationFeeder::cyclicAction()
 
 void SimulationFeeder::writePositionInfo()
 {
-    //UaWriteValues nodesToWrite;
-    //nodesToWrite.create(11);
-    //int writeCounter = 0;
-    //UaVariant tmpValue;
+    UaWriteValues nodesToWrite;
+    nodesToWrite.create(11);
+    int writeCounter = 0;
+    UaVariant tmpValue;
 
 
-    //UaString baseSkillNodeId = "MI5.Simulation.";
+    UaString baseSkillNodeId = "ns=4;s=MI5.Simulation.";
 
-    //for (int i = 0; i < 11; i++)
-    //{
-    //    UaString tmpNodeId = baseSkillNodeId;
-    //    tmpNodeId += "XPosition";
-    //    tmpNodeId += UaString::number(i);
-    //    tmpValue.setDouble(data.XPosition[i]);
-    //    UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
-    //    nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
-    //    OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
-    //    writeCounter++;
-    //    tmpValue.clear();
-    //}
+    for (int i = 0; i < 11; i++)
+    {
+        UaString tmpNodeId = baseSkillNodeId;
+        tmpNodeId += "XPosition";
+        tmpNodeId += UaString::number(i);
+        tmpValue.setDouble(data.XPosition[i]);
+        UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToWrite[writeCounter].NodeId);
+        nodesToWrite[writeCounter].AttributeId = OpcUa_Attributes_Value;
+        OpcUa_Variant_CopyTo(tmpValue, &nodesToWrite[writeCounter].Value.Value);
+        writeCounter++;
+        tmpValue.clear();
+    }
 
-    //// Write!
-    //m_pGateway->write(nodesToWrite);
+    // Write!
+    m_pGateway->write(nodesToWrite);
 }
 
 
@@ -60,6 +60,11 @@ void SimulationFeeder::getPositions()
     for (std::map<int, IProductionModule*>::iterator it = m_moduleList.begin();
          it != m_moduleList.end(); it++)
     {
+        for (int i = 0; i < 11; i++)
+        {
+            data.XPosition[0] = 0;
+        }
+
         switch (it->first)
         {
         case MODULENUMBERCOOKIESEPARATOR:

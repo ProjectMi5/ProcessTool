@@ -35,17 +35,22 @@ int InitManager::enqueueForInit(int moduleNumber)
     return returnVal;
 }
 
-void InitManager::startUpSystem()
+int InitManager::startUpSystem()
 {
+    int returnVal = -1;
+
     if (m_positionCalibrator != NULL)
     {
         evalInitDemands();
+        returnVal = 1;
         //m_timer->start(15000);
     }
     else
     {
         QLOG_ERROR() << "Setup connections first.";
     }
+
+    return returnVal;
 }
 
 void InitManager::evalInitDemands() //Only call this method from within m_thread!

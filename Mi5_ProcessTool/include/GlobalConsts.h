@@ -23,6 +23,8 @@ static const int MODULECREMEUNKNOWNERRORID = 399;
 // Manual modules
 static const int MANUALMODULE1 = 2403;
 static const int MAINTENANCEMODULE = 2402;
+static const int INPUTMODULE = 2501;
+static const int OUTPUTMODULE = 2601;
 
 // Simu modules
 static const int MODULEX = 1202;

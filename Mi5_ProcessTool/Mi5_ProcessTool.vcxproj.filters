@@ -217,15 +217,39 @@
     <ClCompile Include="GeneratedFiles\Release\moc_SimulationFeeder.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProductionModules\SkillStatePollerManual.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ManualModule.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ManualModule.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProductionModules\ManualProductionModule.cpp">
+      <Filter>Source Files\ProductionModules</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ManualProductionModule.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ManualProductionModule.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HelperClasses\ExitHelper.cpp">
+      <Filter>Source Files\HelperClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ExitHelper.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ExitHelper.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ProductionModules\CremeModule.h">
       <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
     <ClInclude Include="include\ProductionModules\XTS.h">
-      <Filter>Header Files\ProductionModules</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ProductionModules\ManualModule.h">
       <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
     <ClInclude Include="include\QsLog\QsLog.h">
@@ -282,6 +306,9 @@
     <ClInclude Include="include\UaHelper.h">
       <Filter>Header Files\HelperClasses</Filter>
     </ClInclude>
+    <ClInclude Include="include\ProductionModules\SkillStatePollerManual.h">
+      <Filter>Header Files\ProductionModules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="include\ProcessHandler.h">
@@ -319,6 +346,15 @@
     </CustomBuild>
     <CustomBuild Include="include\Synchronization\SimulationFeeder.h">
       <Filter>Header Files\Synchronization</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\ProductionModules\ManualModule.h">
+      <Filter>Header Files\ProductionModules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\ProductionModules\ManualProductionModule.h">
+      <Filter>Header Files\ProductionModules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\HelperClasses\ExitHelper.h">
+      <Filter>Header Files\HelperClasses</Filter>
     </CustomBuild>
   </ItemGroup>
 </Project>

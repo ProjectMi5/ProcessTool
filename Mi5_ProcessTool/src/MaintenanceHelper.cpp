@@ -77,6 +77,7 @@ int MaintenanceHelper::getTaskId()
 
 void MaintenanceHelper::skillStateChanged(int moduleNumber, int skillPos, int state)
 {
+
     //if (m_calibrationInProgress &&
     //    (skillPos == m_pModuleList[moduleNumber]->translateSkillIdToSkillPos(POSCALSKILLID)) &&
     //    (moduleNumber == m_usedXtsModuleNumber))
