@@ -202,11 +202,13 @@ void TaskModule::abortTheTask(int taskNumber)
         return;
     }
 
-    m_taskObjects[m_tasklist[taskNumber].taskId]->abortTask();
-    m_abortionTimer->start(20000);
-    m_taskNumberToAbort = taskNumber;
-    QLOG_DEBUG() << "Started: Abortion timer for task #" << taskNumber << ".";
-
+    if (!(m_abortionTimer->isActive()))
+    {
+        m_taskObjects[m_tasklist[taskNumber].taskId]->abortTask();
+        m_abortionTimer->start(20000);
+        m_taskNumberToAbort = taskNumber;
+        QLOG_DEBUG() << "Started: Abortion timer for task #" << taskNumber << ".";
+    }
 }
 
 

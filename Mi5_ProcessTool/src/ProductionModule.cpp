@@ -34,7 +34,7 @@ void ProductionModule::startup()
 {
     setupOpcua();
 
-    changeModuleMode(ModuleModeAuto);
+    // changeModuleMode(ModuleModeAuto);
 
     if ((m_moduleNumber >= MODULENUMBERXTSMIN) && (m_moduleNumber <= MODULENUMBERXTSMAX))
     {

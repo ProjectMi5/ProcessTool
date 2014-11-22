@@ -39,7 +39,8 @@ void InitManager::startUpSystem()
 {
     if (m_positionCalibrator != NULL)
     {
-        m_timer->start(2000);
+        evalInitDemands();
+        //m_timer->start(15000);
     }
     else
     {
