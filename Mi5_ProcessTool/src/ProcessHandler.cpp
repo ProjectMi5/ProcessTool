@@ -62,15 +62,15 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
-    m_xts_enabled = false;
-    m_cookie_enabled = false;
-    m_topping_beckhoff_enabled = false;
+    m_xts_enabled = true;
+    m_cookie_enabled = true;
+    m_topping_beckhoff_enabled = true;
     m_topping_bosch_enabled = false;
-    m_cocktail_enabled = false;
-    m_virtualModules_enabled = false;
-    m_init = false;
-    m_simuEnabled = false;
-    m_enableInOutput = false;
+    m_cocktail_enabled = true;
+    m_virtualModules_enabled = true;
+    m_init = true;
+    m_simuEnabled = true;
+    m_enableInOutput = true;
 
     UaStatus status;
 
@@ -82,7 +82,7 @@ UaStatus ProcessHandler::build()
     if (m_simuEnabled)
     {
         m_gatewayList[MODULENUMBERSIMULATIONFEEDER] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.192.76:4840"));
+            UaString("opc.tcp://192.168.192.117:4840"));
     }
 
     if (m_cookie_enabled)
@@ -108,8 +108,8 @@ UaStatus ProcessHandler::build()
     if (m_virtualModules_enabled)
     {
         m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
-        m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
-        m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));
+        /*  m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
+          m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));*/
     }
 
     m_gatewayList[MANUALMODULE1] = new OpcuaGateway(MAINSERVER);
@@ -193,10 +193,10 @@ UaStatus ProcessHandler::build()
     {
         m_productionModuleList[MODULEX] = new CookieSeparator(m_gatewayList[MODULEX],
                 MODULEX, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
-        m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
-                MODULEY, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
-        m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
-                MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+        //m_productionModuleList[MODULEY] = new CookieSeparator(m_gatewayList[MODULEY],
+        //        MODULEY, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+        //m_productionModuleList[MODULEZ] = new CookieSeparator(m_gatewayList[MODULEZ],
+        //        MODULEZ, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
     }
 
     // Manual Module

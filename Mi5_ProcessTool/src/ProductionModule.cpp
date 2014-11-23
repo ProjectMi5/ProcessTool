@@ -359,6 +359,13 @@ void ProductionModule::buildSkillList()
 
 void ProductionModule::skillStateChanged(int skillPos, int state)
 {
+    if (thread() != QThread::currentThread())
+    {
+        QMetaObject::invokeMethod(this, "skillStateChanged", Qt::QueuedConnection, Q_ARG(int, skillPos),
+                                  Q_ARG(int, state));
+        return;
+    }
+
     if (m_skillRegistrationList.count(skillPos) > 0) //task registered for this skillpos
     {
         ISkillRegistration* pTask = m_skillRegistrationList[skillPos];
@@ -382,6 +389,28 @@ void ProductionModule::skillStateChanged(int skillPos, int state)
         {
             pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEREADY);
         }
+
+        //switch (state)
+        //{
+        //case SKILLMODULEBUSY:
+        //    pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEBUSY);
+        //    break;
+
+        //case SKILLMODULEDONE:
+        //    pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEDONE);
+        //    break;
+
+        //case SKILLMODULEERROR:
+        //    pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEERROR);
+        //    break;
+
+        //case SKILLMODULEREADY:
+        //    pTask->skillStateChanged(m_moduleNumber, skillPos, SKILLMODULEREADY);
+        //    break;
+
+        //default:
+        //    break;
+        //}
     }
     else // no task registered for this skill position
     {

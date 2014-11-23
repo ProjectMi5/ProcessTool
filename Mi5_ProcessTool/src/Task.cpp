@@ -264,32 +264,32 @@ void Task::evaluateSkillState(int skillNumberInTask)
             moduleState = m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->checkSkillState(
                               m_matchedSkills[skillNumberInTask].skillId);
 
-            if (SKILLMODULEREADY == moduleState) // TODO: only do this once. possible endless loop
-            {
-                m_matchedSkills[skillNumberInTask].moduleSkillState = SKILLTASKOPEN;
-                processNextOpenSkill();
-                //try again
-            }
-            else
-            {
-                //// assign skill to new module
-                //m_skillListInSystem = m_pTaskModule->getSkillList();
-                //m_matchedSkills[skillNumberInTask] = assignSingleSkillToModule(m_skillQueue[skillNumberInTask]);
-                //m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKOPEN;
-                QLOG_ERROR() << "Task #" << m_task.taskId << ": Skill #" <<
-                             skillNumberInTask << " ERRORED." ;
-                m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, skillNumberInTask, SKILLTASKFINISHED);
-                m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
-                m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
-                    m_matchedSkills[skillNumberInTask].skillPosition);
+            //if (SKILLMODULEREADY == moduleState) // TODO: only do this once. possible endless loop
+            //{
+            //    m_matchedSkills[skillNumberInTask].moduleSkillState = SKILLTASKOPEN;
+            //    processNextOpenSkill();
+            //    //try again
+            //}
+            /* else
+             {*/
+            //// assign skill to new module
+            //m_skillListInSystem = m_pTaskModule->getSkillList();
+            //m_matchedSkills[skillNumberInTask] = assignSingleSkillToModule(m_skillQueue[skillNumberInTask]);
+            //m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKOPEN;
+            QLOG_ERROR() << "Task #" << m_task.taskId << ": Skill #" <<
+                         skillNumberInTask << " ERRORED." ;
+            m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, skillNumberInTask, SKILLTASKFINISHED);
+            m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
+            m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
+                m_matchedSkills[skillNumberInTask].skillPosition);
 
-                if (m_aborted)
-                {
-                    m_waitCondition.wakeAll();
-                }
-
-                processNextOpenSkill();
+            if (m_aborted)
+            {
+                m_waitCondition.wakeAll();
             }
+
+            processNextOpenSkill();
+            //}
 
             break;
 
@@ -556,6 +556,7 @@ void Task::abortTask()
     tmpMsg += UaString::number(m_task.taskId);
     QLOG_INFO() << tmpMsg.toUtf8();
     m_pMsgFeed->write(tmpMsg, msgSuccess);
+    m_deletionTimer->stop();
     m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, TaskError);
 }
 

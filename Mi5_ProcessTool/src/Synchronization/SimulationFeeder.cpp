@@ -9,7 +9,7 @@ SimulationFeeder::SimulationFeeder(OpcuaGateway* pOpcuaGateway, int moduleNumber
 {
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(cyclicAction()));
-    m_timer->start(4000);
+    m_timer->start(1000);
 
     moveToThread(&m_thread);
     m_thread.setObjectName("ThreadSimulationFeeder");
@@ -60,10 +60,6 @@ void SimulationFeeder::getPositions()
     for (std::map<int, IProductionModule*>::iterator it = m_moduleList.begin();
          it != m_moduleList.end(); it++)
     {
-        for (int i = 0; i < 11; i++)
-        {
-            data.XPosition[0] = 0;
-        }
 
         switch (it->first)
         {

@@ -29,13 +29,20 @@ void SkillStatePoller::checkSkillState()
     UaReadValueIds nodesToRead;
     int readCounter = 0;
 
-    nodesToRead.create(3);
+    nodesToRead.create(4);
     UaString baseNodeId = m_pModule->getBaseNodeId();
     baseNodeId += ".Output.SkillOutput.SkillOutput";
     baseNodeId += UaString::number(m_skillPos);
     baseNodeId += ".";
 
     UaString tmpNodeId = baseNodeId;
+    tmpNodeId += "Ready";
+    UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToRead[readCounter].NodeId);
+    nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
+    readCounter++;
+
+
+    tmpNodeId = baseNodeId;
     tmpNodeId += "Busy";
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToRead[readCounter].NodeId);
     nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
@@ -61,6 +68,8 @@ void SkillStatePoller::checkSkillState()
     }
 
     readCounter = 0;
+    UaVariant(returnValues[readCounter].Value).toBool(m_ready);
+    readCounter++;
     UaVariant(returnValues[readCounter].Value).toBool(m_busy);
     readCounter++;
     UaVariant(returnValues[readCounter].Value).toBool(m_done);
@@ -75,10 +84,15 @@ void SkillStatePoller::evalState()
 {
     int state = -1;
 
-    if (m_done)
+
+    if (m_done == OpcUa_True)
     {
         state = SKILLMODULEDONE;
     }
+    //else if (m_ready)
+    //{
+    //    state = SKILLMODULEDONE;
+    //}
     else if (m_busy)
     {
         state = SKILLMODULEBUSY;

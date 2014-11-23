@@ -35,6 +35,7 @@ protected:
     OpcUa_Boolean m_busy;
     OpcUa_Boolean m_done;
     OpcUa_Boolean m_error;
+    OpcUa_Boolean m_ready;
 
 };
 
