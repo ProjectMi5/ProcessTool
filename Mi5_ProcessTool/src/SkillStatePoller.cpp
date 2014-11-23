@@ -85,7 +85,7 @@ void SkillStatePoller::evalState()
     int state = -1;
 
 
-    if (m_done == OpcUa_True)
+    if ((bool)m_done == true)
     {
         state = SKILLMODULEDONE;
     }

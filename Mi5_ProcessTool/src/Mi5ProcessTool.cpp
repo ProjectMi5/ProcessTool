@@ -10,18 +10,17 @@ int main(int argc, char* argv[])
 {
     int currentExitCode = 0;
 
+    QsLogging::Logger* pLogger = &QsLogging::Logger::instance();
+    pLogger->setLoggingLevel(QsLogging::TraceLevel);
+    QsLogging::DestinationPtr debugDestination(
+        QsLogging::DestinationFactory::MakeDebugOutputDestination());
+    pLogger->addDestination(debugDestination);
 
     do
     {
         QApplication a(argc, argv);
-        ExitHelper* exitHelper = new ExitHelper();
-        QsLogging::Logger* pLogger = &QsLogging::Logger::instance();
-        pLogger->setLoggingLevel(QsLogging::TraceLevel);
-        QsLogging::DestinationPtr debugDestination(
-            QsLogging::DestinationFactory::MakeDebugOutputDestination());
-        pLogger->addDestination(debugDestination);
-
         ProcessHandler* processHandler = new ProcessHandler();
+        ExitHelper* exitHelper = new ExitHelper();
         currentExitCode = a.exec();
     }
     while (currentExitCode == EXIT_CODE);

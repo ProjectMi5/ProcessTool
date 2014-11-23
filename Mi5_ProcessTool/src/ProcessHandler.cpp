@@ -65,7 +65,7 @@ UaStatus ProcessHandler::build()
     m_xts_enabled = true;
     m_cookie_enabled = true;
     m_topping_beckhoff_enabled = true;
-    m_topping_bosch_enabled = false;
+    m_topping_bosch_enabled = true;
     m_cocktail_enabled = true;
     m_virtualModules_enabled = true;
     m_init = true;

@@ -39,7 +39,7 @@ void ProductionModule::startup()
     if (((m_moduleNumber >= MODULENUMBERXTSMIN) && (m_moduleNumber <= MODULENUMBERXTSMAX)) ||
         m_moduleNumber == INPUTMODULE || m_moduleNumber == OUTPUTMODULE)
     {
-        // Dont init the XTS modules.
+        // Dont init the XTS or the In-/Output modules..
     }
     else
     {
@@ -1283,3 +1283,31 @@ UaString ProductionModule::getBaseNodeId()
 {
     return m_baseNodeId;
 }
+
+int ProductionModule::getErrorId()
+{
+    OpcUa_Int16 returnVal = -1;
+
+    // Read state.
+    UaStatus status;
+    UaDataValues returnValues;
+    OpcUa_NodeId tmpNodeId;
+    UaReadValueIds nodesToRead;
+
+    nodesToRead.create(1);
+    UaString nodeIdToRead = m_baseNodeId;
+    nodeIdToRead += ".Output.ErrorID";
+
+    UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[0].NodeId);
+    nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
+
+    returnValues = m_pOpcuaGateway->read(nodesToRead);
+
+    if (returnValues.length() == 1)
+    {
+        UaVariant(returnValues[0].Value).toInt16(returnVal);
+    }
+
+    return (int)returnVal;
+}
+

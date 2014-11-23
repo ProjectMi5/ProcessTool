@@ -56,6 +56,7 @@ public:
     int translateSkillPosToSkillId(int skillPos);
     virtual void changeModuleMode(int mode);
     UaString getBaseNodeId();
+    int getErrorId();
 
 public slots:
     void moduleConnectionStatusChanged(int state);

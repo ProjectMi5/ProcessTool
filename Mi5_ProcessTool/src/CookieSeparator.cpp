@@ -17,11 +17,13 @@ CookieSeparator::~CookieSeparator()
 
 void CookieSeparator::evaluateError()
 {
-    if (output.error == true && output.errorId > 0)
+    int errorId = getErrorId();
+
+    if ((bool)output.error == true && errorId > 0)
     {
-        if (output.errorId == MODULECOOKIEREFILLERRORID)
+        if (errorId == MODULECOOKIEREFILLERRORID)
         {
-            m_pMaintenanceHelper->maintain(m_moduleNumber, output.errorId);
+            m_pMaintenanceHelper->maintain(m_moduleNumber, errorId);
         }
     }
     else

@@ -315,6 +315,7 @@ void TaskModule::notifyTaskDone(OpcUa_Int32 taskId, OpcUa_Int32 taskNumber, OpcU
 
         if (it != m_taskObjects.end())
         {
+            m_abortionTimer->stop();
             updateTaskState(taskNumber, state);
             Task* tmp = it->second;
             m_taskObjects.erase(it);
