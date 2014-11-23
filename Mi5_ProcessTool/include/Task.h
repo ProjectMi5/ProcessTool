@@ -59,6 +59,7 @@ private:
     int m_transportModuleNumber;
     IProductionModule* m_pManual;
     bool m_aborted;
+    bool m_abortionDone;
 
 private: //Qt
     QMutex m_mutex;

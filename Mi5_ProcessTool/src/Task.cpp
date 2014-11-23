@@ -159,6 +159,7 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
         else
         {
             bool searching = true;
+            bool tmpStringSent = false;
 
             while (searching) //TODO: possible endless loop
             {
@@ -173,6 +174,19 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                         searching = false;
                         break;
                     }
+                }
+
+                if ((searching == true) && (tmpStringSent == false))
+                {
+                    UaString tmpMsg;
+                    tmpMsg = "Task #";
+                    tmpMsg += UaString::number(m_task.taskId);
+                    tmpMsg = + UaString(": Waiting for Skill ID #");
+                    tmpMsg = +UaString::number(chosenModule.skillId);
+                    tmpMsg = + UaString(" to become ready..");
+                    QLOG_WARN() << tmpMsg.toUtf8();
+                    m_pMsgFeed->write(tmpMsg, msgWarning);
+                    tmpStringSent = true;
                 }
             }
         }
@@ -277,7 +291,7 @@ void Task::evaluateSkillState(int skillNumberInTask)
             //m_matchedSkills[skillNumberInTask] = assignSingleSkillToModule(m_skillQueue[skillNumberInTask]);
             //m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKOPEN;
             QLOG_ERROR() << "Task #" << m_task.taskId << ": Skill #" <<
-                         skillNumberInTask << " ERRORED." ;
+                         skillNumberInTask << " ERRORED... Skipping." ;
             m_pTaskModule->updateSkillState(m_task.taskNumberInStructure, skillNumberInTask, SKILLTASKFINISHED);
             m_matchedSkills[skillNumberInTask].taskSkillState = SKILLTASKFINISHED;
             m_moduleList[m_matchedSkills[skillNumberInTask].moduleNumber]->deregisterTaskForSkill(
@@ -471,11 +485,12 @@ void Task::abortTask()
     }
 
     m_aborted = true;
+    m_abortionDone = false;
 
     for (std::map<int, matchedSkill>::iterator it = m_matchedSkills.begin();
          it != m_matchedSkills.end(); it++)
     {
-        if (it->second.taskSkillState == SKILLTASKINPROCESS)
+        if (it->second.taskSkillState == SKILLTASKINPROCESS && !m_abortionDone)
         {
             // Wait til its done or timeout (triggered from outside).
             m_mutex.lock();
@@ -491,7 +506,7 @@ void Task::abortTask()
     }
 
     // Reset XTS
-    if (m_foundTransport)
+    if (m_foundTransport && !m_abortionDone)
     {
         ParameterInputArray tmpParam;
 
@@ -503,7 +518,7 @@ void Task::abortTask()
 
         std::map<int, matchedSkill>::iterator matchedSkillsIterator;
 
-        if (m_moduleList[m_transportModuleNumber]->isBlocked())
+        if (m_moduleList[m_transportModuleNumber]->isBlocked() && !m_abortionDone)
         {
             int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSUNBLOCK);
 
@@ -527,7 +542,7 @@ void Task::abortTask()
             m_mutex.unlock();
         }
 
-        if (m_moduleList[m_transportModuleNumber]->isReserved())
+        if (m_moduleList[m_transportModuleNumber]->isReserved() && !m_abortionDone)
         {
             int skillPos = m_moduleList[m_transportModuleNumber]->translateSkillIdToSkillPos(SKILLIDXTSRELEASE);
 
@@ -557,11 +572,13 @@ void Task::abortTask()
     QLOG_INFO() << tmpMsg.toUtf8();
     m_pMsgFeed->write(tmpMsg, msgSuccess);
     m_deletionTimer->stop();
+    m_abortionDone = true;
     m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, TaskError);
 }
 
 void Task::triggerAbortTaskTimeout()
 {
     QLOG_DEBUG() << "Timeout: Abort Task";
+    m_abortionDone = true;
     m_waitCondition.wakeAll();
 }
