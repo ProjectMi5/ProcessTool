@@ -9,3 +9,4 @@ moc_*
 *.opensdf
 *.sdf
 *.suo
+*/Doxygen/html/*
