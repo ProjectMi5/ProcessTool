@@ -127,8 +127,6 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                         break;
                     }
                 }
-
-
             }
             else
             {
@@ -181,9 +179,9 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                     UaString tmpMsg;
                     tmpMsg = "Task #";
                     tmpMsg += UaString::number(m_task.taskId);
-                    tmpMsg = + UaString(": Waiting for Skill ID #");
-                    tmpMsg = +UaString::number(chosenModule.skillId);
-                    tmpMsg = + UaString(" to become ready..");
+                    tmpMsg += UaString(": Waiting for Skill ID #");
+                    tmpMsg += UaString::number(chosenModule.skillId);
+                    tmpMsg += UaString(" to become ready..");
                     QLOG_WARN() << tmpMsg.toUtf8();
                     m_pMsgFeed->write(tmpMsg, msgWarning);
                     tmpStringSent = true;
@@ -571,7 +569,6 @@ void Task::abortTask()
     tmpMsg += UaString::number(m_task.taskId);
     QLOG_INFO() << tmpMsg.toUtf8();
     m_pMsgFeed->write(tmpMsg, msgSuccess);
-    m_deletionTimer->stop();
     m_abortionDone = true;
     m_pTaskModule->notifyTaskDone(m_task.taskId, m_task.taskNumberInStructure, TaskError);
 }
