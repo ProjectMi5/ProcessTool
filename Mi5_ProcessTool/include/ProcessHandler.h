@@ -19,6 +19,10 @@
 #include <Mi5_ProcessTool/include/Synchronization/SimulationFeeder.h>
 #include <Mi5_ProcessTool/include/ProductionModules/ManualProductionModule.h>
 
+//! Main class and entry point for the Mi5 Process Tool.
+/*!
+    In this class, the given configuration is read in and the systems boots up according to it.
+*/
 class ProcessHandler
 {
 public:

@@ -320,7 +320,7 @@ void TaskModule::notifyTaskDone(OpcUa_Int32 taskId, OpcUa_Int32 taskNumber, OpcU
             Task* tmp = it->second;
             m_taskObjects.erase(it);
             return;
-            delete tmp; // whoops, we have a memory leak here, as the task objects still receives skillStateUpdates
+            delete tmp;
         }
     }
 

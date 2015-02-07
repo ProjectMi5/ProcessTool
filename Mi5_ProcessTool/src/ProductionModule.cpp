@@ -316,7 +316,11 @@ int ProductionModule::checkSkillState(int& skillId)
             returnValues = m_pOpcuaGateway->read(nodesToRead);
 
             readCounter = 0;
-            UaVariant(returnValues[0].Value).toBool(output.skillOutput[i].ready);
+
+            if (returnValues.length() == 1)
+            {
+                UaVariant(returnValues[0].Value).toBool(output.skillOutput[i].ready);
+            }
 
             //
             if (output.skillOutput[i].ready)

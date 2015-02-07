@@ -1,6 +1,10 @@
 #ifndef IMODULE_H
 #define IMODULE_H
 
+//! Interface for the modules.
+/*!
+    This abstract class provides an unified interface for all the modules.
+*/
 class IModule
 {
 

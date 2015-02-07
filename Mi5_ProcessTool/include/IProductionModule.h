@@ -4,6 +4,11 @@
 #include <Mi5_ProcessTool/include/IModule.h>
 
 class ISkillRegistration;
+
+//! Interface for the production modules.
+/*!
+    This abstract class provides an unified interface for all the production modules. More precisely this routes the OPC UA subscription information to the respective modules.
+*/
 class IProductionModule : public IModule
 {
 

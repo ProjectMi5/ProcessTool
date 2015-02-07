@@ -10,6 +10,16 @@ ProcessHandler::ProcessHandler()
     m_cremeModule = NULL;
     m_taskModule = NULL;
 
+    m_xts_enabled = true;
+    m_cookie_enabled = true;
+    m_topping_beckhoff_enabled = true;
+    m_topping_bosch_enabled = true;
+    m_cocktail_enabled = true;
+    m_virtualModules_enabled = true;
+    m_init = true;
+    m_simuEnabled = true;
+    m_enableInOutput = true;
+
     m_moduleSkillList.clear();
     m_gatewayList.clear();
     m_gatewayList.clear();
@@ -62,15 +72,6 @@ void ProcessHandler::start()
 
 UaStatus ProcessHandler::build()
 {
-    m_xts_enabled = true;
-    m_cookie_enabled = true;
-    m_topping_beckhoff_enabled = true;
-    m_topping_bosch_enabled = true;
-    m_cocktail_enabled = true;
-    m_virtualModules_enabled = true;
-    m_init = true;
-    m_simuEnabled = true;
-    m_enableInOutput = true;
 
     UaStatus status;
 

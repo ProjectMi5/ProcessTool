@@ -17,53 +17,18 @@ class OpcuaGateway; // Using forward declaration.
 class MaintenanceHelper;
 class InitManager;
 
+//! ProductionModule provides the main functionalities for the production modules.
+/*!
+    Detailed descriptions goes here.
+*/
 class ProductionModule  : public QObject, public IProductionModule
 {
     Q_OBJECT
+
 protected:
     ModuleInput input;
     ModuleOutput output;
     int m_moduleNumber;
-
-public:
-    ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
-                     MaintenanceHelper* pMaintenanceHelper, InitManager* pInitManager);
-    virtual ~ProductionModule();
-    void subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
-                                const UaDataNotifications& dataNotifications,
-                                const UaDiagnosticInfos&   diagnosticInfos);
-    void moduleDataChange(const UaDataNotifications& dataNotifications);
-
-    void startup();
-    //
-    std::map<int, int> getSkills();
-    int checkSkillState(int& SkillId);
-    void writeModuleInput();
-    void assignSkill(int& taskId, Skill skill, int& skillPos);
-    void executeSkill(int& skillPos, ParameterInputArray& paramInput);
-    void removeExecute(int& skillPos);
-    UaString getSkillName(int& skillPos);
-    UaString getModuleName();
-    double getModulePosition();
-    int registerTaskForSkill(ISkillRegistration* pTask, int skillPos);
-    void deregisterTaskForSkill(int& skillPos);
-    bool checkSkillReadyState(int& skillId);
-    void writeConnectionTestInput(bool input);
-    int checkConnectionTestOutput();
-    int translateSkillIdToSkillPos(int skillId);
-    virtual bool isBlocked();
-    virtual bool isReserved();
-    int translateSkillPosToSkillId(int skillPos);
-    virtual void changeModuleMode(int mode);
-    UaString getBaseNodeId();
-    int getErrorId();
-
-public slots:
-    void moduleConnectionStatusChanged(int state);
-    void serverReconnected();
-    void skillStateChanged(int skillPos, int state);
-
-protected:
     OpcuaGateway* m_pOpcuaGateway;
     MessageFeeder* m_pMsgFeed;
     bool m_disconnected;
@@ -71,6 +36,51 @@ protected:
     MaintenanceHelper* m_pMaintenanceHelper;
     InitManager* m_pInitManager;
     bool m_enableConnectionTest;
+
+public:
+    // Ctor/Dtor
+    ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
+                     MaintenanceHelper* pMaintenanceHelper, InitManager* pInitManager);
+    virtual ~ProductionModule();
+
+    // Implementation of the IModule interface.
+    void subscriptionDataChange(OpcUa_UInt32               clientSubscriptionHandle,
+                                const UaDataNotifications& dataNotifications,
+                                const UaDiagnosticInfos&   diagnosticInfos);
+    void moduleDataChange(const UaDataNotifications& dataNotifications);
+    void startup();
+
+    // Implementation of the IProductionModule interface.
+    std::map<int, int> getSkills();
+    int checkSkillState(int& SkillId);
+    bool checkSkillReadyState(int& skillId);
+    int translateSkillIdToSkillPos(int skillId);
+    int translateSkillPosToSkillId(int skillPos);
+    void assignSkill(int& taskId, Skill skill, int& skillPos);
+    void executeSkill(int& skillPos, ParameterInputArray& paramInput);
+    void deregisterTaskForSkill(int& skillPos);
+    UaString getSkillName(int& skillPos);
+    UaString getModuleName();
+    double getModulePosition();
+    int registerTaskForSkill(ISkillRegistration* pTask, int skillPos);
+    void writeConnectionTestInput(bool input);
+    int checkConnectionTestOutput();
+    //
+    virtual bool isBlocked();
+    virtual bool isReserved();
+    virtual void changeModuleMode(int mode);
+    UaString getBaseNodeId();
+    //
+
+    // Other methods.
+    void writeModuleInput();
+    void removeExecute(int& skillPos);
+    int getErrorId();
+
+public slots:
+    void moduleConnectionStatusChanged(int state);
+    void serverReconnected();
+    void skillStateChanged(int skillPos, int state);
 
 private:
     UaString nodeIdToSubscribe;
@@ -96,9 +106,9 @@ private: //const
     static const int SKILLCOUNT = 16;
 
 private: // module interface
-    std::map<int, int> m_moduleSkillList; /* skillid, skillpos */
-    std::map<int, ISkillRegistration*> m_skillRegistrationList; /*skillPos, pTask*/
-    std::map<int, SkillStatePoller*> m_skillStatePollerList; /* skillPos, pSkillStaterPoller */
+    std::map<int, int> m_moduleSkillList; /*!< skillid, skillpos */
+    std::map<int, ISkillRegistration*> m_skillRegistrationList; /*!< skillPos, pTask*/
+    std::map<int, SkillStatePoller*> m_skillStatePollerList; /*!< skillPos, pSkillStaterPoller */
 
 signals:
     void errorOccured();
