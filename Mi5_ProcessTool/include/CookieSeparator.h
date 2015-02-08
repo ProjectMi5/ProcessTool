@@ -4,6 +4,10 @@
 
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 
+//! CookieSeparator production module.
+/*!
+    Digital representation of the CookieSeparator production module.
+*/
 class CookieSeparator : public ProductionModule
 {
     Q_OBJECT

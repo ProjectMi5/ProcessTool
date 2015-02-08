@@ -5,6 +5,10 @@
 
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 
+//! XTS production module.
+/*!
+    Digital representation of the XTS production module.
+*/
 class Xts : public ProductionModule
 {
 

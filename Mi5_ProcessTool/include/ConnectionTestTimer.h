@@ -4,6 +4,10 @@
 #include <QThread>
 
 class IProductionModule;
+//! The ConnectionTestTimer class provides a way to check a module's liveliness.
+/*!
+    A periodic write/read check will be executed inside this class.
+*/
 class ConnectionTestTimer : public QObject
 {
     Q_OBJECT

@@ -11,6 +11,11 @@
 
 class OpcuaGateway; // Using forward declaration.
 
+//! The TaskModule watches the task list for new tasks.
+/*!
+    If a new order is made via the HMI, the TaskModule constructs a new Task object.
+    After the task is finished, the constructed Task object will get deleted.
+*/
 class TaskModule : public QObject, public IModule
 {
     Q_OBJECT

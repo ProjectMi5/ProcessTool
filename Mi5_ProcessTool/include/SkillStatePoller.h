@@ -9,6 +9,12 @@
 
 class OpcuaGateway;
 class IProductionModule;
+
+//! The skill state poller provides a periodic check of a module's skill state upon construction.
+/*!
+    After a skill is being executed, an object of this class will be constructed to periodically check the
+    skill's state. This has been implemented, because with the use of subscriptions, some state changes were missed.
+*/
 class SkillStatePoller : public QObject
 {
     Q_OBJECT

@@ -1,8 +1,6 @@
 #ifndef MAINTENANCEHELPER_H
 #define MAINTENANCEHELPER_H
 #include <iostream>
-
-
 #include <QThread>
 #include <QWaitCondition>
 #include <QMutex>
@@ -15,6 +13,11 @@
 #include <Mi5_ProcessTool/include/IModule.h>
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 
+//! The MaintenanceHelper class provides functionalities for maintenance tasks.
+/*!
+    This class will be constructed upon the production module's call for maintenance task.
+    A message will be displayed on the HMI and, the completion will be signaled to the respective production module.
+*/
 class MaintenanceHelper : public QObject, IModule, ISkillRegistration
 {
     Q_OBJECT

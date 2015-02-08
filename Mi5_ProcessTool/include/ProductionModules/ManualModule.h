@@ -12,6 +12,12 @@
 
 class OpcuaGateway;
 
+//! Manual module for in- and output.
+/*!
+    The Manual module class is similar to the ProductionModule base class.
+    The only difference is a slightly different module interface.
+    TODO: Unify!
+*/
 class ManualModule : public QObject, public IProductionModule
 {
     Q_OBJECT

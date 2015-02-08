@@ -4,6 +4,10 @@
 
 #include <Mi5_ProcessTool/include/ProductionModule.h>
 
+//! Cocktail production module.
+/*!
+    Digital representation of the cocktail production module.
+*/
 class CocktailModule : public ProductionModule
 {
 

@@ -5,6 +5,12 @@
 #include "uabase.h"
 class OpcuaGateway;
 
+//! MessageFeeder provides an interface to display messages to the HMI.
+/*!
+    The MessageFeeder class provides the public method write().
+    Data is written the the central OPC UA server for the HMI to fetch the messages.
+    The messages are shown on the HMI's message feed.
+*/
 class MessageFeeder
 {
 public:

@@ -10,6 +10,12 @@
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 
 class OpcuaGateway;
+//! The InitManager class provides a way to synchronize the initialization tasks.
+/*!
+    A newly constructed module will register itself with the InitManager to demand an initialization.
+    So far, the only initialization method available is the position calibration. This class provides a way
+    to calibrate registered modules sequentially.
+*/
 class InitManager : public QObject
 {
     Q_OBJECT

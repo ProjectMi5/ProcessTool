@@ -9,6 +9,10 @@
 #include <Mi5_ProcessTool/include/IProductionModule.h>
 
 class OpcuaGateway;
+//! The SimulationFeeder class provides an interface to exchange data with the Simulation/Visualization.
+/*!
+    This class periodically writes state information to an OPC UA server, where Industrial Physics grabs this data.
+*/
 class SimulationFeeder : public QObject
 {
     Q_OBJECT

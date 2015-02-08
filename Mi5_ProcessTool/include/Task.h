@@ -13,6 +13,10 @@
 #include <QWaitCondition>
 
 class TaskModule;
+//! The Task class is the representation of an ordered Task, waiting to be or being produced.
+/*!
+    As a new order at the HMI is made, the TaskModule class will construct a new Task object with all the relevant information (e.g. Skills etc.).
+*/
 class Task : public QObject, public ISkillRegistration
 {
     Q_OBJECT

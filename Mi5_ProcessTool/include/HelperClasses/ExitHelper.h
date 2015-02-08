@@ -7,6 +7,10 @@
 #include <QThread>
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 
+//! tbd
+/*!
+    ..
+*/
 class ExitHelper : public QObject
 {
     Q_OBJECT

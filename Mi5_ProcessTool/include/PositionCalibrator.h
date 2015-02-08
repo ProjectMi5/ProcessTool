@@ -16,6 +16,10 @@
 
 class OpcuaGateway; // Using forward declaration.
 
+//! The PositionCalibrator class provides an interface to the XTS for position calibration.
+/*!
+   ..
+*/
 class PositionCalibrator : public QObject, IModule, ISkillRegistration
 {
     Q_OBJECT
