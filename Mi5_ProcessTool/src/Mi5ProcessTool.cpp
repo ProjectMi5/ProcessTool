@@ -5,6 +5,13 @@
 #include <QApplication>
 
 static const int EXIT_CODE = 1337;
+static const bool DEBUGTOCONSOLE = 1;
+static const bool DEBUGTOVISUALSTUDIOOUTPUT = 0;
+
+void logFunction(const QString& message, QsLogging::Level level)
+{
+    qDebug() << message;
+}
 
 int main(int argc, char* argv[])
 {
@@ -12,9 +19,20 @@ int main(int argc, char* argv[])
 
     QsLogging::Logger* pLogger = &QsLogging::Logger::instance();
     pLogger->setLoggingLevel(QsLogging::TraceLevel);
-    QsLogging::DestinationPtr debugDestination(
-        QsLogging::DestinationFactory::MakeDebugOutputDestination());
-    pLogger->addDestination(debugDestination);
+
+    if (DEBUGTOVISUALSTUDIOOUTPUT)
+    {
+        QsLogging::DestinationPtr debugDestination(
+            QsLogging::DestinationFactory::MakeDebugOutputDestination());
+        pLogger->addDestination(debugDestination);
+    }
+
+    if (DEBUGTOCONSOLE)
+    {
+        QsLogging::DestinationPtr functorDestination(QsLogging::DestinationFactory::MakeFunctorDestination(
+                    &logFunction));
+        pLogger->addDestination(functorDestination);
+    }
 
     do
     {
