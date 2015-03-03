@@ -2,7 +2,7 @@
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 #include <QApplication>
 
-static const UaString MAINSERVER("opc.tcp://192.168.192.116:4840"); //116 Production //132 dummy
+static const UaString MAINSERVER("opc.tcp://192.168.42.42:4840"); //116 Production //132 dummy
 
 ProcessHandler::ProcessHandler()
 {
@@ -13,8 +13,8 @@ ProcessHandler::ProcessHandler()
     m_xts_enabled = true;
     m_cookie_enabled = true;
     m_topping_beckhoff_enabled = true;
-    m_topping_bosch_enabled = true;
-    m_cocktail_enabled = true;
+    m_topping_bosch_enabled = false;
+    m_cocktail_enabled = false;
     m_virtualModules_enabled = true;
     m_init = true;
     m_simuEnabled = true;
@@ -83,32 +83,32 @@ UaStatus ProcessHandler::build()
     if (m_simuEnabled)
     {
         m_gatewayList[MODULENUMBERSIMULATIONFEEDER] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.192.117:4840"));
+            UaString("opc.tcp://192.168.42.51:4840"));
     }
 
     if (m_cookie_enabled)
     {
         m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.192.136:4840"));
+            UaString("opc.tcp://192.168.42.11:4840"));
     }
 
     if (m_enableInOutput)
     {
-        m_gatewayList[INPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
-        m_gatewayList[OUTPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
+        m_gatewayList[INPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
+        m_gatewayList[OUTPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
 
     }
 
     if (m_xts_enabled)
     {
-        m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
-        m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
-        m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.192.137:4840"));
+        m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
+        m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
+        m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
     }
 
     if (m_virtualModules_enabled)
     {
-        m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
+        m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
         /*  m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
           m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));*/
     }
@@ -124,18 +124,18 @@ UaStatus ProcessHandler::build()
     if (m_topping_beckhoff_enabled)
     {
         m_gatewayList[MODULENUMBERCREMEBECKHOFF] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.192.138:4840"));
+            UaString("opc.tcp://192.168.42.12:4840"));
     }
 
     if (m_topping_bosch_enabled)
     {
         m_gatewayList[MODULENUMBERCREMEBOSCH] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.192.139:4840"));
+            UaString("opc.tcp://192.168.42.13:4840"));
     }
 
     if (m_cocktail_enabled)
     {
-        m_gatewayList[MODULENUMBERCOCKTAIL] = new OpcuaGateway(UaString("opc.tcp://192.168.192.121:4840"));
+        m_gatewayList[MODULENUMBERCOCKTAIL] = new OpcuaGateway(UaString("opc.tcp://192.168.42.14:4840"));
     }
 
     for (std::map<int, OpcuaGateway*>::iterator it = m_gatewayList.begin(); it != m_gatewayList.end();

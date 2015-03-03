@@ -10,3 +10,4 @@ moc_*
 *.sdf
 *.suo
 */Doxygen/html/*
+*/GeneratedFile*/*

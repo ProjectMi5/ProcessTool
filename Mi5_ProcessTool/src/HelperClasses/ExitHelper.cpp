@@ -5,7 +5,7 @@ ExitHelper::ExitHelper()
     m_exitTimer = new QTimer(this);
     connect(m_exitTimer, SIGNAL(timeout()), this, SLOT(timerTriggered()));
     m_exitTimer->start(5000);
-    m_pGateway = new OpcuaGateway(UaString("opc.tcp://192.168.192.117:4840"));
+    m_pGateway = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
     m_pGateway->connect();
 
     moveToThread(&m_thread);

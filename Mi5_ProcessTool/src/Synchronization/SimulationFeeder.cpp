@@ -7,6 +7,11 @@ SimulationFeeder::SimulationFeeder(OpcuaGateway* pOpcuaGateway, int moduleNumber
                                    MessageFeeder* pMsgFeeder) : m_pGateway(pOpcuaGateway), m_moduleList(moduleList),
     m_pMsgFeeder(pMsgFeeder)
 {
+    for (int i = 0; i < 11; i++)
+    {
+        data.XPosition[i] = 0;
+    }
+
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(cyclicAction()));
     m_timer->start(1000);
