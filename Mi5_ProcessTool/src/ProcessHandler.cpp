@@ -14,7 +14,7 @@ ProcessHandler::ProcessHandler(bool initialInit)
     m_cookie_enabled = true;
     m_topping_beckhoff_enabled = true;
     m_topping_bosch_enabled = false;
-    m_cocktail_enabled = false;
+    m_cocktail_enabled = true;
     m_virtualModules_enabled = true;
     m_init = initialInit;
     m_simuEnabled = true;
@@ -162,7 +162,7 @@ UaStatus ProcessHandler::build()
     // 2. Stelle ÄNDERN
 
     m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
-    m_initManager = new InitManager();
+    m_initManager = new InitManager(m_init);
 
     if (m_cookie_enabled)
     {
@@ -271,11 +271,9 @@ void ProcessHandler::run()
 
     buildSkillList();
 
-    if (m_init)
-    {
-        int calibrationStatus = m_initManager->startUpSystem();
 
-    }
+    int calibrationStatus = m_initManager->startUpSystem();
+
 
 
 

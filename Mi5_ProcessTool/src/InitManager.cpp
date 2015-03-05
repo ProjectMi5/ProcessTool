@@ -2,7 +2,8 @@
 
 
 
-InitManager::InitManager() : m_positionCalibrator(NULL), m_initialInitDone(false)
+InitManager::InitManager(bool initialInit) : m_positionCalibrator(NULL), m_initialInitDone(false),
+    m_initialInit(initialInit)
 {
     m_timer = new QTimer(this);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(evalInitDemands()));
@@ -39,15 +40,22 @@ int InitManager::startUpSystem()
 {
     int returnVal = -1;
 
-    if (m_positionCalibrator != NULL)
+    if (m_initialInit)
     {
-        evalInitDemands();
-        returnVal = 1;
-        //m_timer->start(15000);
+        if (m_positionCalibrator != NULL)
+        {
+            evalInitDemands();
+            returnVal = 1;
+            //m_timer->start(15000);
+        }
+        else
+        {
+            QLOG_ERROR() << "Setup connections first.";
+        }
     }
     else
     {
-        QLOG_ERROR() << "Setup connections first.";
+        m_initQueue.clear();
     }
 
     return returnVal;

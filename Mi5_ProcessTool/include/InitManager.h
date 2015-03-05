@@ -20,7 +20,7 @@ class InitManager : public QObject
 {
     Q_OBJECT
 public:
-    InitManager();
+    InitManager(bool initialInit);
     ~InitManager();
 
 public:
@@ -43,6 +43,7 @@ private:
 private: //Qt
     QTimer* m_timer;
     QThread m_thread;
+    bool m_initialInit;
 
 private slots:
     void evalInitDemands();
