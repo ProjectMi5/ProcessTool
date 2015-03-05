@@ -133,6 +133,7 @@ void ProductionModule::moduleConnectionStatusChanged(int state)
         case true:
             message += " reconnected.";
             startup();
+            m_disconnected = false;
             break;
 
         case false:
@@ -142,7 +143,8 @@ void ProductionModule::moduleConnectionStatusChanged(int state)
 
         // todo: create subscriptions, if reconnect.
     }
-    else if (state == ModuleConnectionDisconnected)
+    // Modul disconnected
+    else if (state == ModuleConnectionDisconnected && !m_disconnected)
     {
         m_disconnected = true;
         message += " disconnected.";
