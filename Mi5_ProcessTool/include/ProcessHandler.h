@@ -26,7 +26,7 @@
 class ProcessHandler
 {
 public:
-    ProcessHandler();
+    ProcessHandler(bool initialInit);
     ~ProcessHandler();
     void start();
 

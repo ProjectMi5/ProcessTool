@@ -4,7 +4,7 @@
 
 static const UaString MAINSERVER("opc.tcp://192.168.42.42:4840"); //116 Production //132 dummy
 
-ProcessHandler::ProcessHandler()
+ProcessHandler::ProcessHandler(bool initialInit)
 {
     m_xts = NULL;
     m_cremeModule = NULL;
@@ -16,7 +16,7 @@ ProcessHandler::ProcessHandler()
     m_topping_bosch_enabled = false;
     m_cocktail_enabled = false;
     m_virtualModules_enabled = true;
-    m_init = true;
+    m_init = initialInit;
     m_simuEnabled = true;
     m_enableInOutput = true;
 

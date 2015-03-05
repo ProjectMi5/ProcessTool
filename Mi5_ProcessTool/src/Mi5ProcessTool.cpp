@@ -13,8 +13,21 @@ void logFunction(const QString& message, QsLogging::Level level)
     qDebug() << message;
 }
 
+void usage(char** argv)
+{
+    std::cout << "Usage for " << argv[0] << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
+    bool initialInit = false;
+
+    if (argc == 2)
+    {
+        initialInit = true;
+        std::cout << "InitialInit set to true" << std::endl;
+    }
+
     int currentExitCode = 0;
 
     QsLogging::Logger* pLogger = &QsLogging::Logger::instance();
@@ -37,7 +50,7 @@ int main(int argc, char* argv[])
     do
     {
         QApplication a(argc, argv);
-        ProcessHandler* processHandler = new ProcessHandler();
+        ProcessHandler* processHandler = new ProcessHandler(initialInit);
         ExitHelper* exitHelper = new ExitHelper();
         currentExitCode = a.exec();
     }
