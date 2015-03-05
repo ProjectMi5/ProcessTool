@@ -435,14 +435,20 @@ UaStatus TaskModule::writeTaskInformation(OpcUa_Int32 taskNumber, int skillNumbe
 
 int TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
 {
+    //Slim down vars to read.
+    int tmpSkillCount = SKILLCOUNT;
+    int tmpParameterCount = PARAMETERCOUNT;
+
     int status = -1;
     UaDataValues returnValues;
     OpcUa_NodeId tmpNodeId;
     UaReadValueIds nodesToRead;
     int readCounter = 0;
 
-    nodesToRead.create(5 + (SKILLCOUNT) * (7 + 10 *
-                                           (PARAMETERCOUNT))); // Fill in number, should be 4799
+    /*nodesToRead.create(5 + (tmpSkillCount) * (7 + 10 *
+                       (tmpParameterCount))); // Fill in number, should be 4799*/
+    nodesToRead.create(5 + tmpSkillCount * (7 + 2 * tmpParameterCount));
+
     UaString baseNodeId = "ns=4;s=MI5.ProductionList[";
     baseNodeId += UaString::number(taskNumber);
     baseNodeId += "].";
@@ -477,7 +483,7 @@ int TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
     nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
     readCounter++;
 
-    for (int i = 0; i < SKILLCOUNT; i++)
+    for (int i = 0; i < tmpSkillCount; i++)
     {
         UaString baseSkillNodeId = baseNodeId;
         baseSkillNodeId += "Skill[";
@@ -526,60 +532,60 @@ int TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
         nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
         readCounter++;
 
-        for (int j = 0; j < PARAMETERCOUNT; j++)
+        for (int j = 0; j < tmpParameterCount; j++)
         {
             UaString baseParamNodeId = baseSkillNodeId;
             baseParamNodeId += "Parameter[";
             baseParamNodeId += UaString::number(j);
             baseParamNodeId += "].";
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "Dummy";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "Dummy";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "ID";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "ID";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "Name";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "Name";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "Unit";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "Unit";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "Required";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "Required";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "Default";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "Default";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "MinValue";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "MinValue";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
-            nodeIdToRead = baseParamNodeId;
-            nodeIdToRead += "MaxValue";
-            UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
-            nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
-            readCounter++;
+            //nodeIdToRead = baseParamNodeId;
+            //nodeIdToRead += "MaxValue";
+            //UaNodeId::fromXmlString(nodeIdToRead).copyTo(&nodesToRead[readCounter].NodeId);
+            //nodesToRead[readCounter].AttributeId = OpcUa_Attributes_Value;
+            //readCounter++;
 
             nodeIdToRead = baseParamNodeId;
             nodeIdToRead += "Value";
@@ -617,7 +623,7 @@ int TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
     UaVariant(returnValues[readCounter].Value).toInt32(m_tasklist[taskNumber].taskState);
     readCounter++;
 
-    for (int i = 0; i < SKILLCOUNT; i++)
+    for (int i = 0; i < tmpSkillCount; i++)
     {
         m_tasklist[taskNumber].skill[i].assignedModuleName = UaVariant(
                     returnValues[readCounter].Value).toString();
@@ -641,32 +647,32 @@ int TaskModule::getTaskInformation(OpcUa_Int32 taskNumber)
             m_tasklist[taskNumber].skill[i].state);
         readCounter++;
 
-        for (int j = 0; j < PARAMETERCOUNT; j++)
+        for (int j = 0; j < tmpParameterCount; j++)
         {
-            UaVariant(returnValues[readCounter].Value).toBool(
-                m_tasklist[taskNumber].skill[i].parameter[j].dummy);
-            readCounter++;
-            UaVariant(returnValues[readCounter].Value).toUInt32(
-                m_tasklist[taskNumber].skill[i].parameter[j].id);
-            readCounter++;
-            m_tasklist[taskNumber].skill[i].parameter[j].name = UaVariant(
-                        returnValues[readCounter].Value).toString();
-            readCounter++;
-            m_tasklist[taskNumber].skill[i].parameter[j].unit = UaVariant(
-                        returnValues[readCounter].Value).toString();
-            readCounter++;
-            UaVariant(returnValues[readCounter].Value).toBool(
-                m_tasklist[taskNumber].skill[i].parameter[j].required);
-            readCounter++;
-            UaVariant(returnValues[readCounter].Value).toDouble(
-                m_tasklist[taskNumber].skill[i].parameter[j].defaultParameter);
-            readCounter++;
-            UaVariant(returnValues[readCounter].Value).toDouble(
-                m_tasklist[taskNumber].skill[i].parameter[j].minvalue);
-            readCounter++;
-            UaVariant(returnValues[readCounter].Value).toDouble(
-                m_tasklist[taskNumber].skill[i].parameter[j].maxValue);
-            readCounter++;
+            //UaVariant(returnValues[readCounter].Value).toBool(
+            //    m_tasklist[taskNumber].skill[i].parameter[j].dummy);
+            //readCounter++;
+            //UaVariant(returnValues[readCounter].Value).toUInt32(
+            //    m_tasklist[taskNumber].skill[i].parameter[j].id);
+            //readCounter++;
+            //m_tasklist[taskNumber].skill[i].parameter[j].name = UaVariant(
+            //            returnValues[readCounter].Value).toString();
+            //readCounter++;
+            //m_tasklist[taskNumber].skill[i].parameter[j].unit = UaVariant(
+            //            returnValues[readCounter].Value).toString();
+            //readCounter++;
+            //UaVariant(returnValues[readCounter].Value).toBool(
+            //    m_tasklist[taskNumber].skill[i].parameter[j].required);
+            //readCounter++;
+            //UaVariant(returnValues[readCounter].Value).toDouble(
+            //    m_tasklist[taskNumber].skill[i].parameter[j].defaultParameter);
+            //readCounter++;
+            //UaVariant(returnValues[readCounter].Value).toDouble(
+            //    m_tasklist[taskNumber].skill[i].parameter[j].minvalue);
+            //readCounter++;
+            //UaVariant(returnValues[readCounter].Value).toDouble(
+            //    m_tasklist[taskNumber].skill[i].parameter[j].maxValue);
+            //readCounter++;
             UaVariant(returnValues[readCounter].Value).toDouble(
                 m_tasklist[taskNumber].skill[i].parameter[j].value);
             readCounter++;
