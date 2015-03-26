@@ -13,9 +13,12 @@ TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
 
     m_abortionTimer = new QTimer(this);
     m_abortionTimer->setSingleShot(true);
+    // TODO: Set interval here and not in the start()-call.
     connect(m_abortionTimer, SIGNAL(timeout()), this, SLOT(abortionTimerTriggered()));
 
+    // TODO: If this works, set the timer to singleShot, and delete the stop()-call.
     m_taskUpdateCounter = new QTimer(this);
+    m_taskUpdateCounter->setInterval(2000);
     connect(m_taskUpdateCounter, SIGNAL(timeout()), this, SLOT(checkTaskStates()));
 
     m_pOpcuaGateway = pOpcuaGateway;
@@ -54,7 +57,7 @@ void TaskModule::startup()
     }
 
     setupOpcua();
-    m_taskUpdateCounter->start(2000);
+    m_taskUpdateCounter->start();
 }
 
 void TaskModule::setupOpcua()
@@ -740,6 +743,9 @@ void TaskModule::updateSkillState(int taskNumber, int skillNumber, OpcUa_Int32 s
 
 void TaskModule::checkTaskStates()
 {
+    // Stop the timer
+    m_taskUpdateCounter->stop();
+
     UaDataValues returnValues;
     OpcUa_NodeId tmpNodeId;
     UaReadValueIds nodesToRead;
@@ -810,6 +816,9 @@ void TaskModule::evalTaskList()
             if (std::find(m_activeTasks.begin(), m_activeTasks.end(), taskNumber) == m_activeTasks.end())
             {
                 m_activeTasks.push_back(taskNumber);
+                // tmp debug
+                QLOG_DEBUG() << "Added task #" << taskNumber << " to activeTasks";
+                //
                 m_tasklist[taskNumber].dummy = true;
                 m_tasklist[taskNumber].taskNumberInStructure = taskNumber;
 
@@ -822,6 +831,9 @@ void TaskModule::evalTaskList()
                     return;
                 }
 
+                // tmp debug
+                QLOG_DEBUG() << "Apparently, received task information for task #" << taskNumber;
+                //
                 QLOG_DEBUG() << "Received new task (#" << taskNumber << ", ID #" << m_tasklist[taskNumber].taskId <<
                              "): " <<
                              m_tasklist[taskNumber].name.toUtf8();
@@ -837,4 +849,7 @@ void TaskModule::evalTaskList()
             }
         }
     }
+
+    // Restart the timer.
+    m_taskUpdateCounter->start();
 }
