@@ -4,7 +4,7 @@
 
 MaintenanceHelper::MaintenanceHelper(MessageFeeder* pFeeder) : m_pMsgFeeder(pFeeder),
     m_moduleToMaintain(-1),
-    m_maintenanceInProcess(false)
+    m_maintenanceInProcess(false), m_oldMaintenanceState(-1)
 {
     moveToThread(&m_thread);
     m_thread.start();
@@ -77,12 +77,10 @@ int MaintenanceHelper::getTaskId()
 
 void MaintenanceHelper::skillStateChanged(int moduleNumber, int skillPos, int state)
 {
-
-    //if (m_calibrationInProgress &&
-    //    (skillPos == m_pModuleList[moduleNumber]->translateSkillIdToSkillPos(POSCALSKILLID)) &&
-    //    (moduleNumber == m_usedXtsModuleNumber))
-    if (m_maintenanceInProcess && moduleNumber == MAINTENANCEMODULE)
+    if ((m_maintenanceInProcess) && (moduleNumber == MAINTENANCEMODULE) &&
+        (m_oldMaintenanceState != state))
     {
+        m_oldMaintenanceState = state;
         QLOG_DEBUG() << "Statechange: " << state ;
 
         switch (state)
@@ -115,6 +113,7 @@ void MaintenanceHelper::resetData()
     m_waitCondition.wakeAll();
     m_moduleToMaintain = -1;
     m_maintenanceInProcess = false;
+    m_oldMaintenanceState = -1;
 }
 
 void MaintenanceHelper::maintenanceExecution(int moduleNumber, int errorId)

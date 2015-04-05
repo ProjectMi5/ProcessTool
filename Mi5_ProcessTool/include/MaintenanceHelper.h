@@ -55,6 +55,7 @@ private:
 private:
     int m_moduleToMaintain;
     bool m_maintenanceInProcess;
+    int m_oldMaintenanceState;
 
 };
 
