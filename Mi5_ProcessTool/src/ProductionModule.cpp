@@ -454,6 +454,12 @@ void ProductionModule::createPoller(int skillPos)
     m_skillStatePollerList[skillPos] = new SkillStatePoller(this, skillPos, m_pOpcuaGateway);
 }
 
+QMutex* ProductionModule::getMutex()
+{
+    return &m_mutex;
+}
+
+
 /*
 * Following: OPC UA methods.
 */

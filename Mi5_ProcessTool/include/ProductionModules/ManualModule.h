@@ -53,6 +53,10 @@ public: //IProductionModule Methods
     virtual bool isReserved();
     virtual void changeModuleMode(int mode);
     UaString getBaseNodeId();
+    QMutex* getMutex();
+
+private:
+    QMutex m_mutex;
 
 private:
     void createMonitoredItems();

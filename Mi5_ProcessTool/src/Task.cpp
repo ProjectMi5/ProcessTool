@@ -120,12 +120,18 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                 for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
                      it != matchedSkillsVector.end(); it++)
                 {
+                    QMutex* moduleMutex = m_moduleList[it->moduleNumber]->getMutex();
+                    moduleMutex->lock();
+
                     if (it->moduleNumber == m_transportModuleNumber)
                     {
                         chosenModule = *it;
                         chosenModule.blocked = true;
+                        moduleMutex->unlock();
                         break;
                     }
+
+                    moduleMutex->unlock();
                 }
             }
             else
@@ -135,6 +141,9 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                     for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
                          it != matchedSkillsVector.end(); it++)
                     {
+                        QMutex* moduleMutex = m_moduleList[it->moduleNumber]->getMutex();
+                        moduleMutex->lock();
+
                         if (m_moduleList[it->moduleNumber]->checkSkillReadyState(it->skillId) ==
                             true) // take the first transport module to become ready.
                         {
@@ -143,8 +152,11 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                             m_transportModuleNumber = it->moduleNumber;
                             chosenModule = *it;
                             chosenModule.blocked = true;
+                            moduleMutex->unlock();
                             break;
                         }
+
+                        moduleMutex->unlock();
                     }
                 }
             }
@@ -164,14 +176,20 @@ matchedSkill Task::assignSingleSkillToModule(taskSkillQueue& nextItem)
                 for (std::vector<matchedSkill>::iterator it = matchedSkillsVector.begin();
                      it != matchedSkillsVector.end(); it++)
                 {
+                    QMutex* moduleMutex = m_moduleList[it->moduleNumber]->getMutex();
+                    moduleMutex->lock();
+
                     if (m_moduleList[it->moduleNumber]->checkSkillReadyState(it->skillId) ==
                         true) // take the first module to become ready.
                     {
                         // Lets use this!
                         chosenModule = *it;
                         searching = false;
+                        moduleMutex->unlock();
                         break;
                     }
+
+                    moduleMutex->unlock();
                 }
 
                 if ((searching == true) && (tmpStringSent == false))
@@ -243,9 +261,12 @@ void Task::skillStateChanged(int moduleNumber, int skillPos, int state)
         {
             int skillNumberInTask = it->first;
             m_matchedSkills[skillNumberInTask].moduleSkillState = state;
+            QMutex* moduleMutex = m_moduleList[moduleNumber]->getMutex();
+            moduleMutex->lock();
             m_matchedSkills[skillNumberInTask].moduleSkillReady =
                 m_moduleList[moduleNumber]->checkSkillReadyState(
                     it->second.skillId);
+            moduleMutex->unlock();
             evaluateSkillState(skillNumberInTask);
         }
     }

@@ -19,6 +19,12 @@ void ManualModule::serverReconnected()
 
 }
 
+QMutex* ManualModule::getMutex()
+{
+    return &m_mutex;
+}
+
+
 void ManualModule::startup()
 {
     setupOpcua();

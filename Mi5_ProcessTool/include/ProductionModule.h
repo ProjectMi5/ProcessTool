@@ -70,6 +70,8 @@ public:
     virtual bool isReserved();
     virtual void changeModuleMode(int mode);
     UaString getBaseNodeId();
+
+    QMutex* getMutex();
     //
 
     // Other methods.
@@ -87,6 +89,7 @@ private:
     UaNodeIdArray nodeToSubscribe;
     ConnectionTestTimer* m_connectionTestTimer;
     QThread m_thread;
+    QMutex m_mutex;
 
 private slots:
     void createPoller(int skillPos);

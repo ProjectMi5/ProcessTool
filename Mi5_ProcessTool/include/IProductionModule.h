@@ -2,6 +2,7 @@
 #define IPRODUCTIONMODULE_H
 
 #include <Mi5_ProcessTool/include/IModule.h>
+#include <QMutex>
 
 class ISkillRegistration;
 
@@ -33,6 +34,8 @@ public:
     virtual void changeModuleMode(int mode) = 0;
     virtual UaString getBaseNodeId() = 0;
     virtual void skillStateChanged(int skillPos, int state) = 0;
+
+    virtual QMutex* getMutex() = 0;
 };
 
 enum moduleSkillState
