@@ -240,7 +240,7 @@ void TaskModule::moduleDataChange(const UaDataNotifications& dataNotifications)
                     tempValue.toBool(abortTask);
                     taskNumber = j;
 
-                    if (abortTask == OpcUa_True)
+                    if (abortTask == (OpcUa_Boolean)true)
                     {
                         abortTheTask(taskNumber);
                     }
@@ -807,7 +807,7 @@ void TaskModule::evalTaskList()
 {
     for (int taskNumber = 0; taskNumber < TASKCOUNT; taskNumber++)
     {
-        if (m_tasklist[taskNumber].abortTask == true)
+        if (m_tasklist[taskNumber].abortTask == (OpcUa_Boolean)true)
         {
             abortTheTask(taskNumber);
         }
