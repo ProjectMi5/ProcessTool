@@ -71,6 +71,9 @@
     <Filter Include="Source Files\OpcUa">
       <UniqueIdentifier>{4e08a865-1780-4ae5-94b3-2dc7b3d9a2e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Data">
+      <UniqueIdentifier>{7a9fdbf4-88fb-4d2b-b126-7f2f4042f058}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Mi5ProcessTool.cpp">
@@ -244,6 +247,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ExitHelper.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="src\Data\SystemConfiguration.cpp">
+      <Filter>Source Files\Data</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ProductionModules\CremeModule.h">
@@ -308,6 +314,9 @@
     </ClInclude>
     <ClInclude Include="include\ProductionModules\SkillStatePollerManual.h">
       <Filter>Header Files\ProductionModules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SystemConfiguration.h">
+      <Filter>Header Files\Data</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

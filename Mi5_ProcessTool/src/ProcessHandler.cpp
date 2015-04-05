@@ -1,30 +1,38 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 #include <QApplication>
+#include <QFile>
+#include <QDir>
 
-static const UaString MAINSERVER("opc.tcp://192.168.42.42:4840"); //116 Production //132 dummy
+static const UaString MAINSERVER("opc.tcp://192.168.42.42:4840");
 
-ProcessHandler::ProcessHandler(bool initialInit)
+ProcessHandler::ProcessHandler()
 {
     m_xts = NULL;
     m_cremeModule = NULL;
     m_taskModule = NULL;
 
-    m_xts_enabled = true;
-    m_cookie_enabled = true;
-    m_topping_beckhoff_enabled = true;
+    m_xts_enabled = false;
+    m_cookie_enabled = false;
+    m_topping_beckhoff_enabled = false;
     m_topping_bosch_enabled = false;
-    m_cocktail_enabled = true;
-    m_virtualModules_enabled = true;
-    m_init = initialInit;
-    m_simuEnabled = true;
-    m_enableInOutput = true;
+    m_cocktail_enabled = false;
+    m_virtualModules_enabled = false;
+    m_simuEnabled = false;
+    m_enableInOutput = false;
 
     m_moduleSkillList.clear();
     m_gatewayList.clear();
     m_gatewayList.clear();
     m_productionModuleList.clear();
 
+    if (loadConfig() == -1)
+    {
+        QLOG_ERROR() << "Couldn't load config, halting..";
+        return;
+    }
+
+    printConfig();
     start();
 }
 
@@ -54,6 +62,105 @@ ProcessHandler::~ProcessHandler()
 
     // Cleanup the UA Stack platform layer
     UaPlatformLayer::cleanup();
+}
+
+int ProcessHandler::loadConfig()
+{
+    QString filename = QDir::currentPath() + "/Mi5Config.ini";
+    QFile configFile(filename);
+
+    if (!configFile.open(QIODevice::ReadOnly))
+    {
+        QLOG_ERROR() << "Couldn't open config file (checked " << filename <<
+                     "), check path.";
+        return -1;
+    }
+
+    QByteArray config = configFile.readAll();
+    QList<QByteArray> configList = config.split('\r\n\r\n');
+
+    for (QList<QByteArray>::Iterator configIterator = configList.begin();
+         configIterator != configList.end();
+         configIterator++)
+    {
+        QList<QByteArray> tmpList = configIterator->split(',');
+        QString tmpString = tmpList[0];
+        tmpString.remove('\n');
+
+        if (("init" == tmpString) && ("1" == tmpList[1]) && (2 == tmpList.size()))
+        {
+            m_systemConfig.init = true;
+        }
+        else
+        {
+            for (QList<ModuleConfiguration>::Iterator iterator = m_systemConfig.moduleList.begin();
+                 iterator != m_systemConfig.moduleList.end(); iterator++)
+            {
+                if ((iterator->name == tmpString) && ("1" == tmpList[1]) && (3 == tmpList.size()))
+                {
+                    iterator->enable = true;
+                    iterator->ip = tmpList[2];
+                }
+            }
+        }
+    }
+
+    //TODO
+    for (QList<ModuleConfiguration>::Iterator iterator = m_systemConfig.moduleList.begin();
+         iterator != m_systemConfig.moduleList.end(); iterator++)
+    {
+        if ((iterator->name == "xts") && (true == iterator->enable))
+        {
+            m_xts_enabled = true;
+        }
+        else if ((iterator->name == "cookie") && (true == iterator->enable))
+        {
+            m_cookie_enabled = true;
+        }
+        else if ((iterator->name == "toppingBeckhoff") && (true == iterator->enable))
+        {
+            m_topping_beckhoff_enabled = true;
+        }
+        else if ((iterator->name == "toppingBosch") && (true == iterator->enable))
+        {
+            m_topping_bosch_enabled = true;
+        }
+        else if ((iterator->name == "cocktail") && (true == iterator->enable))
+        {
+            m_cocktail_enabled = true;
+        }
+        else if ((iterator->name == "virtualModules") && (true == iterator->enable))
+        {
+            m_virtualModules_enabled = true;
+        }
+        else if ((iterator->name == "simu") && (true == iterator->enable))
+        {
+            m_simuEnabled = true;
+        }
+        else if ((iterator->name == "inputOutput") && (true == iterator->enable))
+        {
+            m_enableInOutput = true;
+        }
+    }
+
+    return 0;
+}
+
+void ProcessHandler::printConfig()
+{
+    QLOG_INFO() << "=================================";
+    QLOG_INFO() << "Position Calibration: " << m_systemConfig.init;
+    QLOG_INFO() << "==============";
+
+    for (QList<ModuleConfiguration>::Iterator iterator = m_systemConfig.moduleList.begin();
+         iterator != m_systemConfig.moduleList.end(); iterator++)
+    {
+        QLOG_INFO() << iterator->name;
+        QLOG_INFO() << "			Enabled: " << iterator->enable;
+        QLOG_INFO() << "			IP: " << iterator->ip;
+    }
+
+    QLOG_INFO() << "=================================";
 }
 
 void ProcessHandler::start()
@@ -162,7 +269,7 @@ UaStatus ProcessHandler::build()
     // 2. Stelle ÄNDERN
 
     m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
-    m_initManager = new InitManager(m_init);
+    m_initManager = new InitManager(m_systemConfig.init);
 
     if (m_cookie_enabled)
     {

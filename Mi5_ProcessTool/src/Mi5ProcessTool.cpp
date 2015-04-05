@@ -6,7 +6,7 @@
 
 static const int EXIT_CODE = 1337;
 static const bool DEBUGTOCONSOLE = 1;
-static const bool DEBUGTOVISUALSTUDIOOUTPUT = 0;
+static const bool DEBUGTOVISUALSTUDIOOUTPUT = 1;
 
 void logFunction(const QString& message, QsLogging::Level level)
 {
@@ -20,13 +20,6 @@ void usage(char** argv)
 
 int main(int argc, char* argv[])
 {
-    bool initialInit = false;
-
-    if (argc == 2)
-    {
-        initialInit = true;
-        std::cout << "InitialInit set to true" << std::endl;
-    }
 
     int currentExitCode = 0;
 
@@ -50,7 +43,7 @@ int main(int argc, char* argv[])
     do
     {
         QApplication a(argc, argv);
-        ProcessHandler* processHandler = new ProcessHandler(initialInit);
+        ProcessHandler* processHandler = new ProcessHandler();
         ExitHelper* exitHelper = new ExitHelper();
         currentExitCode = a.exec();
     }

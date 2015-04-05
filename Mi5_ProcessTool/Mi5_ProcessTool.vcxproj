@@ -163,6 +163,7 @@
     </ClCompile>
     <ClCompile Include="src\ConnectionTestTimer.cpp" />
     <ClCompile Include="src\CookieSeparator.cpp" />
+    <ClCompile Include="src\Data\SystemConfiguration.cpp" />
     <ClCompile Include="src\HelperClasses\ExitHelper.cpp" />
     <ClCompile Include="src\InitManager.cpp" />
     <ClCompile Include="src\PositionCalibrator.cpp" />
@@ -368,6 +369,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I$(SolutionDir)\." "-I$(SolutionDir)..\include" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
+    <ClInclude Include="include\SystemConfiguration.h" />
     <ClInclude Include="include\UaHelper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

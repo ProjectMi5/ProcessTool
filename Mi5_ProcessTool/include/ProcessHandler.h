@@ -18,6 +18,7 @@
 #include <Mi5_ProcessTool/include/ProductionModules/CocktailModule.h>
 #include <Mi5_ProcessTool/include/Synchronization/SimulationFeeder.h>
 #include <Mi5_ProcessTool/include/ProductionModules/ManualProductionModule.h>
+#include <Mi5_ProcessTool/include/SystemConfiguration.h>
 
 //! Main class and entry point for the Mi5 Process Tool.
 /*!
@@ -26,7 +27,7 @@
 class ProcessHandler
 {
 public:
-    ProcessHandler(bool initialInit);
+    ProcessHandler();
     ~ProcessHandler();
     void start();
 
@@ -51,11 +52,15 @@ private:
     bool m_init;
     bool m_simuEnabled;
     bool m_enableInOutput;
+    SystemConfiguration m_systemConfig;
+
 private:
     UaStatus build();
-    UaStatus loadConfig();
+    int loadConfig();
+    void printConfig();
     void run();
     void buildSkillList();
+    void readConfiguration();
 
 };
 
