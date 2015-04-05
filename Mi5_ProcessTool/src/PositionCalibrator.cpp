@@ -2,7 +2,8 @@
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 PositionCalibrator::PositionCalibrator(std::map<int, OpcuaGateway*> pGatewayList,
-                                       std::map<int, IProductionModule*> pModuleList, MessageFeeder* pMsgFeeder) : m_pMsgFeeder(pMsgFeeder)
+                                       std::map<int, IProductionModule*> pModuleList,
+                                       MessageFeeder* pMsgFeeder) : m_pMsgFeeder(pMsgFeeder)
 {
     m_xtsModuleNumbers.clear();
     m_pGatewayList.clear();
@@ -10,6 +11,7 @@ PositionCalibrator::PositionCalibrator(std::map<int, OpcuaGateway*> pGatewayList
     m_calibrationInProgress = false;
     m_moduleToCalibrate = -1;
     m_usedXtsModuleNumber = -1;
+    m_oldState = -1;
 
     m_pGatewayList = pGatewayList;
     m_pModuleList = pModuleList;
@@ -168,8 +170,9 @@ void PositionCalibrator::skillStateChanged(int moduleNumber, int skillPos, int s
 {
     if (m_calibrationInProgress &&
         (skillPos == m_pModuleList[moduleNumber]->translateSkillIdToSkillPos(POSCALSKILLID)) &&
-        (moduleNumber == m_usedXtsModuleNumber))
+        (moduleNumber == m_usedXtsModuleNumber) && (m_oldState != state))
     {
+        m_oldState = state;
         QLOG_DEBUG() << "Statechange: " << state ;
         UaString tmpstring;
 
@@ -210,5 +213,6 @@ void PositionCalibrator::resetData()
     int skillPos = m_pModuleList[m_usedXtsModuleNumber]->translateSkillIdToSkillPos(POSCALSKILLID);
     m_pModuleList[m_usedXtsModuleNumber]->deregisterTaskForSkill(skillPos);
     m_usedXtsModuleNumber = -1;
+    m_oldState = -1;
     m_waitCondition.wakeAll();
 }

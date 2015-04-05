@@ -58,6 +58,7 @@ private:
     QMutex m_mutex;
     QWaitCondition m_waitCondition;
     MessageFeeder* m_pMsgFeeder;
+    int m_oldState;
 };
 
 #endif //INITMODULE_H
