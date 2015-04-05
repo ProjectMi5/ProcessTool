@@ -105,7 +105,8 @@ int ProcessHandler::loadConfig()
         }
     }
 
-    //TODO
+    // Parse m_systemConfig to legacy bools.
+    // TODO: Clean this up.
     for (QList<ModuleConfiguration>::Iterator iterator = m_systemConfig.moduleList.begin();
          iterator != m_systemConfig.moduleList.end(); iterator++)
     {
@@ -185,8 +186,6 @@ UaStatus ProcessHandler::build()
     // Initialize the UA Stack platform layer
     UaPlatformLayer::init();
 
-    // Create instance of OpcuaGateway
-    //1. Stelle ÄNDERN
     if (m_simuEnabled)
     {
         m_gatewayList[MODULENUMBERSIMULATIONFEEDER] = new OpcuaGateway(
@@ -223,8 +222,6 @@ UaStatus ProcessHandler::build()
     m_gatewayList[MANUALMODULE1] = new OpcuaGateway(MAINSERVER);
     m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(MAINSERVER);
 
-
-    //// ENDE ÄNDERN
     m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(MAINSERVER);
     m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(MAINSERVER);
 
@@ -248,13 +245,6 @@ UaStatus ProcessHandler::build()
     for (std::map<int, OpcuaGateway*>::iterator it = m_gatewayList.begin(); it != m_gatewayList.end();
          ++it)
     {
-        status = it->second->loadConfig(); //TODO - config needed?
-
-        if (!status.isGood())
-        {
-            QLOG_DEBUG() << "Config load failed." ;
-        }
-
         status = it->second->connect();
 
         if (!status.isGood())
@@ -266,7 +256,6 @@ UaStatus ProcessHandler::build()
 
     m_pMessageFeeder = new MessageFeeder(m_gatewayList[MODULENUMBERMESSAGEFEEDER],
                                          MODULENUMBERMESSAGEFEEDER);
-    // 2. Stelle ÄNDERN
 
     m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
     m_initManager = new InitManager(m_systemConfig.init);
@@ -337,8 +326,6 @@ UaStatus ProcessHandler::build()
             m_pMaintenanceHelper, m_initManager);
     }
 
-    ////ENDE ÄNDERN
-
     m_taskModule = new TaskModule(m_gatewayList[MODULENUMBERTASK], MODULENUMBERTASK,
                                   m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);
 
@@ -378,14 +365,7 @@ void ProcessHandler::run()
 
     buildSkillList();
 
-
     int calibrationStatus = m_initManager->startUpSystem();
-
-
-
-
-
-    //getchar();
 
     /*
     ** Start the task module.

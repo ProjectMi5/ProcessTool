@@ -170,7 +170,6 @@
     <ClCompile Include="src\MaintenanceHelper.cpp" />
     <ClCompile Include="src\MessageFeeder.cpp" />
     <ClCompile Include="src\Mi5ProcessTool.cpp" />
-    <ClCompile Include="src\OpcuaConfigurator.cpp" />
     <ClCompile Include="src\OpcuaGateway.cpp" />
     <ClCompile Include="src\OpcuaSubscriber.cpp" />
     <ClCompile Include="src\ProcessHandler.cpp" />
@@ -260,7 +259,6 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DWIN64 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB  "-I$(SolutionDir)\." "-I$(SolutionDir)..\include" "-I." "-I$(QTDIR)\include" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtWidgets"</Command>
     </CustomBuild>
     <ClInclude Include="include\MessageFeeder.h" />
-    <ClInclude Include="include\OpcuaConfigurator.h" />
     <ClInclude Include="include\OpcuaGateway.h" />
     <ClInclude Include="include\OpcuaSubscriber.h" />
     <CustomBuild Include="include\ProcessHandler.h">

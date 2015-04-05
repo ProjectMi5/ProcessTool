@@ -7,7 +7,6 @@ OpcuaGateway::OpcuaGateway(UaString serverUrl)
     m_moduleList.clear();
 
     m_pSession = new UaSession();
-    m_pConfiguration = new OpcuaConfigurator();
 
     m_pSubscription = new OpcuaSubscriber();
     m_pSubscription->setGateway(this);
@@ -23,37 +22,11 @@ OpcuaGateway::~OpcuaGateway()
         delete m_pSession;
         m_pSession = NULL;
     }
-
-    if (m_pConfiguration)
-    {
-        delete m_pConfiguration;
-        m_pConfiguration = NULL;
-    }
 }
 
 UaString OpcuaGateway::getServerUrl()
 {
     return m_serverUrl;
-}
-
-UaStatus OpcuaGateway::loadConfig()
-{
-    UaString sConfigFile(getAppPath());
-    sConfigFile += "\\OPCUAconfig.ini"; // Windows style
-    QLOG_DEBUG() << "Loading configuration file.." ;
-    UaStatus status = m_pConfiguration->loadConfiguration(sConfigFile);
-
-    if (status.isGood())
-    {
-        QLOG_DEBUG() << "Configuration file loaded successfully." ;
-
-    }
-    else
-    {
-        QLOG_DEBUG() << "Error loading configuration file." ;
-    }
-
-    return status;
 }
 
 void OpcuaGateway::connectionStatusChanged(
@@ -107,7 +80,7 @@ void OpcuaGateway::connectionStatusChanged(
 
     case UaClient::NewSessionCreated:
         QLOG_INFO() << "Connection status changed to NewSessionCreated\n";
-        m_pConfiguration->updateNamespaceIndexes(m_pSession->getNamespaceTable());
+        //        m_pConfiguration->updateNamespaceIndexes(m_pSession->getNamespaceTable());
         break;
     }
 
@@ -130,15 +103,15 @@ UaStatus OpcuaGateway::connect()
     }
 
     // Fill session connect info with data from configuration
-    sessionConnectInfo.sApplicationName = m_pConfiguration->getApplicationName();
+    sessionConnectInfo.sApplicationName = "Mi5 Process Tool";
     // Use the host name to generate a unique application URI
     sessionConnectInfo.sApplicationUri = UaString("urn:%1:%2:%3").arg(sNodeName).arg("ITQ").arg(
             "MI5");
     sessionConnectInfo.sProductUri = UaString("urn:%1:%2").arg("ITQ").arg("MI5");
     sessionConnectInfo.sSessionName = UaString("MI5ProcessTool:%1").arg(UaString::number(
                                           rand() % 10000));
-    sessionConnectInfo.bAutomaticReconnect = m_pConfiguration->getAutomaticReconnect();
-    sessionConnectInfo.bRetryInitialConnect = m_pConfiguration->getRetryInitialConnect();
+    sessionConnectInfo.bAutomaticReconnect = 1;
+    sessionConnectInfo.bRetryInitialConnect = 0;
 
     // Security settings are not initialized - we connect without security for now
     SessionSecurityInfo sessionSecurityInfo;

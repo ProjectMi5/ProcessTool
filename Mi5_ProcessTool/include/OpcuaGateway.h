@@ -7,7 +7,6 @@
 #include <iostream>
 
 #include <Mi5_ProcessTool/include/UaHelper.h>
-#include <Mi5_ProcessTool/include/OpcuaConfigurator.h>
 #include <Mi5_ProcessTool/include/OpcuaSubscriber.h>
 #include <Mi5_ProcessTool/include/IModule.h>
 
@@ -19,7 +18,6 @@ class OpcuaGateway : public UaSessionCallback
 public:
     OpcuaGateway(UaString serverUrl);
     virtual ~OpcuaGateway();
-    UaStatus loadConfig();
 
     // UaSessionCallback implementation ----------------------------------------------------
     virtual void connectionStatusChanged(OpcUa_UInt32 clientConnectionId,
@@ -57,7 +55,6 @@ private:
 private:
     UaSession*                      m_pSession;
     OpcuaSubscriber*                m_pSubscription;
-    OpcuaConfigurator*              m_pConfiguration;
     UaClient::ServerStatus          m_serverStatus;
     OpcuaGateway*                   m_pOpcuaGateway;
     std::map<int, IModule*> m_moduleList;

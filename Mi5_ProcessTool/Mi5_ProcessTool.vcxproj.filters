@@ -187,9 +187,6 @@
     <ClCompile Include="src\PositionCalibrator.cpp">
       <Filter>Source Files\Calibration</Filter>
     </ClCompile>
-    <ClCompile Include="src\OpcuaConfigurator.cpp">
-      <Filter>Source Files\OpcUa</Filter>
-    </ClCompile>
     <ClCompile Include="src\OpcuaSubscriber.cpp">
       <Filter>Source Files\OpcUa</Filter>
     </ClCompile>
@@ -280,9 +277,6 @@
       <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
     <ClInclude Include="include\OpcuaSubscriber.h">
-      <Filter>Header Files\OpcUa</Filter>
-    </ClInclude>
-    <ClInclude Include="include\OpcuaConfigurator.h">
       <Filter>Header Files\OpcUa</Filter>
     </ClInclude>
     <ClInclude Include="include\OpcuaGateway.h">
