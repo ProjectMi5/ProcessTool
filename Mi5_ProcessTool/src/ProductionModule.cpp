@@ -518,6 +518,33 @@ void ProductionModule::serverReconnected()
     setupOpcua();
 }
 
+int ProductionModule::getSkillState(int skillPos)
+{
+    int returnVal = -1;
+
+    if (skillPos < 0 || skillPos > 10)
+    {
+        return returnVal;
+    }
+    else
+    {
+        if (output.error)
+        {
+            returnVal = SKILLMODULEERROR;
+        }
+        else if (output.skillOutput[skillPos].busy)
+        {
+            returnVal = SKILLMODULEBUSY;
+        }
+        else if (output.skillOutput[skillPos].ready)
+        {
+            returnVal = SKILLMODULEREADY;
+        }
+    }
+
+    return returnVal;
+}
+
 void ProductionModule::createMonitoredItems()
 {
     int clientHandleNumber;

@@ -80,6 +80,33 @@ void ManualModule::subscriptionDataChange(OpcUa_UInt32 clientSubscriptionHandle,
     }
 }
 
+int ManualModule::getSkillState(int skillPos)
+{
+    int returnVal = -1;
+
+    if (skillPos < 0 || skillPos > 10)
+    {
+        return returnVal;
+    }
+    else
+    {
+        if (data.oError)
+        {
+            returnVal = SKILLMODULEERROR;
+        }
+        else if (data.oBusy)
+        {
+            returnVal = SKILLMODULEBUSY;
+        }
+        else if (data.oReady)
+        {
+            returnVal = SKILLMODULEREADY;
+        }
+    }
+
+    return returnVal;
+}
+
 void ManualModule::createMonitoredItems()
 {
     int clientHandleNumber;

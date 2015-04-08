@@ -53,6 +53,7 @@ public: //IProductionModule Methods
     virtual bool isReserved();
     virtual void changeModuleMode(int mode);
     UaString getBaseNodeId();
+    int getSkillState(int skillPos);
     QMutex* getMutex();
 
 private:

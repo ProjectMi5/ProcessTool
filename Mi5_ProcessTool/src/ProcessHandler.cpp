@@ -20,6 +20,7 @@ ProcessHandler::ProcessHandler()
     m_virtualModules_enabled = false;
     m_simuEnabled = false;
     m_enableInOutput = false;
+    m_systemConfig.init = false;
 
     m_moduleSkillList.clear();
     m_gatewayList.clear();

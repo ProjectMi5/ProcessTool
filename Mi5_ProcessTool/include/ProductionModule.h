@@ -65,6 +65,7 @@ public:
     int registerTaskForSkill(ISkillRegistration* pTask, int skillPos);
     void writeConnectionTestInput(bool input);
     int checkConnectionTestOutput();
+    int getSkillState(int skillPos);
     //
     virtual bool isBlocked();
     virtual bool isReserved();

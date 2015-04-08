@@ -23,7 +23,7 @@ public:
 
 private:
     void writePositionInfo();
-    void getPositions();
+    void updateModuleData();
 
 private slots:
     void cyclicAction();

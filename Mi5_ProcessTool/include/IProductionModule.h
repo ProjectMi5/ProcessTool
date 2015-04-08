@@ -34,7 +34,7 @@ public:
     virtual void changeModuleMode(int mode) = 0;
     virtual UaString getBaseNodeId() = 0;
     virtual void skillStateChanged(int skillPos, int state) = 0;
-
+    virtual int getSkillState(int skillPos) = 0;
     virtual QMutex* getMutex() = 0;
 };
 

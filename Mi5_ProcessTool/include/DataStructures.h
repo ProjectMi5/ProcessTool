@@ -20,9 +20,22 @@ enum ModuleConnectionStatus
     ModuleConnectionConnected = 1
 };
 
+struct SimuSkillState
+{
+    bool error;
+    bool busy;
+    bool ready;
+
+    SimuSkillState(): error(false), busy(false), ready(false) {};
+};
+
 struct SimulationData
 {
     double XPosition[11];
+    SimuSkillState cookie;
+    SimuSkillState cocktail;
+    SimuSkillState toppingBosch;
+    SimuSkillState toppingBeckhoff;
 };
 
 struct ParameterInput
