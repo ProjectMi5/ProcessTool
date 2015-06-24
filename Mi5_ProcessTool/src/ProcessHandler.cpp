@@ -163,6 +163,10 @@ int ProcessHandler::loadConfig()
             m_gatewayList[INPUTMODULE] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
             m_gatewayList[OUTPUTMODULE] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
         }
+        else if ((iterator->name == "cupDispenser") && (true == iterator->enable))
+        {
+            m_enableCupDispenser = true;
+            m_gatewayList[CUPDISPENSER] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
         }
     }
 
@@ -364,6 +368,12 @@ UaStatus ProcessHandler::build()
         m_simuFeeder = new SimulationFeeder(m_gatewayList[MODULENUMBERSIMULATIONFEEDER],
                                             MODULENUMBERSIMULATIONFEEDER, m_productionModuleList, m_pMessageFeeder);
 
+    }
+
+    if (m_enableCupDispenser)
+    {
+        m_productionModuleList[CUPDISPENSER] = new JavaScriptModule(m_gatewayList[CUPDISPENSER],
+                CUPDISPENSER, m_pMessageFeeder, m_pMaintenanceHelper, NULL, 1);
     }
 
     return status;

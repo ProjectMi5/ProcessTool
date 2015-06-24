@@ -26,6 +26,9 @@ static const int MAINTENANCEMODULE = 2402;
 static const int INPUTMODULE = 2501;
 static const int OUTPUTMODULE = 2601;
 
+// JavaScript Modules
+static const int CUPDISPENSER = 2701;
+
 // Simu modules
 static const int MODULEX = 1202;
 static const int MODULEY = 1203;

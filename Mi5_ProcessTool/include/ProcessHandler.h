@@ -18,6 +18,7 @@
 #include <Mi5_ProcessTool/include/ProductionModules/CocktailModule.h>
 #include <Mi5_ProcessTool/include/Synchronization/SimulationFeeder.h>
 #include <Mi5_ProcessTool/include/ProductionModules/ManualProductionModule.h>
+#include <Mi5_ProcessTool/include/ProductionModules/JavaScriptModule.h>
 #include <Mi5_ProcessTool/include/SystemConfiguration.h>
 
 //! Main class and entry point for the Mi5 Process Tool.
@@ -52,6 +53,7 @@ private:
     bool m_init;
     bool m_simuEnabled;
     bool m_enableInOutput;
+    bool m_enableCupDispenser;
     SystemConfiguration m_systemConfig;
 
 private:

@@ -28,6 +28,8 @@ SystemConfiguration::SystemConfiguration()
     moduleList.append(simulation);
     ModuleConfiguration inputOutput("inputOutput", "", false);
     moduleList.append(inputOutput);
+    ModuleConfiguration cupDispenser("cupDispenser", "", false);
+    moduleList.append(cupDispenser);
 }
 
 SystemConfiguration::~SystemConfiguration()

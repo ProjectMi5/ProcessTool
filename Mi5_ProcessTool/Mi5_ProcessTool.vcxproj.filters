@@ -247,6 +247,9 @@
     <ClCompile Include="src\Data\SystemConfiguration.cpp">
       <Filter>Source Files\Data</Filter>
     </ClCompile>
+    <ClCompile Include="src\ProductionModules\JavaScriptModule.cpp">
+      <Filter>Header Files\ProductionModules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ProductionModules\CremeModule.h">
@@ -311,6 +314,9 @@
     </ClInclude>
     <ClInclude Include="include\SystemConfiguration.h">
       <Filter>Header Files\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ProductionModules\JavaScriptModule.h">
+      <Filter>Header Files\ProductionModules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
