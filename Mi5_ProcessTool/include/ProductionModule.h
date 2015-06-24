@@ -40,7 +40,7 @@ protected:
 public:
     // Ctor/Dtor
     ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber, MessageFeeder* pMessageFeeder,
-                     MaintenanceHelper* pMaintenanceHelper, InitManager* pInitManager);
+                     MaintenanceHelper* pMaintenanceHelper, InitManager* pInitManager, int skillCount = 16);
     virtual ~ProductionModule();
 
     // Implementation of the IModule interface.
@@ -106,8 +106,8 @@ private:
 protected slots:
     virtual void evaluateError() = 0;
 
-private: //const
-    static const int SKILLCOUNT = 16;
+private: //attributes
+    int m_skillCount;
 
 private: // module interface
     std::map<int, int> m_moduleSkillList; /*!< skillid, skillpos */

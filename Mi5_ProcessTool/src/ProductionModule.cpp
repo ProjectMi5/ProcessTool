@@ -6,8 +6,8 @@
 
 ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                                    MessageFeeder* pMessageFeeder, MaintenanceHelper* pHelper,
-                                   InitManager* pInitManager) : m_disconnected(false),
-    m_pMaintenanceHelper(pHelper), m_pInitManager(pInitManager)
+                                   InitManager* pInitManager, int skillCount) : m_disconnected(false),
+    m_pMaintenanceHelper(pHelper), m_pInitManager(pInitManager), m_skillCount(skillCount)
 {
     m_moduleSkillList.clear();
     m_skillRegistrationList.clear();
@@ -42,7 +42,7 @@ void ProductionModule::startup()
     {
         // Dont init the XTS or the In-/Output modules..
     }
-    else
+    else if (m_pInitManager != NULL) // Dont init
     {
         m_pInitManager->enqueueForInit(m_moduleNumber);
     }
@@ -235,7 +235,7 @@ double ProductionModule::getModulePosition()
 
 UaString ProductionModule::getSkillName(int& skillPos)
 {
-    if ((skillPos >= 0) && (skillPos < SKILLCOUNT))
+    if ((skillPos >= 0) && (skillPos < m_skillCount))
     {
         if (output.skillOutput[skillPos].dummy == false)
         {
@@ -272,7 +272,7 @@ bool ProductionModule::checkSkillReadyState(int& skillId)
 
     if ((skillId >= 0))
     {
-        for (int i = 0; i < SKILLCOUNT; i++)
+        for (int i = 0; i < m_skillCount; i++)
         {
             if (output.skillOutput[i].id == skillId)
             {
@@ -293,7 +293,7 @@ int ProductionModule::checkSkillState(int& skillId)
         return SKILLMODULEERROR;
     }
 
-    for (int i = 0; i < SKILLCOUNT; i++)
+    for (int i = 0; i < m_skillCount; i++)
     {
         if (output.skillOutput[i].id == skillId)
         {
@@ -355,7 +355,7 @@ void ProductionModule::buildSkillList()
 {
     m_moduleSkillList.clear();
 
-    for (int i = 0; i < SKILLCOUNT; i++)
+    for (int i = 0; i < m_skillCount; i++)
     {
         if (output.skillOutput[i].dummy == false)
         {
@@ -709,7 +709,7 @@ void ProductionModule::createMonitoredItems()
     // TODO: Statevalues
 
     // Skills
-    for (int i = 0; i < SKILLCOUNT; i++)
+    for (int i = 0; i < m_skillCount; i++)
     {
         UaString tempNodeid = baseNodeId;
         tempNodeid += "Output.SkillOutput.SkillOutput";
@@ -862,7 +862,7 @@ void ProductionModule::createMonitoredItems()
 void ProductionModule::writeModuleInput()
 {
     UaWriteValues nodesToWrite;
-    nodesToWrite.create(5 + SKILLCOUNT * (1    + PARAMETERCOUNT * 1)); // Fill in number
+    nodesToWrite.create(5 + m_skillCount * (1    + PARAMETERCOUNT * 1)); // Fill in number
     int writeCounter = 0;
     UaVariant tmpValue;
 
@@ -909,7 +909,7 @@ void ProductionModule::writeModuleInput()
     tmpValue.clear();
 
 
-    for (int i = 0; i < SKILLCOUNT; i++)
+    for (int i = 0; i < m_skillCount; i++)
     {
         UaString baseSkillNodeId = baseNodeIdToWrite;
         baseSkillNodeId += "SkillInput.SkillInput";
@@ -1170,7 +1170,7 @@ void ProductionModule::moduleDataChange(const UaDataNotifications& dataNotificat
 
             else
             {
-                for (int k = 0; k < SKILLCOUNT; k++) // Get skills
+                for (int k = 0; k < m_skillCount; k++) // Get skills
                 {
                     // Input
                     if ((dataNotifications[i].ClientHandle % (14001 + k * 10)) == 0)
