@@ -24,6 +24,7 @@ public:
 
 public:
     bool init;
+    QString mainServerUri;
     QList<ModuleConfiguration> moduleList;
 };
 

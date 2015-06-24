@@ -92,6 +92,10 @@ int ProcessHandler::loadConfig()
         {
             m_systemConfig.init = true;
         }
+        else if (("mainServer" == tmpString) && (2 == tmpList.size()))
+        {
+            m_systemConfig.mainServerUri = tmpList[1];
+        }
         else
         {
             for (QList<ModuleConfiguration>::Iterator iterator = m_systemConfig.moduleList.begin();
@@ -114,34 +118,51 @@ int ProcessHandler::loadConfig()
         if ((iterator->name == "xts") && (true == iterator->enable))
         {
             m_xts_enabled = true;
+            m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
+            m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
+            m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
         }
         else if ((iterator->name == "cookie") && (true == iterator->enable))
         {
             m_cookie_enabled = true;
+            m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
+                UaString(iterator->ip.toUtf8()));
         }
         else if ((iterator->name == "toppingBeckhoff") && (true == iterator->enable))
         {
             m_topping_beckhoff_enabled = true;
+            m_gatewayList[MODULENUMBERCREMEBECKHOFF] = new OpcuaGateway(
+                UaString(iterator->ip.toUtf8()));
         }
         else if ((iterator->name == "toppingBosch") && (true == iterator->enable))
         {
             m_topping_bosch_enabled = true;
+            m_gatewayList[MODULENUMBERCREMEBOSCH] = new OpcuaGateway(
+                UaString(iterator->ip.toUtf8()));
         }
         else if ((iterator->name == "cocktail") && (true == iterator->enable))
         {
             m_cocktail_enabled = true;
+            m_gatewayList[MODULENUMBERCOCKTAIL] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
+
         }
         else if ((iterator->name == "virtualModules") && (true == iterator->enable))
         {
             m_virtualModules_enabled = true;
+            m_gatewayList[MODULEX] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
         }
         else if ((iterator->name == "simu") && (true == iterator->enable))
         {
             m_simuEnabled = true;
+            m_gatewayList[MODULENUMBERSIMULATIONFEEDER] = new OpcuaGateway(
+                UaString(iterator->ip.toUtf8()));
         }
         else if ((iterator->name == "inputOutput") && (true == iterator->enable))
         {
             m_enableInOutput = true;
+            m_gatewayList[INPUTMODULE] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
+            m_gatewayList[OUTPUTMODULE] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
+        }
         }
     }
 
@@ -189,58 +210,61 @@ UaStatus ProcessHandler::build()
 
     if (m_simuEnabled)
     {
-        m_gatewayList[MODULENUMBERSIMULATIONFEEDER] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.42.51:4840"));
+        /*m_gatewayList[MODULENUMBERSIMULATIONFEEDER] = new OpcuaGateway(
+            UaString("opc.tcp://192.168.42.51:4840"));*/
     }
 
     if (m_cookie_enabled)
     {
-        m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.42.11:4840"));
+        //m_gatewayList[MODULENUMBERCOOKIESEPARATOR] = new OpcuaGateway(
+        //    UaString("opc.tcp://192.168.42.11:4840"));
     }
 
     if (m_enableInOutput)
     {
-        m_gatewayList[INPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
-        m_gatewayList[OUTPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
+        /*  m_gatewayList[INPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
+          m_gatewayList[OUTPUTMODULE] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));*/
 
     }
 
     if (m_xts_enabled)
     {
-        m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
-        m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
-        m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
+        /* m_gatewayList[MODULENUMBERXTS1] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
+         m_gatewayList[MODULENUMBERXTS2] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));
+         m_gatewayList[MODULENUMBERXTS3] = new OpcuaGateway(UaString("opc.tcp://192.168.42.10:4840"));*/
     }
 
     if (m_virtualModules_enabled)
     {
-        m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
+        //m_gatewayList[MODULEX] = new OpcuaGateway(UaString("opc.tcp://192.168.42.51:4840"));
         /*  m_gatewayList[MODULEY] = new OpcuaGateway(UaString("opc.tcp://192.168.192.118:4840"));
           m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));*/
     }
 
-    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(MAINSERVER);
-    m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(MAINSERVER);
+    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString(m_systemConfig.mainServerUri.toUtf8()));
+    m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(UaString(
+                m_systemConfig.mainServerUri.toUtf8()));
 
-    m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(MAINSERVER);
-    m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(MAINSERVER);
+    m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString(
+                m_systemConfig.mainServerUri.toUtf8()));
+    m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(UaString(
+                m_systemConfig.mainServerUri.toUtf8()));
 
     if (m_topping_beckhoff_enabled)
     {
-        m_gatewayList[MODULENUMBERCREMEBECKHOFF] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.42.12:4840"));
+        //m_gatewayList[MODULENUMBERCREMEBECKHOFF] = new OpcuaGateway(
+        //    UaString("opc.tcp://192.168.42.12:4840"));
     }
 
     if (m_topping_bosch_enabled)
     {
-        m_gatewayList[MODULENUMBERCREMEBOSCH] = new OpcuaGateway(
-            UaString("opc.tcp://192.168.42.13:4840"));
+        //m_gatewayList[MODULENUMBERCREMEBOSCH] = new OpcuaGateway(
+        //    UaString("opc.tcp://192.168.42.13:4840"));
     }
 
     if (m_cocktail_enabled)
     {
-        m_gatewayList[MODULENUMBERCOCKTAIL] = new OpcuaGateway(UaString("opc.tcp://192.168.42.14:4840"));
+        //m_gatewayList[MODULENUMBERCOCKTAIL] = new OpcuaGateway(UaString("opc.tcp://192.168.42.14:4840"));
     }
 
     for (std::map<int, OpcuaGateway*>::iterator it = m_gatewayList.begin(); it != m_gatewayList.end();
@@ -271,19 +295,19 @@ UaStatus ProcessHandler::build()
     if (m_xts_enabled)
     {
         m_productionModuleList[MODULENUMBERXTS1] = new Xts(m_gatewayList[MODULENUMBERXTS1],
-                MODULENUMBERXTS1, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+                MODULENUMBERXTS1, m_pMessageFeeder, m_pMaintenanceHelper, NULL);
         m_productionModuleList[MODULENUMBERXTS2] = new Xts(m_gatewayList[MODULENUMBERXTS2],
-                MODULENUMBERXTS2, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+                MODULENUMBERXTS2, m_pMessageFeeder, m_pMaintenanceHelper, NULL);
         m_productionModuleList[MODULENUMBERXTS3] = new Xts(m_gatewayList[MODULENUMBERXTS3],
-                MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+                MODULENUMBERXTS3, m_pMessageFeeder, m_pMaintenanceHelper, NULL);
     }
 
     if (m_enableInOutput)
     {
         m_productionModuleList[INPUTMODULE] = new ManualProductionModule(m_gatewayList[INPUTMODULE],
-                INPUTMODULE, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+                INPUTMODULE, m_pMessageFeeder, m_pMaintenanceHelper, NULL);
         m_productionModuleList[OUTPUTMODULE] = new ManualProductionModule(m_gatewayList[OUTPUTMODULE],
-                OUTPUTMODULE, m_pMessageFeeder, m_pMaintenanceHelper, m_initManager);
+                OUTPUTMODULE, m_pMessageFeeder, m_pMaintenanceHelper, NULL);
 
     }
 
