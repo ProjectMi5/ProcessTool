@@ -167,7 +167,7 @@ void ProductionModule::moduleConnectionStatusChanged(int state)
         return;
     }
 
-    m_pMsgFeed->write(message, msgError);
+    //m_pMsgFeed->write(message, msgError);
     QLOG_ERROR() << message.toUtf8();
 }
 

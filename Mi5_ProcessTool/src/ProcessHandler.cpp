@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 
+static const bool enableMainServer = true;
 static const UaString MAINSERVER("opc.tcp://192.168.42.42:4840");
 
 ProcessHandler::ProcessHandler()
@@ -245,14 +246,17 @@ UaStatus ProcessHandler::build()
           m_gatewayList[MODULEZ] = new OpcuaGateway(UaString("opc.tcp://192.168.192.119:4840"));*/
     }
 
-    m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString(m_systemConfig.mainServerUri.toUtf8()));
-    m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(UaString(
-                m_systemConfig.mainServerUri.toUtf8()));
+    if (enableMainServer)
+    {
+        m_gatewayList[MANUALMODULE1] = new OpcuaGateway(UaString(m_systemConfig.mainServerUri.toUtf8()));
+        m_gatewayList[MAINTENANCEMODULE] = new OpcuaGateway(UaString(
+                    m_systemConfig.mainServerUri.toUtf8()));
 
-    m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString(
-                m_systemConfig.mainServerUri.toUtf8()));
-    m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(UaString(
-                m_systemConfig.mainServerUri.toUtf8()));
+        m_gatewayList[MODULENUMBERTASK] = new OpcuaGateway(UaString(
+                    m_systemConfig.mainServerUri.toUtf8()));
+        m_gatewayList[MODULENUMBERMESSAGEFEEDER] = new OpcuaGateway(UaString(
+                    m_systemConfig.mainServerUri.toUtf8()));
+    }
 
     if (m_topping_beckhoff_enabled)
     {
@@ -283,11 +287,14 @@ UaStatus ProcessHandler::build()
 
     }
 
-    m_pMessageFeeder = new MessageFeeder(m_gatewayList[MODULENUMBERMESSAGEFEEDER],
-                                         MODULENUMBERMESSAGEFEEDER);
+    if (enableMainServer)
+    {
+        m_pMessageFeeder = new MessageFeeder(m_gatewayList[MODULENUMBERMESSAGEFEEDER],
+                                             MODULENUMBERMESSAGEFEEDER);
 
-    m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
-    m_initManager = new InitManager(m_systemConfig.init);
+        m_pMaintenanceHelper = new MaintenanceHelper(m_pMessageFeeder);
+        m_initManager = new InitManager(m_systemConfig.init);
+    }
 
     if (m_cookie_enabled)
     {
@@ -326,13 +333,15 @@ UaStatus ProcessHandler::build()
     }
 
     // Manual Module
+    if (enableMainServer)
+    {
+        m_productionModuleList[MANUALMODULE1] = new ManualModule(m_gatewayList[MANUALMODULE1],
+                MANUALMODULE1, m_pMessageFeeder);
 
-    m_productionModuleList[MANUALMODULE1] = new ManualModule(m_gatewayList[MANUALMODULE1],
-            MANUALMODULE1, m_pMessageFeeder);
-
-    m_productionModuleList[MAINTENANCEMODULE] = new ManualModule(m_gatewayList[MAINTENANCEMODULE],
-            MAINTENANCEMODULE,
-            m_pMessageFeeder);
+        m_productionModuleList[MAINTENANCEMODULE] = new ManualModule(m_gatewayList[MAINTENANCEMODULE],
+                MAINTENANCEMODULE,
+                m_pMessageFeeder);
+    }
 
     if (m_topping_beckhoff_enabled)
     {
@@ -355,13 +364,14 @@ UaStatus ProcessHandler::build()
             m_pMaintenanceHelper, m_initManager);
     }
 
-    m_taskModule = new TaskModule(m_gatewayList[MODULENUMBERTASK], MODULENUMBERTASK,
-                                  m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);
+    if (enableMainServer)
+    {
+        m_taskModule = new TaskModule(m_gatewayList[MODULENUMBERTASK], MODULENUMBERTASK,
+                                      m_productionModuleList, m_pMessageFeeder, m_productionModuleList[MANUALMODULE1]);
 
-
-
-    m_initManager->setConnections(m_gatewayList, m_productionModuleList, m_pMessageFeeder);
-    m_pMaintenanceHelper->setModuleList(m_productionModuleList);
+        m_initManager->setConnections(m_gatewayList, m_productionModuleList, m_pMessageFeeder);
+        m_pMaintenanceHelper->setModuleList(m_productionModuleList);
+    }
 
     if (m_simuEnabled)
     {
@@ -396,7 +406,7 @@ void ProcessHandler::run()
     ** Startup init module and initialize the positions.
     */
     QLOG_DEBUG() << "Startup finished." ;
-    m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
+    //m_pMessageFeeder->write(UaString("Startup finished"), msgSuccess);
 
     buildSkillList();
 
@@ -406,7 +416,7 @@ void ProcessHandler::run()
     ** Start the task module.
     */
 
-    m_taskModule->startup();
+    // m_taskModule->startup();
 }
 
 void ProcessHandler::buildSkillList()

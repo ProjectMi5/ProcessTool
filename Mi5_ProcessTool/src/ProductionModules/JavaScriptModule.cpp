@@ -8,6 +8,7 @@ JavaScriptModule::JavaScriptModule(OpcuaGateway* pOpcuaGateway,
                                                moduleNumber,
                                                pMessageFeeder, pHelper, pInitManager, skillCount)
 {
+    m_enableConnectionTest = false;
     QLOG_DEBUG() << "Created module JavaScriptModule with module number " << moduleNumber ;
 }
 
