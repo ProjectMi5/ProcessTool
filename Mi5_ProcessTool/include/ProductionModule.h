@@ -66,6 +66,7 @@ public:
     void writeConnectionTestInput(bool input);
     int checkConnectionTestOutput();
     int getSkillState(int skillPos);
+    UaString getServerUrl();
     //
     virtual bool isBlocked();
     virtual bool isReserved();

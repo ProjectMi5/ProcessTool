@@ -235,17 +235,17 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ManualProductionModule.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="src\HelperClasses\ExitHelper.cpp">
-      <Filter>Source Files\HelperClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ExitHelper.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ExitHelper.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="src\Data\SystemConfiguration.cpp">
       <Filter>Source Files\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ResetHelper.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ResetHelper.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HelperClasses\ResetHelper.cpp">
+      <Filter>Source Files\HelperClasses</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -356,7 +356,7 @@
     <CustomBuild Include="include\ProductionModules\ManualProductionModule.h">
       <Filter>Header Files\ProductionModules</Filter>
     </CustomBuild>
-    <CustomBuild Include="include\HelperClasses\ExitHelper.h">
+    <CustomBuild Include="include\HelperClasses\ResetHelper.h">
       <Filter>Header Files\HelperClasses</Filter>
     </CustomBuild>
   </ItemGroup>

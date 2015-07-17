@@ -31,6 +31,11 @@ ProductionModule::~ProductionModule()
     m_pOpcuaGateway->disconnect();
 }
 
+UaString ProductionModule::getServerUrl()
+{
+    return m_pOpcuaGateway->getServerUrl();
+}
+
 void ProductionModule::startup()
 {
     setupOpcua();

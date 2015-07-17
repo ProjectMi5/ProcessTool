@@ -51,6 +51,7 @@ private: //const
     static const int PARAMETERCOUNT = 6;
 
 private:
+
     ProductionTask m_task;
     OpcUa_UInt32 m_state;
     std::map<int, IProductionModule*> m_moduleList;

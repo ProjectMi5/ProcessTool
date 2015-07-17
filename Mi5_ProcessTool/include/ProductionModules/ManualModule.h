@@ -55,6 +55,7 @@ public: //IProductionModule Methods
     UaString getBaseNodeId();
     int getSkillState(int skillPos);
     QMutex* getMutex();
+    UaString getServerUrl();
 
 private:
     QMutex m_mutex;

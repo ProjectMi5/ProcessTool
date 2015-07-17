@@ -1,7 +1,6 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLogDest.h>
-#include <Mi5_ProcessTool/include/HelperClasses/ExitHelper.h>
 #include <QApplication>
 
 static const int EXIT_CODE = 1337;
@@ -40,14 +39,7 @@ int main(int argc, char* argv[])
         pLogger->addDestination(functorDestination);
     }
 
-    do
-    {
-        QApplication a(argc, argv);
-        ProcessHandler* processHandler = new ProcessHandler();
-        ExitHelper* exitHelper = new ExitHelper();
-        currentExitCode = a.exec();
-    }
-    while (currentExitCode == EXIT_CODE);
-
-    return currentExitCode;
+    QApplication a(argc, argv);
+    ProcessHandler* processHandler = new ProcessHandler();
+    return a.exec();
 }

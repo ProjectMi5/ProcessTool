@@ -2,11 +2,13 @@
 #include <Mi5_ProcessTool/include/OpcuaGateway.h>
 #include <qcoreapplication.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
+#include <Mi5_ProcessTool/include/HelperClasses/ResetHelper.h>
 
 TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
                        std::map<int, IProductionModule*> moduleList, MessageFeeder* pMessageFeeder,
                        IProductionModule* pManual) : m_pManual(pManual)
 {
+    m_pResetHelper = new ResetHelper(this);
     m_taskCounter = 0;
     m_moduleSkillList.clear();
     m_taskObjects.clear();
@@ -35,6 +37,16 @@ TaskModule::TaskModule(OpcuaGateway* pOpcuaGateway, int moduleNumber,
 
 TaskModule::~TaskModule()
 {
+}
+void TaskModule::resetAllTasks()
+{
+    QLOG_DEBUG() << "Reseting all tasks..";
+
+    for (std::map<int, Task*>::iterator it = m_taskObjects.begin(); it != m_taskObjects.end(); it++)
+    {
+        it->second->abortTask();
+        it->second->triggerAbortTaskTimeout();
+    }
 }
 
 void TaskModule::abortionTimerTriggered()
@@ -701,6 +713,7 @@ std::vector<skillModuleList> TaskModule::getSkillList()
 
 void TaskModule::buildSkillList()
 {
+    m_moduleSkillList.clear();
 
     for (std::map<int, IProductionModule*>::iterator it = m_moduleList.begin();
          it != m_moduleList.end(); ++it)

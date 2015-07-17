@@ -347,6 +347,11 @@ std::map<int, int> ManualModule::getSkills()
     return tmpMap;
 }
 
+UaString ManualModule::getServerUrl()
+{
+    return m_pGateway->getServerUrl();
+}
+
 int ManualModule::checkSkillState(int& skillId)
 {
     int returnVal = -1;

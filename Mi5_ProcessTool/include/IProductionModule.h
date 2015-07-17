@@ -3,6 +3,7 @@
 
 #include <Mi5_ProcessTool/include/IModule.h>
 #include <QMutex>
+#include <uastring.h>
 
 class ISkillRegistration;
 
@@ -36,6 +37,7 @@ public:
     virtual void skillStateChanged(int skillPos, int state) = 0;
     virtual int getSkillState(int skillPos) = 0;
     virtual QMutex* getMutex() = 0;
+    virtual UaString getServerUrl() = 0;
 };
 
 enum moduleSkillState

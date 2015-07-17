@@ -1,7 +1,8 @@
-#include <Mi5_ProcessTool/include/HelperClasses/ExitHelper.h>
+#include <Mi5_ProcessTool/include/HelperClasses/ResetHelper.h>
 
-ExitHelper::ExitHelper()
+ResetHelper::ResetHelper(TaskModule* callbackPtr) : m_pCallBack(callbackPtr)
 {
+    connect(this, SIGNAL(resetTasks()), callbackPtr, SLOT(resetAllTasks()));
     m_exitTimer = new QTimer(this);
     connect(m_exitTimer, SIGNAL(timeout()), this, SLOT(timerTriggered()));
     m_exitTimer->start(5000);
@@ -12,28 +13,28 @@ ExitHelper::ExitHelper()
     m_thread.start();
 }
 
-ExitHelper::~ExitHelper()
+ResetHelper::~ResetHelper()
 {
 
 }
 
-void ExitHelper::timerTriggered()
+void ResetHelper::timerTriggered()
 {
     bool resetRequested = readExitDemand();
 
     if (resetRequested)
     {
-        bool exitDemandReset = resetExitDemand();
+        bool exitDemandReseted = resetExitDemand();
 
-        if (exitDemandReset)
+        if (exitDemandReseted)
         {
-            quitApplication();
+            emit resetTasks();
         }
     }
 
 }
 
-bool ExitHelper::readExitDemand()
+bool ResetHelper::readExitDemand()
 {
     OpcUa_Boolean returnVal = false;
     // Read state.
@@ -59,7 +60,7 @@ bool ExitHelper::readExitDemand()
     return (bool)returnVal;
 }
 
-bool ExitHelper::resetExitDemand()
+bool ResetHelper::resetExitDemand()
 {
     bool returnVal = false;
 
@@ -84,11 +85,3 @@ bool ExitHelper::resetExitDemand()
 
     return returnVal;
 }
-
-void ExitHelper::quitApplication()
-{
-    qApp->exit(1337);
-}
-
-
-

@@ -9,6 +9,7 @@
 #include <Mi5_ProcessTool/include/MessageFeeder.h>
 #include <QTimer>
 
+class ResetHelper;
 class OpcuaGateway; // Using forward declaration.
 
 //! The TaskModule watches the task list for new tasks.
@@ -35,11 +36,13 @@ public:
     void updateSkillState(int taskNumber, int skillNumber, OpcUa_Int32 state);
 
 public slots:
+    void resetAllTasks();
     void notifyTaskDone(OpcUa_Int32 taskId, OpcUa_Int32 taskNumber, OpcUa_Int32 state);
     void startup();
 
 private:
     OpcuaGateway* m_pOpcuaGateway;
+    ResetHelper* m_pResetHelper;
 
 private:
     UaString nodeIdToSubscribe;
