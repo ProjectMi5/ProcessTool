@@ -3,6 +3,7 @@
 #include <Mi5_ProcessTool/include/QsLog/QsLogDest.h>
 #include <Mi5_ProcessTool/include/HelperClasses/ExitHelper.h>
 #include <QApplication>
+#include <qthreadpool.h>
 
 static const int EXIT_CODE = 1337;
 static const bool DEBUGTOCONSOLE = 1;
@@ -22,7 +23,7 @@ int main(int argc, char* argv[])
 {
 
     int currentExitCode = 0;
-
+    QThreadPool::globalInstance()->setMaxThreadCount(128);
     QsLogging::Logger* pLogger = &QsLogging::Logger::instance();
     pLogger->setLoggingLevel(QsLogging::TraceLevel);
 

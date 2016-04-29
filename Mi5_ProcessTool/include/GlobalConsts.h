@@ -28,6 +28,7 @@ static const int OUTPUTMODULE = 2601;
 
 // JavaScript Modules
 static const int CUPDISPENSER = 2502;
+static const int SCHOKODRUCKERID = 3101;
 
 // Simu modules
 static const int MODULEX = 1202;

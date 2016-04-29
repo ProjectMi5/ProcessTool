@@ -16,6 +16,8 @@ ProductionModule::ProductionModule(OpcuaGateway* pOpcuaGateway, int moduleNumber
     m_moduleNumber = moduleNumber;
     m_pMsgFeed = pMessageFeeder;
 
+    m_enableConnectionTest = false;
+
 
     m_pOpcuaGateway->registerModule(m_moduleNumber, this);
 

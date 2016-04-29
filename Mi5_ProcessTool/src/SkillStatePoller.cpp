@@ -45,19 +45,19 @@ void SkillStatePoller::checkSkillState()
     tmpNodeId = baseNodeId;
     tmpNodeId += "Busy";
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToRead[readCounter].NodeId);
-    nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
+    nodesToRead[1].AttributeId = OpcUa_Attributes_Value;
     readCounter++;
 
     tmpNodeId = baseNodeId;
     tmpNodeId += "Done";
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToRead[readCounter].NodeId);
-    nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
+    nodesToRead[2].AttributeId = OpcUa_Attributes_Value;
     readCounter++;
 
     tmpNodeId = baseNodeId;
     tmpNodeId += "Busy";
     UaNodeId::fromXmlString(tmpNodeId).copyTo(&nodesToRead[readCounter].NodeId);
-    nodesToRead[0].AttributeId = OpcUa_Attributes_Value;
+    nodesToRead[3].AttributeId = OpcUa_Attributes_Value;
     readCounter++;
 
     returnValues = m_pGateway->read(nodesToRead, 500); //TODO: adjust values.

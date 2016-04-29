@@ -30,6 +30,8 @@ SystemConfiguration::SystemConfiguration()
     moduleList.append(inputOutput);
     ModuleConfiguration cupDispenser("cupDispenser", "", false);
     moduleList.append(cupDispenser);
+    ModuleConfiguration schokodrucker("schokodrucker", "", false);
+    moduleList.append(schokodrucker);
 }
 
 SystemConfiguration::~SystemConfiguration()

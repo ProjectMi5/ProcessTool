@@ -22,6 +22,8 @@ ProcessHandler::ProcessHandler()
     m_simuEnabled = false;
     m_enableInOutput = false;
     m_systemConfig.init = false;
+    m_enableCupDispenser = false;
+    m_enableSchokodrucker = false;
 
     m_moduleSkillList.clear();
     m_gatewayList.clear();
@@ -168,6 +170,11 @@ int ProcessHandler::loadConfig()
         {
             m_enableCupDispenser = true;
             m_gatewayList[CUPDISPENSER] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
+        }
+        else if ((iterator->name == "schokodrucker") && (true == iterator->enable))
+        {
+            m_enableSchokodrucker = true;
+            m_gatewayList[SCHOKODRUCKERID] = new OpcuaGateway(UaString(iterator->ip.toUtf8()));
         }
     }
 
@@ -386,6 +393,13 @@ UaStatus ProcessHandler::build()
                 CUPDISPENSER, m_pMessageFeeder, m_pMaintenanceHelper, NULL, 1);
     }
 
+    if (m_enableSchokodrucker)
+    {
+        m_productionModuleList[SCHOKODRUCKERID] = new CocktailModule(
+            m_gatewayList[SCHOKODRUCKERID], SCHOKODRUCKERID, m_pMessageFeeder,
+            m_pMaintenanceHelper, m_initManager);
+    }
+
     return status;
 }
 
@@ -416,7 +430,7 @@ void ProcessHandler::run()
     ** Start the task module.
     */
 
-    // m_taskModule->startup();
+    m_taskModule->startup();
 }
 
 void ProcessHandler::buildSkillList()

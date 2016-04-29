@@ -54,6 +54,7 @@ private:
     bool m_simuEnabled;
     bool m_enableInOutput;
     bool m_enableCupDispenser;
+    bool m_enableSchokodrucker;
     SystemConfiguration m_systemConfig;
 
 private:
