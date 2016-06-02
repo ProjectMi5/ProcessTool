@@ -1,7 +1,6 @@
 #include <Mi5_ProcessTool/include/ProcessHandler.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLog.h>
 #include <Mi5_ProcessTool/include/QsLog/QsLogDest.h>
-#include <Mi5_ProcessTool/include/HelperClasses/ExitHelper.h>
 #include <QApplication>
 #include <qthreadpool.h>
 
@@ -45,7 +44,6 @@ int main(int argc, char* argv[])
     {
         QApplication a(argc, argv);
         ProcessHandler* processHandler = new ProcessHandler();
-        ExitHelper* exitHelper = new ExitHelper();
         currentExitCode = a.exec();
     }
     while (currentExitCode == EXIT_CODE);
